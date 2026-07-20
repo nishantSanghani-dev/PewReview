@@ -5,7 +5,7 @@ export default function Loader() {
         <div className="loader-overlay">
             <div className="text-center">
                 <div
-                    className="spinner-border text-primary"
+                    className="spinner-border text-danger"
                     style={{ width: "4rem", height: "4rem" }}
                     role="status"
                 >

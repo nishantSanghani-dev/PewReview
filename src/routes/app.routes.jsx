@@ -16,6 +16,7 @@ import UserAdd from "../pages/users/addUser/UserAdd";
 import RoleAndPermission from "../pages/roleAndPermisson/pages/roleAndPermissionView/RoleAndPermission";
 import RoleAndPermissionAdd from "../pages/roleAndPermisson/pages/roleAndPermissionAdd/RoleAndPermissionAdd";
 import EndUserView from "../pages/endUsers/manage-end-user/EndUserView";
+import VenueDetails from "../pages/endUsers/manage-end-user/venues/VenueDetails";
 
 export const routes = createBrowserRouter([
     {
@@ -97,6 +98,15 @@ export const routes = createBrowserRouter([
                     {
                         path: "edit/:id",
                         element: <RoleAndPermissionAdd />
+                    }
+                ]
+            },
+            {
+                path: "venues",
+                children: [
+                    {
+                        path: "view/:venueId",
+                        element: <VenueDetails />
                     }
                 ]
             }

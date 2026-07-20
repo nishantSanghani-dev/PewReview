@@ -1,32 +1,12 @@
 import { Grid, GridColumn } from '@progress/kendo-react-grid'
 import React from 'react'
-const gunData = [
-    {
-        id: 1,
-        gunName: "Andrew Abbott",
-        categoryName: "Handgun",
-        manufacturerName: "Glock",
-        details: "Glock 19 Gen5, 9mm semi-automatic pistol.",
-        images: "5 Images",
-        ammunition: "9mm",
-        createdOn: "17 May 2024",
-        approvalStatus: "Approved",
-        isActive: true
-    }
-];
+
 const ActionCell = (props) => {
     console.log(props);
 
     return (
         <td {...props.tdProps}>
             <div className="d-flex gap-2 align-items-center">
-
-                <a
-                    href="javascript:void(0)"
-                    className="small-square-btn edit-btn"
-                >
-                    <i className="demo-icon icon-eye-line"></i>
-                </a>
 
                 <a
                     href="javascript:void(0)"
@@ -54,15 +34,57 @@ const StatusCell = (props) => {
         </td>
     );
 };
-const DetailsCell = (props) => {
+const ImageCell = (props) => {
     return (
         <td {...props.tdProps}>
-            <p className="mb-0">
-                {props.dataItem.details}
-            </p>
+            {props.dataItem.attachmentFullPath ? (
+                <img
+                    src={props.dataItem.attachmentFullPath}
+                    alt=""
+                    style={{ width: "50px", height: "50px", objectFit: "cover", borderRadius: "4px" }}
+                />
+            ) : (
+                "-"
+            )}
         </td>
     );
 };
+export const DateCell = ({ tdProps, dataItem, field }) => {
+    console.log(dataItem);
+
+    return (
+        <td {...tdProps}>
+            {new Date(dataItem?.createdDate || dataItem?.createdOn).toLocaleDateString("en-US")}
+        </td>
+    )
+}
+const DetailCell = ({ tdProps, dataItem, field }) => {
+    return (
+        <td  {...tdProps}>
+            <div className="text-ellipsis">
+                {dataItem.details || "-"}
+            </div>
+        </td>
+    )
+}
+
+const columns = [
+    { field: "gunName", title: "Gun Name" },
+    { field: "categoryNames", title: "Category Name" },
+    { field: "manufacturerNames", title: "Manufacturer Name" },
+    { field: "details", title: "Details", cell: DetailCell },
+    { field: "attachmentFullPath", title: "Image", cell: ImageCell },
+    { field: "ammunitions", title: "Ammunition" },
+    { field: "createdDate", title: "Created Date", cell: DateCell },
+    { field: "approvalStatusName", title: "Approval Status" },
+    { field: "isActive", title: "Status", cell: StatusCell },
+
+];
+const TextCell = ({ tdProps, dataItem, field }) => (
+    <td {...tdProps}>
+        {dataItem[field] ?? "-"}
+    </td>
+);
 export default function UploadGun({ data }) {
     console.log(data);
 
@@ -78,7 +100,7 @@ export default function UploadGun({ data }) {
                     <div className="col-12">
                         <div className="table-responsive">
                             <Grid
-                                className="table-wrapper fw-bold text-center"
+                                className="table-wrapper  text-center"
                                 data={data}
                                 sortable
 
@@ -90,13 +112,41 @@ export default function UploadGun({ data }) {
                                     type: "numeric"
                                 }}
                             >
-
                                 <GridColumn
+                                    field="action"
                                     title="Action"
-                                    width="120px"
+                                    width="80px"
                                     cells={{ data: ActionCell }}
                                 />
 
+                                {
+                                    columns.map((col, index) => {
+                                        return (
+
+                                            <GridColumn
+                                                className=''
+                                                key={col.field}
+                                                field={col.field}
+                                                title={col.title}
+
+                                                width="150px"
+                                                cells={
+                                                    col.cell
+                                                        ?
+                                                        { data: col.cell }
+                                                        :
+                                                        {
+                                                            data: (props) => (
+                                                                <TextCell {...props} field={col.field} />
+                                                            )
+                                                        }
+                                                }
+                                            />
+                                        )
+                                    })
+                                }
+
+                                {/* 
                                 <GridColumn
                                     field="gunName"
                                     title="Gun Name"
@@ -122,9 +172,10 @@ export default function UploadGun({ data }) {
                                 />
 
                                 <GridColumn
-                                    field="images"
+                                    field="attachmentFullPath"
                                     title="Images"
                                     width="120px"
+                                    cells={{ data: ImageCell }}
                                 />
 
                                 <GridColumn
@@ -149,7 +200,7 @@ export default function UploadGun({ data }) {
                                     title="Status"
                                     width="110px"
                                     cells={{ data: StatusCell }}
-                                />
+                                /> */}
 
                             </Grid>
                         </div>

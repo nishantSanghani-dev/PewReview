@@ -4,17 +4,23 @@ import { useParams } from 'react-router-dom'
 import { API_ROUTES } from '../../../routes/api.routes'
 import { Grid, GridColumn } from '@progress/kendo-react-grid';
 import UploadGun from './UploadGun';
-import Venues from './Venues';
+import Venues from './venues/Venues';
 import Event from '../../events/Event';
 import Events from './Events';
+import { toast } from 'react-toastify';
+import ActivitiesEndUser from './ActivitiesEndUser';
 
 export default function EndUserView() {
     const { id } = useParams()
     const [activeTab, setActiveTab] = useState("uploadGun");
     const [data, setData] = useState([]);
-    const [loading, setLoading] = useState(false);
     const [manageUserSingleData, setmanageUserSingleData] = useState(null)
-    const [venuesData, setVenuesData] = useState([])
+    const [isUpcomingEvent, setisUpcomingEvent] = useState(true)
+    const [activitiesFilter, setactivitiesFilter] = useState([{
+        Field: "userId",
+        OperatorType: 2,
+        value: id
+    }])
     const manageEndUserSingleView = async () => {
         const res = await apiRequest("GET", API_ROUTES.endUser.endUserSingleView(id), null, null, {
             showLoader: true
@@ -29,7 +35,7 @@ export default function EndUserView() {
         setData(res.data.data)
     }
     const getVenue = async () => {
-        const res = await apiRequest("POST", API_ROUTES.venue.getVenueListByUser, { page: 1, pageSize: 10, userId: id }, null, {
+        const res = await apiRequest("POST", API_ROUTES.venue.getVenueListByUser, { page: 1, pageSize: 10, userId: id, isMyVenue: true }, null, {
             showLoader: true
         })
         if (res && res.data) {
@@ -38,41 +44,60 @@ export default function EndUserView() {
     }
 
     const getEvents = async () => {
-        const res = await apiRequest("POST", API_ROUTES.events.getEventList, { pageNumber: 1, pageSize: 10, userId: id }, null, {
+        const res = await apiRequest("POST", API_ROUTES.events.getEventList, { pageNumber: 1, pageSize: 10, userId: id, search: "", isUpcomingEvent }, null, {
             showLoader: true
         })
         setData(res.data.data)
     }
     const getActivities = async () => {
-        const res = await apiRequest()
+        const res = await apiRequest("POST", API_ROUTES.activities.getActivities, {
+            page: 1,
+            pageSize: 10,
+            Filters: activitiesFilter
+        }, null, {
+            showLoader: true
+        })
+        setData(res.data.data)
     }
     useEffect(() => {
         manageEndUserSingleView()
-
-
+        // uploadGunView()
     }, [id])
 
     useEffect(() => {
-        console.log(activeTab);
+        if (!id) return;
 
-        const fatchData = async () => {
+        const fetchData = async () => {
             switch (activeTab) {
                 case "uploadGun":
-                    await uploadGunView()
+                    await uploadGunView();
                     break;
+
                 case "venues":
-                    await getVenue()
+                    await getVenue();
                     break;
+
                 case "events":
-                    await getEvents()
+                    await getEvents();
                     break;
+
                 case "activities":
+                    await getActivities();
+                    break;
 
+                default:
+                    break;
             }
-        }
-        fatchData()
+        };
 
-    }, [activeTab])
+        fetchData();
+
+    }, [activeTab, id]);
+    useEffect(() => {
+        if (activeTab === "events") {
+            getEvents();
+        }
+    }, [isUpcomingEvent])
     return (
         <>
 
@@ -326,15 +351,18 @@ export default function EndUserView() {
                                         </div>
                                     </div>
                                     <div className="col-sm-6 mt-3">
+                                        <div className='form-group'>
+                                            <label htmlFor="documents" className="fw-semibold">
+                                                Uploaded Documents
+                                            </label>
+                                        </div>
                                         {
                                             manageUserSingleData?.userDocument?.length !== 0
                                             &&
                                             manageUserSingleData?.userDocument?.map((value, index) => {
                                                 return (
                                                     <div className="form-group">
-                                                        <label htmlFor="contactNo" className="fw-semibold">
-                                                            Uploaded Documents
-                                                        </label>
+
 
                                                         <input
                                                             type="text"
@@ -350,7 +378,25 @@ export default function EndUserView() {
 
                                         }
                                     </div>
+
                                 </fieldset>
+                                <div className="col-sm-6 mt-3">
+                                    <div className="form-group">
+                                        <label htmlFor="contact-no" className="fw-semibold">
+                                            Settings  <span className="danger-color">*</span>
+                                        </label>
+                                        <div className="form-check form-switch">
+                                            <input
+                                                className="form-check-input"
+                                                type="checkbox"
+                                                disabled
+
+                                            />
+                                            &nbsp;&nbsp;&nbsp;
+                                            <label htmlFor="">Follower request confirmation</label>
+                                        </div>
+                                    </div>
+                                </div>
                             </form>
                         </div>
                     </div>
@@ -475,10 +521,12 @@ export default function EndUserView() {
                                     {
                                         activeTab === "events"
                                         &&
-                                        <Events data={data} />
+                                        <Events isUpcomingEvent={isUpcomingEvent} setisUpcomingEvent={setisUpcomingEvent} data={data} />
                                     }
                                     {
                                         activeTab === "activities"
+                                        &&
+                                        <ActivitiesEndUser data={data} />
                                     }
                                     {/* <div
                                         className="tab-pane fade accordion-item"

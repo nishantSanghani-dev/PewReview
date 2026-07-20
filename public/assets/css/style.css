@@ -1461,7 +1461,7 @@ header {
 
 .content-inside {
   margin-left: 240px;
-  min-height: calc(100vh - 64px);
+  /* min-height: calc(100vh - 64px); */
   padding: 24px;
   width: calc(100% - 240px);
 }
@@ -3437,6 +3437,10 @@ span.chat-time {
   background: #f8f9fa;
 }
 
+.k-grid-header .k-table-th,
+.k-grid-header th {
+  font-weight: 600;
+}
 
 /* Active page */
 .k-pager-numbers .k-selected {
@@ -3532,4 +3536,30 @@ span.chat-time {
   background: #8f1d1d;
   /* Dark red */
   border-radius: 10px;
+}
+
+.text-ellipsis {
+  max-width: 250px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.attachment-images {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+  /* Keep all images in one line */
+  overflow-x: auto;
+  /* Horizontal scroll if too many images */
+}
+
+.attachment-img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 4px;
+  flex-shrink: 0;
+  /* Prevent images from shrinking */
 }

@@ -153,7 +153,7 @@ export default function RoleAndPermissionAdd() {
                                                 type="text"
                                                 name="description"
                                                 defaultValue={singlePermissionData?.description}
-                                                className="form-control"
+
                                                 className={`form-control ${touchedFields.description && errors.description && 'border-danger'}`}
                                                 required=""
                                                 {...register("description")}
@@ -188,7 +188,7 @@ export default function RoleAndPermissionAdd() {
                                                                     <td>
                                                                         <label className="custom-checkbox">
                                                                             <input
-                                                                                            
+
                                                                                 checked={value.isRead || singlePermissionData?.isRead}
                                                                                 onChange={(e) => handleChange(value?.menuId, "isRead", e.target.checked)}
                                                                                 type="checkbox"

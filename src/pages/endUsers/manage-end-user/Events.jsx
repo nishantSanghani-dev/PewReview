@@ -44,7 +44,8 @@ const DateTimeCell = (props) => {
     return (
         <td {...props.tdProps}>
             <p className="mb-0">
-                {item.dateTime || item.eventDate || item.date || "-"}
+
+                {new Date(item.dateTime || item.eventDate || item.date).toLocaleDateString("en-US") || "-"}
             </p>
         </td>
     );
@@ -60,34 +61,31 @@ const AddressCell = (props) => {
         </td>
     );
 };
-export default function Events({ data }) {
-    const [activeTab, setActiveTab] = useState("upcoming");
+export default function Events({ data, isUpcomingEvent, setisUpcomingEvent }) {
+    // const [activeTab, setActiveTab] = useState("upcoming");
 
     return (
         <>
             <div className="event-tabs">
                 <button
-                    className={`event-tab-btn ${activeTab === "upcoming" ? "active" : ""
-                        }`}
-                    onClick={() => setActiveTab("upcoming")}
+                    className={`event-tab-btn ${isUpcomingEvent === true ? "active" : ""}`}
+                    onClick={() => setisUpcomingEvent(true)}
                 >
                     Upcoming Events
                 </button>
 
                 <button
-                    className={`event-tab-btn ${activeTab === "passed" ? "active" : ""
-                        }`}
-                    onClick={() => setActiveTab("passed")}
+                    className={`event-tab-btn ${isUpcomingEvent === false ? "active" : ""}`}
+                    onClick={() => setisUpcomingEvent(false)}
                 >
                     Passed Events
                 </button>
 
                 <button
-                    className={`event-tab-btn ${activeTab === "requests" ? "active" : ""
-                        }`}
-                    onClick={() => setActiveTab("requests")}
+                    className={`event-tab-btn ${isUpcomingEvent === null ? "active" : ""}`}
+                    onClick={() => setisUpcomingEvent(null)}
                 >
-                    Events Requests
+                    Event Requests
                 </button>
             </div>
 
@@ -139,8 +137,20 @@ export default function Events({ data }) {
 
                                     <GridColumn
                                         title="Address"
-                                        width="300px"
+                                        width="250px"
                                         cells={{ data: AddressCell }}
+                                    />
+                                    <GridColumn
+                                        field='userName'
+                                        title="Created By"
+                                        width="150px"
+
+                                    />
+                                    <GridColumn
+                                        field='approvalStatusName'
+                                        title="status"
+                                        width="150px"
+
                                     />
                                 </Grid>
                             </div>
