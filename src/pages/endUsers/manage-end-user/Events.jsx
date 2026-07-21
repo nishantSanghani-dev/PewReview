@@ -1,15 +1,18 @@
 import { Grid, GridColumn } from '@progress/kendo-react-grid'
 import React, { useState } from 'react'
-const ActionCell = (props) => {
+import { Link } from 'react-router-dom';
+export const ActionCell = (props) => {
+    console.log(props.dataItem.eventId);
+
     return (
         <td {...props.tdProps}>
             <div className="d-flex gap-2 align-items-center">
-                <a
-                    href="javascript:void(0)"
+                <Link
+                    to={`/admin/events/view/${props.dataItem.eventId}`}
                     className="small-square-btn edit-btn"
                 >
                     <i className="demo-icon icon-eye-line"></i>
-                </a>
+                </Link>
                 <a
                     href="javascript:void(0)"
                     className="small-square-btn danger-btn"
@@ -21,7 +24,7 @@ const ActionCell = (props) => {
     );
 };
 
-const HostNameCell = (props) => {
+export const HostNameCell = (props) => {
     const item = props.dataItem;
     return (
         <td {...props.tdProps}>
@@ -30,7 +33,7 @@ const HostNameCell = (props) => {
     );
 };
 
-const EventNameCell = (props) => {
+export const EventNameCell = (props) => {
     const item = props.dataItem;
     return (
         <td {...props.tdProps}>
@@ -39,19 +42,19 @@ const EventNameCell = (props) => {
     );
 };
 
-const DateTimeCell = (props) => {
+export const DateTimeCell = (props) => {
     const item = props.dataItem;
     return (
         <td {...props.tdProps}>
             <p className="mb-0">
 
-                {new Date(item.dateTime || item.eventDate || item.date).toLocaleDateString("en-US") || "-"}
+                {new Date(item.dateTime || item.eventDate || item.date || item.createdOn).toLocaleDateString("en-US") || "-"}
             </p>
         </td>
     );
 };
 
-const AddressCell = (props) => {
+export const AddressCell = (props) => {
     const item = props.dataItem;
     return (
         <td {...props.tdProps}>

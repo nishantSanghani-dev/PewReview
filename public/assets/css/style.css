@@ -3563,3 +3563,474 @@ span.chat-time {
   flex-shrink: 0;
   /* Prevent images from shrinking */
 }
+
+/* for the approval status in kendo grid form */
+
+/* Container */
+.approval-status-wrapper {
+  position: relative;
+  width: 130px;
+}
+
+/* Hide default arrow */
+.approval-status-select {
+  width: 100%;
+  height: 38px;
+  padding: 0 38px 0 14px;
+  border: 1px solid #d8d8d8;
+  border-radius: 10px;
+  background: #fff;
+  color: #6b6b6b;
+  font-size: 15px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  outline: none;
+  transition: all .2s ease;
+}
+
+.approval-status-select:hover {
+  border: none;
+  border-color: #cfcfcf;
+}
+
+.approval-status-select:focus {
+  border-color: #d8d8d8;
+  box-shadow: none;
+}
+
+/* Custom Arrow */
+.approval-status-wrapper::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  transform: translateY(-40%);
+
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 6px solid #333;
+}
+
+/* Dropdown options (limited browser support) */
+.approval-status-select option {
+  font-size: 15px;
+  padding: 10px;
+  color: #222;
+}
+
+
+.approval-status-select option:checked {
+  background: #c62828;
+  color: #fff;
+}
+
+
+/* for the activities details. */
+
+
+.activity-page {
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+.activity-breadcrumb span {
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+.activity-breadcrumb .text-danger {
+  color: #c62828 !important;
+}
+
+.activity-image-card,
+.activity-details-card {
+  border: 1px solid #d9d9d9;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.activity-image-card .card-body {
+  padding: 18px;
+}
+
+.activity-image-wrapper {
+  width: 100%;
+}
+
+.activity-image {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 1px solid #e5e5e5;
+}
+
+.detail-label {
+  font-size: 20px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0;
+}
+
+.detail-value {
+  font-size: 20px;
+  font-weight: 400;
+  color: #4b5563;
+  line-height: 1.7;
+  margin-bottom: 0;
+}
+
+.activity-details-card .row {
+  align-items: flex-start;
+}
+
+/* Tablet */
+@media (max-width: 991.98px) {
+  .activity-breadcrumb {
+    font-size: 24px;
+  }
+
+  .detail-label {
+    font-size: 20px;
+    margin-bottom: 8px;
+  }
+
+  .detail-value {
+    font-size: 18px;
+  }
+
+  .activity-image {
+    height: 200px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 575.98px) {
+  .activity-page {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .activity-breadcrumb {
+    font-size: 20px;
+  }
+
+  .activity-image-card .card-body,
+  .activity-details-card .card-body {
+    padding: 16px;
+  }
+
+  .detail-label {
+    font-size: 18px;
+    margin-bottom: 6px;
+  }
+
+  .detail-value {
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  .activity-image {
+    height: 180px;
+  }
+}
+
+
+/* for the event details */
+
+.page-title {
+  font-size: 20px;
+}
+
+.event-image-card {
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.event-image {
+  width: 100%;
+  height: 360px;
+  object-fit: cover;
+}
+
+.event-ended {
+  font-size: 22px;
+  color: #555;
+}
+
+.event-title {
+  font-size: 21px;
+  font-weight: 700;
+}
+
+.info-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #555;
+  font-size: 13px;
+}
+
+.info-row i {
+  font-size: 22px;
+  color: #555;
+}
+
+.stats-row {
+  max-width: 420px;
+}
+
+.stat-box {
+  border-right: 1px solid #ddd;
+}
+
+.stat-box h4 {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.stat-box p {
+  margin: 0;
+  color: #666;
+  font-size: 17px;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 18px;
+}
+
+.detail-card {
+  border: 1px solid #ddd;
+  border-radius: 14px;
+  padding: 20px;
+  font-size: 13px;
+  color: #555;
+}
+
+.host-card {
+  border: 1px solid #ddd;
+  border-radius: 14px;
+  padding: 18px;
+  max-width: 700px;
+}
+
+.host-image {
+  width: 90px;
+  height: 90px;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.host-title {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.host-card p {
+  font-size: 13px;
+}
+
+/* Responsive */
+
+/* =========================
+   Tablet (992px and below)
+========================= */
+@media (max-width: 991.98px) {
+
+  .event-image {
+    height: 280px;
+  }
+
+  .event-title {
+    font-size: 20px;
+    margin-top: 15px;
+  }
+
+  .info-row {
+    font-size: 13px;
+    gap: 10px;
+  }
+
+  .stats-row {
+    max-width: 100%;
+    margin-top: 20px;
+  }
+
+  .stat-box h4 {
+    font-size: 26px;
+  }
+
+  .stat-box p {
+    font-size: 15px;
+  }
+
+  .host-card {
+    max-width: 100%;
+  }
+
+  .host-image {
+    width: 75px;
+    height: 75px;
+  }
+
+  .host-title {
+    font-size: 15px;
+  }
+
+  .host-card p {
+    font-size: 13px;
+  }
+
+  .detail-card {
+    font-size: 16px;
+  }
+}
+
+/* =========================
+   Mobile (768px and below)
+========================= */
+@media (max-width: 767.98px) {
+
+  .page-title {
+    font-size: 18px;
+  }
+
+  .event-image {
+    height: 230px;
+  }
+
+  .event-ended {
+    font-size: 16px;
+  }
+
+  .event-title {
+    font-size: 18px;
+    margin-top: 12px;
+  }
+
+  .info-row {
+    font-size: 12px;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  .info-row i {
+    font-size: 16px;
+    margin-top: 2px;
+  }
+
+  .stats-row {
+    max-width: 100%;
+    margin-top: 15px;
+  }
+
+  .stat-box {
+    text-align: center;
+  }
+
+  .stat-box h4 {
+    font-size: 22px;
+  }
+
+  .stat-box p {
+    font-size: 13px;
+  }
+
+  .section-title {
+    font-size: 17px;
+    margin-bottom: 12px;
+  }
+
+  .detail-card {
+    padding: 15px;
+    font-size: 14px;
+  }
+
+  .host-card {
+    padding: 15px;
+  }
+
+  .host-image {
+    width: 65px;
+    height: 65px;
+    border-radius: 10px;
+  }
+
+  .host-title {
+    font-size: 14px;
+    margin-bottom: 5px;
+  }
+
+  .host-card p {
+    font-size: 12px;
+    margin-bottom: 4px;
+  }
+}
+
+/* =========================
+   Small Mobile (576px and below)
+========================= */
+@media (max-width: 575.98px) {
+
+  .event-image {
+    height: 200px;
+  }
+
+  .page-title {
+    font-size: 16px;
+  }
+
+  .event-title {
+    font-size: 17px;
+  }
+
+  .info-row {
+    font-size: 11px;
+  }
+
+  .stat-box h4 {
+    font-size: 20px;
+  }
+
+  .stat-box p {
+    font-size: 12px;
+  }
+
+  .detail-card {
+    font-size: 13px;
+    padding: 12px;
+  }
+
+  .host-card .row {
+    flex-direction: column;
+    align-items: flex-start !important;
+  }
+
+  .host-image {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 10px;
+  }
+
+  .host-title {
+    font-size: 14px;
+  }
+
+  .host-card p {
+    font-size: 12px;
+  }
+}

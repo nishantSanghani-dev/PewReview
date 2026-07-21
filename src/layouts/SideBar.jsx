@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
-import { Link, NavLink, Outlet } from 'react-router-dom'
+import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 
 export default function SideBar({ mobileSlideBar, setmobileSlideBar }) {
     const [masterSubMenu, setmasterSubMenu] = useState(false)
+    const location = useLocation();
     return (
         <div id="wrapper" className={`content-wrapper ${mobileSlideBar ? 'toggled' : ''}`}>
             {/* sidebar start */}
@@ -17,22 +18,22 @@ export default function SideBar({ mobileSlideBar, setmobileSlideBar }) {
                             </NavLink>
                         </li>
                         <li onClick={() => setmobileSlideBar(false)}>
-                            <NavLink to="/admin/activity">
+                            <NavLink to="/admin/activity/view">
                                 <i className="demo-icon icon-activity" />
                                 <span>Activity</span>
                             </NavLink>
                         </li>
                         <li>
-                            <NavLink to={'/admin/events'}>
+                            <NavLink to={'/admin/events/view'}>
                                 <i className="demo-icon icon-roles" />
                                 <span>Events</span>
                             </NavLink>
                         </li>
                         <li>
-                            <a href="javascript:void(0);">
+                            <NavLink className={location.pathname.includes("/venues") ? "active" : ""} to={'/admin/venues/list'}>
                                 <i className="demo-icon icon-location-2" />
                                 <span>Venues</span>
-                            </a>
+                            </NavLink>
                         </li>
                         <li>
                             <NavLink to={'/admin/role-and-permission/view'}>

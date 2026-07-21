@@ -17,6 +17,9 @@ import RoleAndPermission from "../pages/roleAndPermisson/pages/roleAndPermission
 import RoleAndPermissionAdd from "../pages/roleAndPermisson/pages/roleAndPermissionAdd/RoleAndPermissionAdd";
 import EndUserView from "../pages/endUsers/manage-end-user/EndUserView";
 import VenueDetails from "../pages/endUsers/manage-end-user/venues/VenueDetails";
+import VenueList from "../pages/endUsers/manage-end-user/venues/VenueList";
+import ActivityDetails from "../pages/activity/ActivityDetails";
+import EventDetails from "../pages/events/EventDetails";
 
 export const routes = createBrowserRouter([
     {
@@ -62,11 +65,29 @@ export const routes = createBrowserRouter([
 
             {
                 path: "activity",
-                element: <Activity />
+                children: [
+                    {
+                        path: "view",
+                        element: <Activity />
+                    },
+                    {
+                        path: "view/:id",
+                        element: <ActivityDetails />
+                    }
+                ]
             },
             {
                 path: "events",
-                element: <Event />
+                children: [
+                    {
+                        path: "view",
+                        element: <Event />
+                    },
+                    {
+                        path: "view/:id",
+                        element: <EventDetails />
+                    }
+                ]
             },
             {
                 path: "manage-end-user",
@@ -104,6 +125,10 @@ export const routes = createBrowserRouter([
             {
                 path: "venues",
                 children: [
+                    {
+                        path: "list",
+                        element: <VenueList />
+                    },
                     {
                         path: "view/:venueId",
                         element: <VenueDetails />

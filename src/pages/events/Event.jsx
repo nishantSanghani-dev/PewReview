@@ -1,8 +1,48 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import { apiRequest } from '../../services/Api'
+import { API_ROUTES } from '../../routes/api.routes'
+import { Grid, GridColumn } from '@progress/kendo-react-grid'
+import { ActionCell, AddressCell, DateTimeCell, EventNameCell, HostNameCell } from '../endUsers/manage-end-user/Events'
 
 export default function Event() {
+    const [eventTabs, seteventTabs] = useState("upcomingEvents")
+    const [params, setParams] = useState({ isUpcomingEvents: true, isAdminRequest: null })
+    const [eventsData, seteventsData] = useState([])
+    const getEevent = async () => {
+        const res = await apiRequest("POST", API_ROUTES.events.getAllEvent, { page: 1, pageSize: 10 }, params, {
+            showLoader: true
+        })
+        seteventsData(res.data.data)
+    }
+    useEffect(() => {
+        console.log(eventTabs);
+        getEevent()
+    }, [eventTabs])
     return (
         <div className="container-fluid">
+            <div className="col mb-3">
+                <h2 className="page-title">Events</h2>
+            </div>
+            <div className="tabbar-section mb-3">
+                <div className="row align-items-center gap-3">
+                    <div className="col-12 col-lg-auto">
+                        <form className="d-md-flex searchbar align-items-center" role="search">
+                            <input
+                                className="form-control search-input"
+                                type="search"
+                                placeholder="Search"
+                                aria-label="Search"
+                            />
+                            <button
+                                className="btn btn-outline-primary search-toggle"
+                                type="button"
+                            >
+                                <i className="demo-icon icon-search" />
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
             <div className="tabbar-section">
                 <div className="row">
                     <div className="col-12">
@@ -10,10 +50,13 @@ export default function Event() {
                         <ul className="nav nav-tabs" id="myTab" role="tablist">
                             <li className="nav-item" role="presentation">
                                 <button
-                                    className="nav-link active"
+                                    onClick={() => {
+                                        seteventTabs("upcomingEvents")
+                                        setParams({ isUpcomingEvents: true, isAdminRequest: null })
+                                    }}
+                                    className={`nav-link   ${eventTabs === "upcomingEvents" ? 'active' : ""}`}
                                     id="nav-one-tab"
-                                    data-bs-toggle="tab"
-                                    data-bs-target="#nav-one-tab-pane"
+
                                     type="button"
                                     role="tab"
                                     aria-controls="nav-one-tab-pane"
@@ -24,10 +67,13 @@ export default function Event() {
                             </li>
                             <li className="nav-item" role="presentation">
                                 <button
-                                    className="nav-link"
+                                    onClick={() => {
+                                        seteventTabs("passedEvents")
+                                        setParams({ isUpcomingEvents: false, isAdminRequest: null })
+                                    }}
+                                    className={`nav-link  ${eventTabs === "passedEvents" ? 'active' : ""}`}
                                     id="nav-two-tab"
-                                    data-bs-toggle="tab"
-                                    data-bs-target="#nav-two-tab-pane"
+
                                     type="button"
                                     role="tab"
                                     aria-controls="nav-two-tab-pane"
@@ -36,9 +82,27 @@ export default function Event() {
                                     Passed Events
                                 </button>
                             </li>
+                            <li className={`nav-item `} role="presentation">
+                                <button
+                                    onClick={() => {
+                                        seteventTabs("adminEvents")
+                                        setParams({ isUpcomingEvents: null, isAdminRequest: true })
+                                    }}
+                                    className={`nav-link  ${eventTabs === "adminEvents" ? 'active' : ""}`}
+                                    id="nav-three-tab"
+
+                                    type="button"
+                                    role="tab"
+                                    aria-controls="nav-three-tab-pane"
+                                    aria-selected="true"
+                                >
+                                    Admin-added venues' Events requests
+                                </button>
+                            </li>
                         </ul>
                         {/* Shared Content: Tab + Accordion */}
                         <div className="tab-content accordion" id="myTabContent">
+
                             <div
                                 className="tab-pane fade show active accordion-item"
                                 id="nav-one-tab-pane"
@@ -68,243 +132,67 @@ export default function Event() {
                                         <div className="row">
                                             <div className="col-12">
                                                 <div className="table-responsive">
-                                                    <table className="table">
-                                                        <thead className="table-dark">
-                                                            <tr>
-                                                                <th>Action</th>
-                                                                <th>Host Name/Venue Name</th>
-                                                                <th>Event Name</th>
-                                                                <th>Date &amp; Time</th>
-                                                                <th>Address</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <tr>
-                                                                <td>
-                                                                    <span className="d-flex gap-2 align-items-center">
-                                                                        <a
-                                                                            className="small-square-btn edit-btn"
-                                                                            href="javascript:void(0);"
-                                                                        >
-                                                                            <i className="demo-icon icon-eye-line" />
-                                                                        </a>
-                                                                        <a
-                                                                            className="small-square-btn danger-btn"
-                                                                            href="javascript:void(0);"
-                                                                        >
-                                                                            <i className="demo-icon icon-delete-1" />
-                                                                        </a>
-                                                                    </span>
-                                                                </td>
-                                                                <td>Suite Park</td>
-                                                                <td>Meet Ups</td>
-                                                                <td>
-                                                                    <p className="mb-0">
-                                                                        Monday, 17 May 2024 3:30 am- 6:30 am
-                                                                    </p>
-                                                                </td>
-                                                                <td>
-                                                                    <p className="mb-0">
-                                                                        Gun Club Association Member Meeting, Buriel club
-                                                                        co. Ashville, NC
-                                                                    </p>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>
-                                                                    <span className="d-flex gap-2 align-items-center">
-                                                                        <a
-                                                                            className="small-square-btn edit-btn"
-                                                                            href="javascript:void(0);"
-                                                                        >
-                                                                            <i className="demo-icon icon-eye-line" />
-                                                                        </a>
-                                                                        <a
-                                                                            className="small-square-btn danger-btn"
-                                                                            href="javascript:void(0);"
-                                                                        >
-                                                                            <i className="demo-icon icon-delete-1" />
-                                                                        </a>
-                                                                    </span>
-                                                                </td>
-                                                                <td>Vanguard Shooting Park</td>
-                                                                <td>GO Up meeting</td>
-                                                                <td>
-                                                                    <p className="mb-0">
-                                                                        Monday, 17 May 2024 3:30 am- 6:30 am
-                                                                    </p>
-                                                                </td>
-                                                                <td>
-                                                                    <p className="mb-0">
-                                                                        Gun Club Association Member Meeting, Buriel club
-                                                                        co. Ashville, NC
-                                                                    </p>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>
-                                                                    <span className="d-flex gap-2 align-items-center">
-                                                                        <a
-                                                                            className="small-square-btn edit-btn"
-                                                                            href="javascript:void(0);"
-                                                                        >
-                                                                            <i className="demo-icon icon-eye-line" />
-                                                                        </a>
-                                                                        <a
-                                                                            className="small-square-btn danger-btn"
-                                                                            href="javascript:void(0);"
-                                                                        >
-                                                                            <i className="demo-icon icon-delete-1" />
-                                                                        </a>
-                                                                    </span>
-                                                                </td>
-                                                                <td>Pistol Range</td>
-                                                                <td>Gun Meet Ups</td>
-                                                                <td>
-                                                                    <p className="mb-0">
-                                                                        Monday, 17 May 2024 3:30 am- 6:30 am
-                                                                    </p>
-                                                                </td>
-                                                                <td>
-                                                                    <p className="mb-0">
-                                                                        Gun Club Association Member Meeting, Buriel club
-                                                                        co. Ashville, NC
-                                                                    </p>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>
-                                                                    <span className="d-flex gap-2 align-items-center">
-                                                                        <a
-                                                                            className="small-square-btn edit-btn"
-                                                                            href="javascript:void(0);"
-                                                                        >
-                                                                            <i className="demo-icon icon-eye-line" />
-                                                                        </a>
-                                                                        <a
-                                                                            className="small-square-btn danger-btn"
-                                                                            href="javascript:void(0);"
-                                                                        >
-                                                                            <i className="demo-icon icon-delete-1" />
-                                                                        </a>
-                                                                    </span>
-                                                                </td>
-                                                                <td>Pistol Range</td>
-                                                                <td>GO Up meeting</td>
-                                                                <td>
-                                                                    <p className="mb-0">
-                                                                        Monday, 17 May 2024 3:30 am- 6:30 am
-                                                                    </p>
-                                                                </td>
-                                                                <td>
-                                                                    <p className="mb-0">
-                                                                        Gun Club Association Member Meeting, Buriel club
-                                                                        co. Ashville, NC
-                                                                    </p>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>
-                                                                    <span className="d-flex gap-2 align-items-center">
-                                                                        <a
-                                                                            className="small-square-btn edit-btn"
-                                                                            href="javascript:void(0);"
-                                                                        >
-                                                                            <i className="demo-icon icon-eye-line" />
-                                                                        </a>
-                                                                        <a
-                                                                            className="small-square-btn danger-btn"
-                                                                            href="javascript:void(0);"
-                                                                        >
-                                                                            <i className="demo-icon icon-delete-1" />
-                                                                        </a>
-                                                                    </span>
-                                                                </td>
-                                                                <td>Falcon Ridge Shooting Park</td>
-                                                                <td>Gun Meet Ups</td>
-                                                                <td>
-                                                                    <p className="mb-0">
-                                                                        Monday, 17 May 2024 3:30 am- 6:30 am
-                                                                    </p>
-                                                                </td>
-                                                                <td>
-                                                                    <p className="mb-0">
-                                                                        Gun Club Association Member Meeting, Buriel club
-                                                                        co. Ashville, NC
-                                                                    </p>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>
-                                                                    <span className="d-flex gap-2 align-items-center">
-                                                                        <a
-                                                                            className="small-square-btn edit-btn"
-                                                                            href="javascript:void(0);"
-                                                                        >
-                                                                            <i className="demo-icon icon-eye-line" />
-                                                                        </a>
-                                                                        <a
-                                                                            className="small-square-btn danger-btn"
-                                                                            href="javascript:void(0);"
-                                                                        >
-                                                                            <i className="demo-icon icon-delete-1" />
-                                                                        </a>
-                                                                    </span>
-                                                                </td>
-                                                                <td>Clay Target Center</td>
-                                                                <td>GO Up meeting</td>
-                                                                <td>
-                                                                    <p className="mb-0">
-                                                                        Monday, 17 May 2024 3:30 am- 6:30 am
-                                                                    </p>
-                                                                </td>
-                                                                <td>
-                                                                    <p className="mb-0">
-                                                                        Gun Club Association Member Meeting, Buriel club
-                                                                        co. Ashville, NC
-                                                                    </p>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>
-                                                                    <span className="d-flex gap-2 align-items-center">
-                                                                        <a
-                                                                            className="small-square-btn edit-btn"
-                                                                            href="javascript:void(0);"
-                                                                        >
-                                                                            <i className="demo-icon icon-eye-line" />
-                                                                        </a>
-                                                                        <a
-                                                                            className="small-square-btn danger-btn"
-                                                                            href="javascript:void(0);"
-                                                                        >
-                                                                            <i className="demo-icon icon-delete-1" />
-                                                                        </a>
-                                                                    </span>
-                                                                </td>
-                                                                <td>Falcon Ridge Shooting Park</td>
-                                                                <td>Gun Meet Ups</td>
-                                                                <td>
-                                                                    <p className="mb-0">
-                                                                        Monday, 17 May 2024 3:30 am- 6:30 am
-                                                                    </p>
-                                                                </td>
-                                                                <td>
-                                                                    <p className="mb-0">
-                                                                        Gun Club Association Member Meeting, Buriel club
-                                                                        co. Ashville, NC
-                                                                    </p>
-                                                                </td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
+                                                    <Grid
+                                                        className="table-wrapper fw-bold text-center"
+                                                        data={eventsData}
+                                                        sortable
+                                                        pageable={{
+                                                            buttonCount: 5,
+                                                            pageSizes: [10, 20, 50],
+                                                            info: true,
+                                                            previousNext: true,
+                                                            type: "numeric"
+                                                        }}
+                                                    >
+                                                        <GridColumn
+                                                            title="Action"
+                                                            width="120px"
+                                                            cells={{ data: ActionCell }}
+                                                        />
+
+                                                        <GridColumn
+                                                            title="Host Name"
+                                                            width="200px"
+                                                            cells={{ data: HostNameCell }}
+                                                        />
+
+                                                        <GridColumn
+                                                            title="Event Name"
+                                                            width="200px"
+                                                            cells={{ data: EventNameCell }}
+                                                        />
+
+                                                        <GridColumn
+                                                            title="Date & Time"
+                                                            width="200px"
+                                                            cells={{ data: DateTimeCell }}
+                                                        />
+
+                                                        <GridColumn
+                                                            title="Address"
+                                                            width="250px"
+                                                            cells={{ data: AddressCell }}
+                                                        />
+                                                        <GridColumn
+                                                            field='userName'
+                                                            title="Created By"
+                                                            width="150px"
+
+                                                        />
+                                                        <GridColumn
+                                                            field='approvalStatusName'
+                                                            title="status"
+                                                            width="150px"
+
+                                                        />
+                                                    </Grid>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div
+                            {/* <div
                                 className="tab-pane fade accordion-item"
                                 id="nav-two-tab-pane"
                                 role="tabpanel"
@@ -575,12 +463,12 @@ export default function Event() {
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
 
     )
 }

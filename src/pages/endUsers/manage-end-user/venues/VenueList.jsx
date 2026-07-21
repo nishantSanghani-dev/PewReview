@@ -1,20 +1,74 @@
 import React, { useEffect, useState } from 'react'
-import { apiRequest } from '../../services/Api'
-import { API_ROUTES } from '../../routes/api.routes'
-import { Grid, GridColumn } from '@progress/kendo-react-grid';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom'
+import { apiRequest } from '../../../../services/Api'
+import { API_ROUTES } from '../../../../routes/api.routes'
+import { Grid, GridColumn } from '@progress/kendo-react-grid'
+import GunDetails from '../../../../components/common/gunDetails/GunDetails'
+import { DateTimeCell } from '../Events'
 const ActionCell = (props) => {
-
+    console.log(props.dataItem.venueId);
 
     return (
         <td {...props.tdProps}>
             <div className="d-flex gap-2 align-items-center">
-                <Link to={`/admin/activity/view/${props.dataItem.postId}`}
+
+                <Link to={`/admin/venues/view/${props.dataItem.venueId}`}
 
                     className="small-square-btn edit-btn"
                 >
                     <i className="demo-icon icon-eye-line"></i>
                 </Link>
+                <a
+                    href="javascript:void(0)"
+                    className="small-square-btn edit-btn"
+                >
+                    <i className="demo-icon icon-edit-1" />
+                </a>
+                <a
+                    href="javascript:void(0)"
+                    className="small-square-btn danger-btn"
+                >
+                    <i className="demo-icon icon-delete-1"></i>
+                </a>
+            </div>
+        </td>
+    );
+};
+const DetailCell = ({ tdProps, dataItem, field }) => {
+    return (
+        <td  {...tdProps}>
+            <div className="text-ellipsis">
+                {dataItem.description || "-"}
+            </div>
+        </td>
+    )
+}
+const WebsiteCell = ({ tdProps, dataItem }) => {
+    const website = dataItem.website?.startsWith("http")
+        ? dataItem.website
+        : `https://${dataItem.website}`;
+
+    return (
+        <td {...tdProps}>
+            <a
+                href={website}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary"
+            >
+                {dataItem.website}
+            </a>
+        </td>
+    );
+};
+const AddressCell = (props) => {
+    const item = props.dataItem;
+    return (
+        <td {...props.tdProps}>
+            <div className="text-ellipsis">
+                <p className="mb-0">
+                    {item.address || item.location || item.fullAddress || "-"}
+                </p>
             </div>
         </td>
     );
@@ -25,132 +79,139 @@ const TextCell = ({ tdProps, dataItem, field }) => (
         {dataItem[field] ?? "-"}
     </td>
 );
-const ImagesVdeo = ({ tdProps, dataItem }) => {
-
-    const isVideo = (url) => {
-        return /\.(mp4|webm|ogg|mov|avi|mkv)$/i.test(url);
-    };
-
-    return (
-        <td {...tdProps}>
-            {dataItem.attachmentList?.length > 0 ? (
-                <div className="d-flex align-items-center gap-2 overflow-auto">
-                    {dataItem.attachmentList.map((value, index) =>
-                        isVideo(value) ? (
-                            <video
-                                key={index}
-                                width="50"
-                                src={value}
-                                height="50"
-                                className="rounded flex-shrink-0"
-
-                            // autoPlay={true}
-                            >
-
-                            </video>
-                        ) : (
-                            <img
-                                key={index}
-                                src={value}
-                                alt=""
-                                width="50"
-                                height="50"
-                                className="rounded flex-shrink-0"
-                                style={{ objectFit: "cover" }}
-                            />
-                        )
-                    )}
-                </div>
-            ) : (
-                "-"
-            )}
-        </td>
-    );
-};
 const StatusCell = (props) => {
+    const item = props.dataItem;
+
     return (
         <td {...props.tdProps}>
-            <div className="form-check form-switch mb-0">
+            <div className="form-check form-switch">
                 <input
                     className="form-check-input"
                     type="checkbox"
-                    checked={props.dataItem.isActive}
+                    checked={item.isActive}
                     readOnly
                 />
-                <label className="form-check-label"></label>
             </div>
         </td>
     );
 };
-export const DateCell = ({ tdProps, dataItem, field }) => {
-    console.log(dataItem);
 
-    return (
-        <td {...tdProps}>
-            {new Date(dataItem?.createdDate || dataItem?.createdOn).toLocaleDateString("en-US")}
-        </td>
-    )
-}
-const UserNameCell = ({ tdProps, dataItem, field }) => {
+export const UserNameCell = ({ tdProps, dataItem, field }) => {
     return (
         <td {...tdProps}>
             <Link className='text-primary' to={`/admin/manage-end-user/view/${dataItem.userId}`}>
-                {dataItem.userName}
+                {dataItem.venueOwnerUserName || dataItem.userName}
             </Link>
         </td>
     )
 }
-export default function Activity() {
-    const [activityData, setactivityData] = useState([])
-    const [total, setTotal] = useState(0);
-    const [dataState, setDataState] = useState({
-        skip: 0,
-        take: 10,
-    });
-
-    const getActivities = async () => {
-        const page = Math.floor(dataState.skip / dataState.take) + 1;
-        const payload = {
-            page,
-            pageSize: dataState.take
-        };
-        const res = await apiRequest("POST", API_ROUTES.activities.getActivities, payload, null, {
+export default function VenueList() {
+    const [venueListData, setvenueListData] = useState([])
+    const [gunDetailsData, setgunDetailsData] = useState([])
+    const [showGunDetails, setShowGunDetails] = useState(false);
+    const getVenueList = async () => {
+        const res = await apiRequest("POST", API_ROUTES.venue.getVenueList, { page: 1, pageSize: 10 }, null, {
             showLoader: true
         })
-        setactivityData(res.data.data)
+        setvenueListData(res.data.data)
     }
-    const venueActivityTabColumn = [
-        { field: "action", title: "Action", cell: ActionCell, width: "80px" },
-        { field: "userName", title: "Created By", width: "150px", cell: UserNameCell },
-        { field: "createdOn", title: "Created On", cell: DateCell, width: "150px" },
-        { field: "postTypeName", title: "Post Type", width: "150px" },
-        { field: "attachmentList", title: "Images/Video", cell: ImagesVdeo, width: "180px" },
-        { field: "post", title: "Description", width: "150px" },
-        { field: "rate", title: "Rating", width: "100px" },
-        { field: "totalGun", title: "Gun", width: "100px" },
-        { field: "totalLike", title: "Likes", width: "100px" },
-        { field: "totalComment", title: "Comments", width: "120px" },
-        { field: "totalShare", title: "Share", width: "100px" },
-        { field: "totalHide", title: "Hide Count", width: "120px" },
-        { field: "totalReport", title: "Reported", width: "120px" },
-        { field: "isActive", title: "Status", width: "110px", cell: StatusCell }
-    ];
+    const getVenueGunDetails = async (venueId) => {
+        const res = await apiRequest("GET", API_ROUTES.venue.getVenueGunDetails, null, {
+            venueId
+        }, {
+            showLoader: true
+        })
+        setgunDetailsData(res.data)
 
-    useEffect(() => {
-        getActivities()
-    }, [dataState])
-    return (
+    }
 
-        <div className="container-fluid">
-            <div className="page-heading">
-                <div className="row align-items-center gap-2">
-                    <div className="col">
-                        <h2 className="page-title">Activity</h2>
+    const GunCell = ({ tdProps, dataItem, setShowGunDetails }) => {
+        console.log(dataItem.venueId);
+
+        useEffect(() => {
+            console.log(showGunDetails);
+
+        }, [setShowGunDetails])
+        return (
+            <>
+                <td {...tdProps}>
+                    <div>
+                        {
+                            dataItem.totalGun > 0
+                                ?
+
+                                <Link
+                                    onClick={() => {
+                                        setShowGunDetails(true)
+                                        getVenueGunDetails(dataItem.venueId)
+                                    }}
+                                    className="text-primary"
+                                    style={{ cursor: "pointer" }}
+                                >
+                                    {dataItem.totalGun}
+                                </Link>
+                                :
+                                0
+                        }
                     </div>
+                </td>
 
+                {
+                    showGunDetails && (
+                        <GunDetails
+                            gunDetailsData={gunDetailsData}
+                            setShowGunDetails={setShowGunDetails}
+                        />
+                    )
+                }
 
+            </>
+        );
+    };
+
+    const ApprovalStatusCell = ({ tdProps, dataItem }) => {
+        return (
+            <td {...tdProps}>
+                <div className="approval-status-wrapper">
+                    <select className="approval-status-select">
+                        <option value={dataItem.approvalStatusName}>Approved</option>
+                        <option value={dataItem.approvalStatusName}>Rejected</option>
+                        <option value={dataItem.approvalStatusName}>Pending</option>
+                    </select>
                 </div>
-                <div className='mt-4' style={{ width: "230px" }}>
+            </td>
+        );
+    };
+
+    const venueColumns = [
+        { field: "action", title: "Action", cell: ActionCell, width: "130px" },
+        { field: "venueOwnerUserName", title: "Owner Name", cell: UserNameCell },
+        { field: "venueName", title: "Venue Name", width: "200px" },
+        { field: "description", title: "Description", cell: DetailCell },
+        { field: "website", title: "Website", cell: WebsiteCell },
+        { field: "phone", title: "Phone" },
+        { field: "address", title: "Address", cell: AddressCell },
+        { field: "totalGun", title: "No. of Guns", cell: GunCell },
+        { field: "avgRate", title: "Avg. Venue Rating" },
+        { field: "noOfChackin", title: "No. of Check-Ins" },
+        { field: "noOfEvent", title: "No. of Event Created", width: "170px" },
+        { field: "userName", title: "Created By" },
+        { field: "createdOn", title: "Created On", cell: DateTimeCell },
+        { field: "approvalStatusName", title: "Approval Status", cell: ApprovalStatusCell },
+        { field: "isActive", title: "Status", cell: StatusCell }
+    ];
+    useEffect(() => {
+        getVenueList()
+    }, [])
+
+    return (
+        <div className='container-fluid'>
+
+            <div className="col mb-3">
+                <h2 className="page-title">Venues</h2>
+            </div>
+            <div className="row align-items-center gap-3">
+                <div className="col-12 col-lg-auto">
                     <form className="d-md-flex searchbar align-items-center" role="search">
                         <input
                             className="form-control search-input"
@@ -167,69 +228,49 @@ export default function Activity() {
                         </button>
                     </form>
                 </div>
+                <div className="col-12 col-lg">
+                    <div className="btn-list d-flex justify-content-lg-end flex-wrap gap-2 gap-md-3 text-end">
+
+                        <a
+                            href="javascript:void(0);"
+                            className="btn main-btn border-btn sky-btn"
+                        >
+                            Add Venue
+                        </a>
+
+                    </div>
+                </div>
             </div>
-            <div className="card-section">
-                <div className="row">
-                    <div className="col-xl-12 mt-3 mt-xxl-4">
+            <div
+
+                id="nav-four-tab-pane"
+                role="tabpanel"
+                aria-labelledby="nav-four-tab"
+                tabIndex={0}
+            >
+                <h2 className="accordion-header d-lg-none" id="headingFour">
+                    <button
+                        className="accordion-button collapsed"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#collapseFour"
+                        aria-expanded="false"
+                        aria-controls="collapseThree"
+                    >
+                        Activities
+                    </button>
+                </h2>
+                <div
+                    id="collapseFour"
+                    className="accordion-collapse collapse d-lg-block"
+                    aria-labelledby="headingFour"
+                    data-bs-parent="#myTabContent"
+                >
+                    <div className="accordion-body mt-3 mt-xxl-4">
                         <div className="row">
                             <div className="col-12">
                                 <div className="table-responsive">
-                                    <Grid
-                                        className="table-wrapper  text-center"
-                                        data={activityData}
-                                        sortable
-                                        pageable={{
-                                            buttonCount: 5,
-                                            pageSizes: [20, 50, 150],
-                                            info: true,
-                                            previousNext: true,
-                                            type: "numeric"
-                                        }}
-                                        onDataStateChange={(e) => {
-                                            setDataState({
-                                                skip: e.dataState.skip,
-                                                take: e.dataState.take
-                                            });
-                                        }}
-                                    >
-                                        {
-                                            venueActivityTabColumn?.map((col, ind) => {
-                                                console.log(col.width);
-
-                                                return (
-                                                    <GridColumn
-                                                        key={col.field}
-                                                        field={col.field}
-                                                        title={col.title}
-                                                        width={col.width}
-                                                        pageable={{
-                                                            buttonCount: 4,
-                                                            pageSizes: [20, 50, 200],
-                                                            previousNext: true,
-                                                            info: true,
-                                                            type: "numeric"
-                                                        }}
-                                                        cells={
-                                                            col.cell
-                                                                ? {
-                                                                    data: (props) => (
-                                                                        <col.cell
-                                                                            {...props}
-                                                                        />
-                                                                    )
-                                                                }
-                                                                : {
-                                                                    data: (props) => (
-                                                                        <TextCell {...props} field={col.field} />
-                                                                    )
-                                                                }
-                                                        }
-                                                    />
-                                                )
-                                            })
-                                        }
-                                    </Grid>
-                                    {/* 
+                                    {/*                                     
                                     <table className="table">
                                         <thead className="table-dark">
                                             <tr>
@@ -460,6 +501,45 @@ export default function Activity() {
                                             </tr>
                                         </tbody>
                                     </table> */}
+
+                                    <Grid
+                                        className="table-wrapper  text-center"
+                                        data={venueListData}
+                                        sortable
+                                        pageable={{
+                                            buttonCount: 5,
+                                            pageSizes: [10, 20, 50],
+                                            info: true,
+                                            previousNext: true,
+                                            type: "numeric"
+                                        }}
+
+                                    >
+                                        {venueColumns.map((col) => (
+                                            <GridColumn
+                                                key={col.field}
+                                                field={col.field}
+                                                title={col.title}
+                                                width={col.width || "150px"}
+                                                cells={
+                                                    col.cell
+                                                        ? {
+                                                            data: (props) => (
+                                                                <col.cell
+                                                                    {...props}
+                                                                    setShowGunDetails={setShowGunDetails}
+                                                                />
+                                                            )
+                                                        }
+                                                        : {
+                                                            data: (props) => (
+                                                                <TextCell {...props} field={col.field} />
+                                                            )
+                                                        }
+                                                }
+                                            />
+                                        ))}
+                                    </Grid>
                                 </div>
                             </div>
                         </div>
@@ -467,7 +547,5 @@ export default function Activity() {
                 </div>
             </div>
         </div>
-
-
     )
 }

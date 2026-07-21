@@ -36,12 +36,16 @@ export const API_ROUTES = {
         getVenueListByUser: "Venue/GetVenueListByUser",
         getVenueGunDetails: `Venue/GetVenueGunDetails`,
         getVenueById: (venueId) => `Venue/${venueId}`,
-        getActivities: "Venue/GetActivities"
+        getActivities: "Venue/GetActivities",
+        getVenueList: "Venue/GetList"
     },
     events: {
-        getEventList: "Event/GetEventList"
+        getEventList: "Event/GetEventList",
+        getAllEvent: "Event/List",
+        getEventById: `Event/Get`
     },
     activities: {
-        getActivities: "Activities/GetActivities"
+        getActivities: "Activities/GetActivities",
+        getActivityById: (id) => `Venue/GetVenueActivity/${id}`
     }
 }

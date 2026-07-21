@@ -2,6 +2,7 @@ import { Grid, GridColumn } from '@progress/kendo-react-grid';
 import React from 'react'
 import { Link } from 'react-router-dom';
 import { DateCell } from '../UploadGun';
+import { UserNameCell } from './VenueList';
 const ActionCell = (props) => {
 
 
@@ -85,7 +86,7 @@ export default function VenuesActivityTab({ activityTabData }) {
 
     const venueActivityTabColumn = [
         { field: "action", title: "Action", cell: ActionCell, width: "80px" },
-        { field: "userName", title: "Uploaded By", width: "150px" },
+        { field: "userName", title: "Uploaded By", width: "150px", cell: UserNameCell },
         { field: "createdOn", title: "Uploaded Date", cell: DateCell, width: "150px" },
         { field: "attachmentList", title: "Images/Video", cell: ImagesVdeo, width: "180px" },
         { field: "rate", title: "Rating", width: "100px" },
