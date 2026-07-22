@@ -14,7 +14,8 @@ export const API_ROUTES = {
     },
     endUser: {
         endUserView: "EndUser/GetUsers",
-        endUserSingleView: (id) => `EndUser/${id}`
+        endUserSingleView: (id) => `EndUser/${id}`,
+        endUserDropDown: "EndUser/GetEndUserDropdown"
     },
     role: {
         roleList: "Role/List",
@@ -27,17 +28,22 @@ export const API_ROUTES = {
     common: {
         gender: "Common/GetGenders",
         getCommincateWith: "common/GetCommincateWith",
-        getCountry: "Common/country-codes"
+        getCountry: "Common/country-codes",
+        getVenueType: "Common/GetVenueTypes"
     },
     gun: {
-        gunListByUser: "GUN/GunListByUser"
+        gunListByUser: "GUN/GunListByUser",
+        getGunDropDown: "Gun/GetGunDropdownAll"
     },
     venue: {
+        VenueAdd: "Venue/Add",
+        venueEdit: (id) => `Venue/Update/${id}`,
         getVenueListByUser: "Venue/GetVenueListByUser",
         getVenueGunDetails: `Venue/GetVenueGunDetails`,
         getVenueById: (venueId) => `Venue/${venueId}`,
         getActivities: "Venue/GetActivities",
-        getVenueList: "Venue/GetList"
+        getVenueList: "Venue/GetList",
+        venueDelete: (id) => `Venue/${id}`
     },
     events: {
         getEventList: "Event/GetEventList",

@@ -4034,3 +4034,131 @@ span.chat-time {
     font-size: 12px;
   }
 }
+
+
+
+/* for the venue add. */
+.venue-modal {
+  backdrop-filter: blur(2px);
+
+}
+
+.modal-content {
+  border-radius: 18px;
+}
+
+.form-label {
+  font-size: 15px;
+  font-weight: 500;
+  color: #3d3d3d;
+  margin-bottom: 8px;
+}
+
+.form-control-custom,
+.form-select {
+  height: 46px;
+  border-radius: 10px;
+  border: 1px solid #d7d7d7;
+  box-shadow: none;
+}
+
+.form-control-custom:focus,
+.form-select:focus {
+  border-color: #9f9f9f;
+  box-shadow: none;
+}
+
+textarea.form-control-custom {
+  min-height: 105px;
+  resize: none;
+}
+
+.map-box {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #dcdcdc;
+}
+
+.btn-primary {
+  background: #4361ee;
+  border: none;
+  border-radius: 8px;
+  height: 42px;
+  padding: 0 30px;
+}
+
+.btn-light {
+  border: 1px solid #d8d8d8;
+  border-radius: 8px;
+  height: 42px;
+  padding: 0 30px;
+}
+
+.modal-header h2 {
+  font-size: 38px;
+  font-weight: 700;
+}
+
+/* Main dropdown */
+.custom-dropdown {
+  position: relative;
+  width: 100%;
+}
+
+/* Header */
+.custom-dropdown-toggle {
+  height: 46px;
+  width: 100%;
+  border: 1px solid #dee2e6;
+  border-radius: 10px;
+  padding: 0 14px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  background: #fff;
+  cursor: pointer;
+  transition: .2s;
+}
+
+.custom-dropdown-toggle:hover {
+  border-color: #bfc6ce;
+}
+
+.custom-dropdown-toggle i {
+  font-size: 14px;
+  color: #6c757d;
+}
+
+/* Dropdown */
+.custom-dropdown-menu {
+  position: absolute;
+  left: 0;
+  top: calc(100% + 5px);
+
+  width: 100%;
+  max-height: 250px;
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  background: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 10px;
+
+  box-shadow: 0 8px 20px rgba(0, 0, 0, .12);
+
+  z-index: 999;
+}
+
+/* Items */
+.custom-dropdown-item {
+  padding: 10px 15px;
+  cursor: pointer;
+  transition: .2s;
+  font-size: 15px;
+}
+
+.custom-dropdown-item:hover {
+  background: #f8f9fa;
+}

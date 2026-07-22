@@ -86,7 +86,8 @@ export default function UserForm({ userRoleData, genderData, communicationData, 
                 countryCode: userSingleData.countryCode,
                 email: userSingleData.email,
                 role: userSingleData.roleId,
-                commincateWith: userSingleData.commincateWith
+                commincateWith: userSingleData.commincateWith,
+                profileImage: userSingleData.profileImageFullPath
             })
             handleRoleData(userSingleData.roleId);
         }
@@ -100,7 +101,7 @@ export default function UserForm({ userRoleData, genderData, communicationData, 
                         <div className="user-image-edit">
                             <img
 
-                                src="/assets/images/user-img.png"
+                                src={userSingleData?.profileImageFullPath}
                                 className="img-fluid"
                                 alt="Profile"
                             />

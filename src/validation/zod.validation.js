@@ -74,3 +74,40 @@ export const userSchema = z.object({
         .any()
         .optional()
 })
+
+export const venueSchema = z.object({
+    // userId: z
+    //     .string()
+    //     .min(1, "User is required"),
+    venueName: z
+        .string()
+        .trim()
+        .min(1, "Venue name is required"),
+    imageName: z
+        .any()
+        .refine(file => file, "Venue image is required"),
+    description: z
+        .string()
+        .optional(),
+    website: z
+        .string()
+        .optional(),
+    // selectedCountryId: z
+    //     .string()
+    //     .min(1, "Country code is required"),
+    phone: z
+        .string()
+        .trim()
+        .min(1, "Phone number is required")
+        .regex(/^\d+$/, "Phone number must contain only digits")
+        .min(10, "Phone number must be at least 10 digits"),
+    address: z
+        .string()
+        .min(1, "Address is required"),
+    venueType: z
+        .any()
+        .refine(val => val, "Venue type is required"),
+    gunIds: z
+        .array(z.string())
+        .optional()
+})

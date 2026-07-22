@@ -1,66 +1,121 @@
 import { Grid, GridColumn } from '@progress/kendo-react-grid'
 import React from 'react'
+import { Link } from 'react-router-dom';
 const ActionCell = (props) => {
+
+
     return (
         <td {...props.tdProps}>
             <div className="d-flex gap-2 align-items-center">
-                <a
-                    href="javascript:void(0)"
+                <Link to={`/admin/activity/view/${props.dataItem.postId}`}
+
                     className="small-square-btn edit-btn"
                 >
                     <i className="demo-icon icon-eye-line"></i>
-                </a>
-                <a
-                    href="javascript:void(0)"
-                    className="small-square-btn danger-btn"
-                >
-                    <i className="demo-icon icon-delete-1"></i>
-                </a>
+                </Link>
             </div>
         </td>
     );
 };
+const TextCell = ({ tdProps, dataItem, field }) => (
+    <td {...tdProps}>
 
-const HostNameCell = (props) => {
-    const item = props.dataItem;
+        {dataItem[field] ?? "-"}
+    </td>
+);
+const ImagesVdeo = ({ tdProps, dataItem }) => {
+
+    const isVideo = (url) => {
+        return /\.(mp4|webm|ogg|mov|avi|mkv)$/i.test(url);
+    };
+
     return (
-        <td {...props.tdProps}>
-            {item.hostName || item.venueName || item.name || "-"}
+        <td {...tdProps}>
+            {dataItem.attachmentList?.length > 0 ? (
+                <div className="d-flex align-items-center gap-2 overflow-auto">
+                    {dataItem.attachmentList.map((value, index) =>
+                        isVideo(value) ? (
+                            <video
+                                key={index}
+                                width="50"
+                                src={value}
+                                height="50"
+                                className="rounded flex-shrink-0"
+
+                            // autoPlay={true}
+                            >
+
+                            </video>
+                        ) : (
+                            <img
+                                key={index}
+                                src={value}
+                                alt=""
+                                width="50"
+                                height="50"
+                                className="rounded flex-shrink-0"
+                                style={{ objectFit: "cover" }}
+                            />
+                        )
+                    )}
+                </div>
+            ) : (
+                "-"
+            )}
         </td>
     );
 };
-
-const EventNameCell = (props) => {
-    const item = props.dataItem;
+const StatusCell = (props) => {
     return (
         <td {...props.tdProps}>
-            {item.eventName || item.title || item.event || "-"}
+            <div className="form-check form-switch mb-0">
+                <input
+                    className="form-check-input"
+                    type="checkbox"
+                    checked={props.dataItem.isActive}
+                    readOnly
+                />
+                <label className="form-check-label"></label>
+            </div>
         </td>
     );
 };
+export const DateCell = ({ tdProps, dataItem, field }) => {
+    console.log(dataItem);
 
-const DateTimeCell = (props) => {
-    const item = props.dataItem;
     return (
-        <td {...props.tdProps}>
-            <p className="mb-0">
-                {item.dateTime || item.eventDate || item.date || "-"}
-            </p>
+        <td {...tdProps}>
+            {new Date(dataItem?.createdDate || dataItem?.createdOn).toLocaleDateString("en-US")}
         </td>
-    );
-};
+    )
+}
 
-const AddressCell = (props) => {
-    const item = props.dataItem;
+const DetailCell = ({ tdProps, dataItem, field }) => {
     return (
-        <td {...props.tdProps}>
-            <p className="mb-0">
-                {item.address || item.location || item.fullAddress || "-"}
-            </p>
+        <td  {...tdProps}>
+            <div className="text-ellipsis">
+                {dataItem.post || "-"}
+            </div>
         </td>
-    );
-};
+    )
+}
+
 export default function ActivitiesEndUser({ data }) {
+    const activityTabColumn = [
+        { field: "action", title: "Action", cell: ActionCell, width: "80px" },
+        { field: "createdOn", title: "Created On", cell: DateCell, width: "150px" },
+        { field: "postTypeName", title: "Post Type", width: "150px" },
+        { field: "attachmentList", title: "Images/Video", cell: ImagesVdeo, width: "180px" },
+        { field: "post", title: "Description", width: "150px", cell: DetailCell },
+        { field: "rate", title: "Rating", width: "100px" },
+        { field: "totalGun", title: "Gun", width: "100px" },
+        { field: "totalLike", title: "Likes", width: "100px" },
+        { field: "totalComment", title: "Comments", width: "120px" },
+        { field: "totalShare", title: "Share", width: "100px" },
+        { field: "totalHide", title: "Hide Count", width: "120px" },
+        { field: "totalReport", title: "Reported", width: "120px" },
+        { field: "isActive", title: "Status", width: "110px", cell: StatusCell }
+    ];
     return (
         <div
             id="collapseTwo"
@@ -73,46 +128,54 @@ export default function ActivitiesEndUser({ data }) {
                     <div className="col-12">
                         <div className="table-responsive">
                             <Grid
-                                className="table-wrapper fw-bold text-center"
+                                className="table-wrapper  text-center"
                                 data={data}
                                 sortable
                                 pageable={{
                                     buttonCount: 5,
-                                    pageSizes: [10, 20, 50],
+                                    pageSizes: [20, 50, 150],
                                     info: true,
                                     previousNext: true,
                                     type: "numeric"
                                 }}
+
                             >
-                                <GridColumn
-                                    title="Action"
-                                    width="120px"
-                                    cells={{ data: ActionCell }}
-                                />
+                                {
+                                    activityTabColumn?.map((col, ind) => {
+                                        console.log(col.width);
 
-                                <GridColumn
-                                    title="Host Name"
-                                    width="200px"
-                                    cells={{ data: HostNameCell }}
-                                />
-
-                                <GridColumn
-                                    title="Event Name"
-                                    width="200px"
-                                    cells={{ data: EventNameCell }}
-                                />
-
-                                <GridColumn
-                                    title="Date & Time"
-                                    width="200px"
-                                    cells={{ data: DateTimeCell }}
-                                />
-
-                                <GridColumn
-                                    title="Address"
-                                    width="300px"
-                                    cells={{ data: AddressCell }}
-                                />
+                                        return (
+                                            <GridColumn
+                                                key={col.field}
+                                                field={col.field}
+                                                title={col.title}
+                                                width={col.width}
+                                                pageable={{
+                                                    buttonCount: 4,
+                                                    pageSizes: [20, 50, 200],
+                                                    previousNext: true,
+                                                    info: true,
+                                                    type: "numeric"
+                                                }}
+                                                cells={
+                                                    col.cell
+                                                        ? {
+                                                            data: (props) => (
+                                                                <col.cell
+                                                                    {...props}
+                                                                />
+                                                            )
+                                                        }
+                                                        : {
+                                                            data: (props) => (
+                                                                <TextCell {...props} field={col.field} />
+                                                            )
+                                                        }
+                                                }
+                                            />
+                                        )
+                                    })
+                                }
                             </Grid>
                         </div>
                     </div>

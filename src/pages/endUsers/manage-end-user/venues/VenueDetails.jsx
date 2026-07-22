@@ -98,7 +98,7 @@ export default function VenueDetails() {
                             </div>
 
                             {
-                                venueDetailsData?.guns?.map((value, index) => {
+                                venueDetailsData?.guns?.slice(0, 3).map((value, index) => {
                                     return (
                                         <div className="gun-item">
 

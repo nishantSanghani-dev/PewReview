@@ -17,6 +17,7 @@
     "@progress/kendo-react-animation": "^15.1.0",
     "@progress/kendo-react-data-tools": "^15.1.0",
     "@progress/kendo-react-dateinputs": "^15.1.0",
+    "@progress/kendo-react-dropdowns": "^15.1.0",
     "@progress/kendo-react-grid": "^15.1.0",
     "@progress/kendo-react-inputs": "^15.1.0",
     "@progress/kendo-react-intl": "^15.1.0",

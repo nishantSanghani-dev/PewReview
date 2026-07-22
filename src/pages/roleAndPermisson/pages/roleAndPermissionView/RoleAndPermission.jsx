@@ -54,9 +54,10 @@ export default function RoleAndPermission() {
     const [roleData, setroleData] = useState([])
     const [customSearch, setcustomSearch] = useState("")
     const [total, setTotal] = useState(0)
-    const [dataState, setDataState] = useState({ skip: 0, take: 10 })
+    const [dataState, setDataState] = useState({ skip: 0, take: 10, filter: null })
     const [kendoSort, setKendoSort] = useState([])
     const [sort, setsort] = useState([])
+    const [filters, setFilters] = useState([]);
     const getRole = async () => {
         const page = Math.floor(dataState.skip / dataState.take) + 1
         const payload = {
@@ -64,6 +65,7 @@ export default function RoleAndPermission() {
             pageSize: dataState.take,
             customSearch,
             Sorts: sort,
+            Filters: filters
         }
         const res = await apiRequest("POST", API_ROUTES.role.roleList, payload, null, {
             showLoader: true,
@@ -107,7 +109,7 @@ export default function RoleAndPermission() {
     // fetch on mount and when paging, sorting or search changes
     useEffect(() => {
         getRole()
-    }, [customSearch, dataState.skip, dataState.take, sort])
+    }, [customSearch, dataState.skip, dataState.take, sort, filters])
 
     return (
         <div className="container-fluid">
@@ -163,6 +165,8 @@ export default function RoleAndPermission() {
                                 sortable={{ allowUnsort: true, mode: 'single' }}
 
                                 sort={kendoSort}
+                                filterable={true}
+                                filter={dataState.filter}
 
                                 pageable={{
                                     buttonCount: 5,
@@ -183,12 +187,32 @@ export default function RoleAndPermission() {
                                     } else {
                                         setsort([])
                                     }
+
+
+                                    const nextFilter = e.dataState.filter;
+
+                                    if (nextFilter && nextFilter.filters.length > 0) {
+
+                                        setFilters(
+                                            nextFilter.filters.map((item) => ({
+                                                Field: item.field,
+                                                Value: item.value,
+                                                OperatorType: 8
+                                            }))
+                                        );
+
+                                    } else {
+
+                                        setFilters([]);
+
+                                    }
                                 }}
                             >
 
                                 <GridColumn
                                     title="Action"
                                     width="120px"
+
                                     cells={{
                                         data: (props) => (
                                             <RoleActionCell
