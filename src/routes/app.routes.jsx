@@ -20,6 +20,12 @@ import VenueDetails from "../pages/endUsers/manage-end-user/venues/VenueDetails"
 import VenueList from "../pages/endUsers/manage-end-user/venues/VenueList";
 import ActivityDetails from "../pages/activity/ActivityDetails";
 import EventDetails from "../pages/events/EventDetails";
+import SupportTicket from "../pages/supportTicket/SupportTicket";
+import Groups from "../pages/groups/Groups";
+import GroupDetails from "../pages/groups/GroupDetails";
+import GroupMember from "../pages/groups/GroupMember";
+import GroupActivities from "../pages/groups/GroupActivities";
+import Badges from "../pages/badges/Badges";
 
 export const routes = createBrowserRouter([
     {
@@ -134,6 +140,35 @@ export const routes = createBrowserRouter([
                         element: <VenueDetails />
                     }
                 ]
+            },
+            {
+                path: "support-tickets",
+                element: <SupportTicket />
+            },
+            {
+                path: "groups",
+                children: [
+                    {
+                        index: true,
+                        element: <Groups />
+                    },
+                    {
+                        path: "view/:id",
+                        element: <GroupDetails />
+                    },
+                    {
+                        path: "view/:id/members",
+                        element: <GroupMember />
+                    },
+                    {
+                        path: "activity/:id",
+                        element: <GroupActivities />
+                    }
+                ]
+            },
+            {
+                path: "manage-badges",
+                element: <Badges />
             }
         ],
     },

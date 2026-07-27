@@ -23,6 +23,12 @@ export default function SideBar({ mobileSlideBar, setmobileSlideBar }) {
                                 <span>Activity</span>
                             </NavLink>
                         </li>
+                        <li onClick={() => setmobileSlideBar(false)}>
+                            <NavLink to="/admin/groups">
+                                <i className="demo-icon icon-users" />
+                                <span>Groups</span>
+                            </NavLink>
+                        </li>
                         <li>
                             <NavLink to={'/admin/events/view'}>
                                 <i className="demo-icon icon-roles" />
@@ -54,10 +60,10 @@ export default function SideBar({ mobileSlideBar, setmobileSlideBar }) {
                             </NavLink>
                         </li>
                         <li>
-                            <a href="javascript:void(0);">
+                            <NavLink to={'/admin/support-tickets'}>
                                 <i className="demo-icon icon-support-ticket" />
                                 <span>Support Ticket</span>
-                            </a>
+                            </NavLink>
                         </li>
                         <li>
                             <NavLink to={'/admin/messages'}>
@@ -78,14 +84,18 @@ export default function SideBar({ mobileSlideBar, setmobileSlideBar }) {
                             </a>
                         </li>
                         <li>
-                            <a href="javascript:void(0);">
+                            <NavLink to={'/admin/manage-badges'}>
                                 <i className="demo-icon icon-manage-badges" />
-                                <span>Manage Badges</span>
-                            </a>
+                                <span>Badges</span>
+                            </NavLink>
                         </li>
                         <li className={`has-submenu ng-star-inserted ${masterSubMenu && 'open'}`}>
-                            <Link onClick={() => setmasterSubMenu(!masterSubMenu)}
-                                href="javascript:void(0);"
+                            <Link
+                                to="#"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    setmasterSubMenu(!masterSubMenu);
+                                }}
                                 id="masters"
                                 className="submenu-toggle d-flex w-100 justify-content-between"
                             >
@@ -97,17 +107,24 @@ export default function SideBar({ mobileSlideBar, setmobileSlideBar }) {
                                 <i className="demo-icon icon-down-arrow" />
                             </Link>
                             <ul className={`submenu ${masterSubMenu ? 'd-block' : 'd-none'}`}>
+
+                                <li>
+                                    <a href="javascript:void(0);">Prohibited Words</a>
+                                </li>
+                                <li>
+                                    <a href="javascript:void(0);">Gun Master</a>
+                                </li>
+                                <li>
+                                    <a href="javascript:void(0);">Ammunition Master</a>
+                                </li>
+                                <li>
+                                    <a href="javascript:void(0);">Accessories Master</a>
+                                </li>
                                 <li>
                                     <a href="javascript:void(0);">Category Master</a>
                                 </li>
                                 <li>
-                                    <a href="javascript:void(0);">Sub-Category Master</a>
-                                </li>
-                                <li>
-                                    <a href="javascript:void(0);">Prohibited Words Master</a>
-                                </li>
-                                <li>
-                                    <a href="javascript:void(0);">Holiday Master</a>
+                                    <a href="javascript:void(0);">Manufacturer Master</a>
                                 </li>
                             </ul>
                         </li>

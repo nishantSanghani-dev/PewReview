@@ -1,9 +1,9 @@
 import { Grid, GridColumn } from '@progress/kendo-react-grid'
 import React from 'react'
+import { handleStatusChange } from '../../../utils/ChangeStatus';
 
 const ActionCell = (props) => {
     console.log(props);
-
     return (
         <td {...props.tdProps}>
             <div className="d-flex gap-2 align-items-center">
@@ -28,6 +28,14 @@ const StatusCell = (props) => {
                     type="checkbox"
                     checked={props.dataItem.isActive}
                     readOnly
+                    onChange={(e) =>
+                        handleStatusChange(
+                            props.dataItem.gunId,
+                            e.target.checked,
+                            "gun",
+                            "gunStatusUpdate" // callback
+                        )
+                    }
                 />
                 <label className="form-check-label"></label>
             </div>

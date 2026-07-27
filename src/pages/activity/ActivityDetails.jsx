@@ -19,7 +19,7 @@ export default function ActivityDetails() {
     }, [id])
 
     return (
-        <div className="container-fluid py-3 activity-page">
+        <div className="container-fluid ">
 
             {/* Breadcrumb */}
             <div className="mb-3 activity-breadcrumb">

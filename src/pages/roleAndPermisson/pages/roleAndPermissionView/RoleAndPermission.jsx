@@ -5,6 +5,7 @@ import { apiRequest } from '../../../../services/Api'
 import { API_ROUTES } from '../../../../routes/api.routes'
 import RoleRow from '../../components/RoleRow'
 import { Grid, GridColumn } from '@progress/kendo-react-grid'
+import { handleStatusChange } from '../../../../utils/ChangeStatus'
 const RoleActionCell = (props) => {
     const item = props.dataItem;
 
@@ -42,7 +43,13 @@ const RoleStatusCell = (props) => {
                     type="checkbox"
                     checked={item.isActive}
                     onChange={(e) =>
-                        props.onToggle(item.id, e.target.checked)
+                        handleStatusChange(
+                            props.dataItem.id,
+                            e.target.checked,
+                            "role",
+                            "roleStatusEdit",
+                            props.getRole // callback
+                        )
                     }
                 />
                 <label className="form-check-label"></label>
@@ -218,6 +225,7 @@ export default function RoleAndPermission() {
                                             <RoleActionCell
                                                 {...props}
                                                 onDelete={handleRoleDelete}
+
                                             />
                                         )
                                     }}
@@ -249,7 +257,7 @@ export default function RoleAndPermission() {
                                         data: (props) => (
                                             <RoleStatusCell
                                                 {...props}
-                                                onToggle={handleToggle}
+                                                getRole={getRole}
                                             />
                                         )
                                     }}

@@ -87,7 +87,7 @@ export const DateCell = ({ tdProps, dataItem, field }) => {
 
     return (
         <td {...tdProps}>
-            {new Date(dataItem?.createdDate || dataItem?.createdOn).toLocaleDateString("en-US")}
+            {new Date(dataItem?.createdDate || dataItem?.createdOn || dataItem?.reportDate).toLocaleDateString("en-US")}
         </td>
     )
 }

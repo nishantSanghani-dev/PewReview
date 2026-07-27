@@ -101,7 +101,7 @@ export default function EndUserView() {
     return (
         <>
 
-            < div className="container-fluid" >
+            <div className="container-fluid">
                 <div className="tabbar-section">
                     <div className="row">
                         <div className="col-12">
@@ -125,7 +125,7 @@ export default function EndUserView() {
                                 <div className="row align-items-end gap-1">
                                     <div className="col">
                                         <div className="user-image-edit small-profile">
-                                            <img src="/assets/images/user-img.png" className="img-fluid" />
+                                            <img src={manageUserSingleData?.profileImageUrl} className="img-fluid" />
                                         </div>
                                         <p className="fw-semibold dark-color mt-2 mb-0 d-flex align-items-center gap-1 text-nowrap">
                                             {manageUserSingleData?.fullName} <i className="demo-icon icon-verified" />

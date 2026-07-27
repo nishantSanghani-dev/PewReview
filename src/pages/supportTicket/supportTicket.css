@@ -1,0 +1,286 @@
+/* ===========================
+   Backdrop
+=========================== */
+
+.custom-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55) !important;
+    z-index: 1040;
+}
+
+/* ===========================
+   Wrapper
+=========================== */
+
+.custom-modal-wrapper {
+    position: fixed;
+    top: 55%;
+    left: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform: translate(-50%, -50%);
+    padding: 20px;
+    z-index: 1050;
+}
+
+/* ===========================
+   Modal
+=========================== */
+
+.custom-modal {
+    width: 520px;
+    max-width: 100%;
+    max-height: 90vh;
+
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+}
+
+/* ===========================
+   Header
+=========================== */
+
+.modal-header-custom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 20px 24px;
+
+    border-bottom: 1px solid #ececec;
+
+    flex-shrink: 0;
+}
+
+.modal-header-custom h3 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    color: #222;
+}
+
+.btn-close-modal {
+    border: none;
+    background: transparent;
+    font-size: 32px;
+    cursor: pointer;
+    line-height: 1;
+    color: #555;
+}
+
+.btn-close-modal:hover {
+    color: #000;
+}
+
+/* ===========================
+   Body
+=========================== */
+
+.modal-body-custom {
+    padding: 24px;
+
+    overflow-y: auto;
+    flex: 1;
+}
+
+/* Optional scrollbar styling */
+
+.modal-body-custom::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-body-custom::-webkit-scrollbar-thumb {
+    background: #c5c5c5;
+    border-radius: 10px;
+}
+
+/* ===========================
+   Footer
+=========================== */
+
+.modal-footer-custom {
+    padding: 20px 24px;
+
+    border-top: 1px solid #ececec;
+
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+
+    flex-shrink: 0;
+}
+
+/* ===========================
+   Form
+=========================== */
+
+.form-label {
+    font-size: 15px;
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.custom-input {
+    border-radius: 12px;
+    min-height: 48px;
+    border: 1px solid #d8d8d8;
+    font-size: 15px;
+    box-shadow: none !important;
+}
+
+.custom-input:focus {
+    border-color: #999;
+    box-shadow: none;
+}
+
+textarea.custom-input {
+    min-height: 120px;
+    resize: vertical;
+}
+
+/* ===========================
+   Buttons
+=========================== */
+
+.btn-cancel {
+    width: 110px;
+    height: 46px;
+
+    border-radius: 12px;
+    border: 1px solid #d6d6d6;
+
+    background: #fff;
+    color: #333;
+
+    font-weight: 600;
+}
+
+.btn-cancel:hover {
+    background: #f5f5f5;
+}
+
+.btn-save {
+    width: 110px;
+    height: 46px;
+
+    border-radius: 12px;
+
+    border: none;
+
+    background: #991b1b;
+    color: #fff;
+
+    font-weight: 600;
+}
+
+.btn-save:hover {
+    background: #7d1616;
+}
+
+
+/* ===========================
+   Responsive
+=========================== */
+
+@media (max-width: 768px) {
+
+    .custom-modal-wrapper {
+        top: 50%;
+        width: 100%;
+        padding: 15px;
+    }
+
+    .custom-modal {
+        width: 100%;
+        max-width: 500px;
+        max-height: 75vh;
+    }
+
+    .modal-header-custom {
+        padding: 16px 20px;
+    }
+
+    .modal-header-custom h3 {
+        font-size: 22px;
+    }
+
+    .modal-body-custom {
+        padding: 20px;
+    }
+
+    .modal-footer-custom {
+        padding: 16px 20px;
+    }
+
+    .btn-cancel,
+    .btn-save {
+        width: 100px;
+        height: 44px;
+    }
+}
+
+@media (max-width: 576px) {
+
+    .custom-modal-wrapper {
+        top: 50%;
+        width: 100%;
+        padding: 10px;
+    }
+
+    .custom-modal {
+        width: 100%;
+        max-width: 100%;
+        max-height: 75vh;
+        border-radius: 14px;
+    }
+
+    .modal-header-custom {
+        padding: 15px;
+    }
+
+    .modal-header-custom h3 {
+        font-size: 20px;
+    }
+
+    .btn-close-modal {
+        font-size: 28px;
+    }
+
+    .modal-body-custom {
+        padding: 15px;
+    }
+
+    .modal-footer-custom {
+        padding: 15px;
+        gap: 10px;
+    }
+
+    .form-label {
+        font-size: 14px;
+    }
+
+    .custom-input {
+        min-height: 44px;
+        font-size: 14px;
+    }
+
+    textarea.custom-input {
+        min-height: 100px;
+    }
+
+    .btn-cancel,
+    .btn-save {
+        width: 90px;
+        height: 42px;
+        font-size: 14px;
+    }
+}

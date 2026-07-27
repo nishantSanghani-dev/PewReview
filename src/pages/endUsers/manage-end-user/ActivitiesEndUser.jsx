@@ -1,6 +1,7 @@
 import { Grid, GridColumn } from '@progress/kendo-react-grid'
 import React from 'react'
 import { Link } from 'react-router-dom';
+import { handleStatusChange } from '../../../utils/ChangeStatus';
 const ActionCell = (props) => {
 
 
@@ -74,6 +75,14 @@ const StatusCell = (props) => {
                     type="checkbox"
                     checked={props.dataItem.isActive}
                     readOnly
+                    onChange={(e) =>
+                        handleStatusChange(
+                            props.dataItem.postId,
+                            e.target.checked,
+                            "activities",
+                            "activitiesPostStatus"
+                        )
+                    }
                 />
                 <label className="form-check-label"></label>
             </div>

@@ -6,6 +6,7 @@ import { Grid, GridColumn } from '@progress/kendo-react-grid'
 import GunDetails from '../../../../components/common/gunDetails/GunDetails'
 import { DateTimeCell } from '../Events'
 import VenueAdd from './VenueAdd'
+import { handleStatusChange } from '../../../../utils/ChangeStatus'
 
 const DetailCell = ({ tdProps, dataItem, field }) => {
     return (
@@ -59,6 +60,15 @@ const StatusCell = (props) => {
         <td {...props.tdProps}>
             <div className="form-check form-switch">
                 <input
+                    onChange={(e) =>
+                        handleStatusChange(
+                            props.dataItem.venueId,
+                            e.target.checked,
+                            "venue",
+                            "venueStatusUpdate",
+                            props.getVenueList
+                        )
+                    }
                     className="form-check-input"
                     type="checkbox"
                     checked={item.isActive}
@@ -319,6 +329,7 @@ export default function VenueList() {
                                                             data: (props) => (
                                                                 <col.cell
                                                                     {...props}
+                                                                    getVenueList={getVenueList}
                                                                     setShowGunDetails={setShowGunDetails}
                                                                 />
                                                             )
@@ -342,10 +353,10 @@ export default function VenueList() {
                 venueAddBtn
                 &&
 
-                <VenueAdd 
-                    setvenueAddBtn={setvenueAddBtn} 
-                    editVenueId={editVenueId} 
-                    setEditVenueId={setEditVenueId} 
+                <VenueAdd
+                    setvenueAddBtn={setvenueAddBtn}
+                    editVenueId={editVenueId}
+                    setEditVenueId={setEditVenueId}
                 />
             }
         </div>
