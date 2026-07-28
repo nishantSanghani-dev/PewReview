@@ -1,6 +1,12 @@
 import React from 'react'
+import { apiRequest } from '../../services/Api'
 
 export default function ReportedUser() {
+
+    // const getReportedUser = async () => {
+    //     const res = await apiRequest("POST")
+    // }
+
     return (
 
         <div className="container-fluid">

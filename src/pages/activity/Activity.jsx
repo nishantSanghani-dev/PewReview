@@ -83,11 +83,11 @@ const StatusCell = (props) => {
     );
 };
 export const DateCell = ({ tdProps, dataItem, field }) => {
-    console.log(dataItem);
+    // console.log(dataItem);
 
     return (
         <td {...tdProps}>
-            {new Date(dataItem?.createdDate || dataItem?.createdOn || dataItem?.reportDate).toLocaleDateString("en-US")}
+            {new Date(dataItem?.createdDate || dataItem?.createdOn || dataItem?.reportDate || dataItem?.createdAt).toLocaleDateString("en-US")}
         </td>
     )
 }

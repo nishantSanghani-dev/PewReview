@@ -3,6 +3,7 @@ import { apiRequest } from '../../services/Api'
 import { API_ROUTES } from '../../routes/api.routes'
 import TopLikedPost from './TopLikedPost'
 import TotalReportedPost from './TotalReportedPost'
+import { Link } from 'react-router-dom'
 
 
 export default function Dashboard() {
@@ -229,9 +230,9 @@ export default function Dashboard() {
                                 <h3 className="fw-bold theme-color">Most Liked Posts</h3>
                             </div>
                             <div className="col-auto">
-                                <a className="basic-links" href="javascript:void(0);">
+                                <Link className="basic-links" to={'/admin/activity/view'}>
                                     View All
-                                </a>
+                                </Link>
                             </div>
                         </div>
                         <div className="row mt-3">
@@ -363,9 +364,9 @@ export default function Dashboard() {
                                 </h3>
                             </div>
                             <div className="col-auto">
-                                <a className="basic-links" href="javascript:void(0);">
+                                <Link className="basic-links" to={'/admin/activity/view'}>
                                     View All
-                                </a>
+                                </Link>
                             </div>
                         </div>
                         <div className="row mt-3">

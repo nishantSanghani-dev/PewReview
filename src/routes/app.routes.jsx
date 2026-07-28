@@ -26,6 +26,12 @@ import GroupDetails from "../pages/groups/GroupDetails";
 import GroupMember from "../pages/groups/GroupMember";
 import GroupActivities from "../pages/groups/GroupActivities";
 import Badges from "../pages/badges/Badges";
+import Prohibited from "../pages/masters/prohabitedWords/Prohibited";
+import Manufacturer from "../pages/masters/manufacturer/Manufacturer";
+import Accessories from "../pages/masters/accessories/Accessories";
+import GunMaster from "../pages/masters/gunMaster/GunMaster";
+import Ammunition from "../pages/masters/ammunition/Ammunition";
+import CategoryMaster from "../pages/masters/category/CategoryMaster";
 
 export const routes = createBrowserRouter([
     {
@@ -169,6 +175,35 @@ export const routes = createBrowserRouter([
             {
                 path: "manage-badges",
                 element: <Badges />
+            },
+            {
+                path: "masters",
+                children: [
+                    {
+                        path: "prohibited-words",
+                        element: <Prohibited />
+                    },
+                    {
+                        path: "manufacturer",
+                        element: <Manufacturer />
+                    },
+                    {
+                        path: "accessories",
+                        element: <Accessories />
+                    },
+                    {
+                        path: "gun",
+                        element: <GunMaster />
+                    },
+                    {
+                        path: "ammunition",
+                        element: <Ammunition />
+                    },
+                    {
+                        path: "category",
+                        element: <CategoryMaster />
+                    }
+                ]
             }
         ],
     },

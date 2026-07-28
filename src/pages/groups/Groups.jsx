@@ -5,22 +5,8 @@ import { Grid, GridColumn } from '@progress/kendo-react-grid'
 import { Link } from 'react-router-dom';
 import { DateCell } from '../activity/Activity';
 import { handleStatusChange } from '../../utils/ChangeStatus';
+import { handleDelete } from '../../utils/DeleteRecords';
 const ActionCell = (props) => {
-    console.log(props.dataItem.venueId);
-
-    const deleteEvent = async () => {
-        if (confirm("Are You Want To Delete Venue ? ")) {
-
-            const res = await apiRequest("DELETE", API_ROUTES.venue.venueDelete(props.dataItem.venueId), null, null, {
-                showLoader: true,
-                showToaster: true
-            })
-            if (res.status) {
-                getVenueList()
-            }
-        }
-
-    }
 
     return (
         <td {...props.tdProps}>
@@ -34,8 +20,7 @@ const ActionCell = (props) => {
                 </Link>
 
                 <button
-
-                    onClick={() => deleteEvent()}
+                    onClick={() => handleDelete(props.dataItem.id, "groups", "groupDelete", props.getGroups)}
                     className="small-square-btn danger-btn"
                 >
                     <i className="demo-icon icon-delete-1"></i>

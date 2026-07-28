@@ -3,6 +3,7 @@ import { Grid, GridColumn } from "@progress/kendo-react-grid"
 import { apiRequest } from '../../../services/Api'
 import { API_ROUTES } from '../../../routes/api.routes'
 import { Link } from 'react-router-dom'
+import { handleDelete } from '../../../utils/DeleteRecords'
 
 export default function EndUser() {
     const [manageUserData, setmanageUserData] = useState([])
@@ -67,6 +68,7 @@ export default function EndUser() {
                     </Link>
 
                     <button
+                        onClick={() => handleDelete(item.id, "endUser", "endUserDelete", getManageEndUser)}
                         type="button"
                         className="small-square-btn danger-btn"
                     >

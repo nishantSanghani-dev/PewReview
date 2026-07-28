@@ -111,3 +111,54 @@ export const venueSchema = z.object({
         .array(z.string())
         .optional()
 })
+
+export const prohibitedWordSchema = z.object({
+    words: z
+        .string()
+        .trim()
+        .min(1, "Prohibited Word is required")
+        .max(100, "Maximum 100 characters allowed"),
+
+    description: z
+        .string()
+        .trim()
+        .max(500, "Maximum 500 characters allowed")
+        .optional()
+        .or(z.literal(""))
+});
+
+
+export const manufecturerSchema = z.object({
+    name: z
+        .string()
+        .trim()
+        .min(1, "Manufecturer Name is required")
+        .max(100, "Maximum 100 characters allowed"),
+
+    description: z
+        .string()
+        .trim()
+        .max(500, "Maximum 500 characters allowed")
+        .optional()
+        .or(z.literal(""))
+});
+
+export const ammunitionSchema = z.object({
+    name: z
+        .string()
+        .trim()
+        .min(1, "Ammunition Name is required")
+        .max(100, "Maximum 100 characters allowed"),
+    categoryIds: z
+        .array(z.string())
+        .min(1, "At least one category is required"),
+    manufacturerId: z
+        .string()
+        .min(1, "Manufacturer is required"),
+    description: z
+        .string()
+        .trim()
+        .max(500, "Maximum 500 characters allowed")
+        .optional()
+        .or(z.literal(""))
+});

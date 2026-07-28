@@ -4,6 +4,7 @@ import { apiRequest } from '../../services/Api'
 import { API_ROUTES } from '../../routes/api.routes'
 import { Grid, GridColumn } from '@progress/kendo-react-grid'
 import BdagesAdd from './BdagesAdd'
+import { handleDelete } from '../../utils/DeleteRecords'
 const ActionCell = (props) => {
     console.log(props.dataItem.id);
     console.log(props);
@@ -24,7 +25,7 @@ const ActionCell = (props) => {
                 </button>
 
                 <button
-
+                    onClick={() => handleDelete(props.dataItem.id, "badges", "badgeDelete", props.getBadges)}
 
                     className="small-square-btn danger-btn"
                 >
@@ -160,7 +161,7 @@ export default function Badges() {
                                                             {...props}
                                                             setid={setid}
                                                             id={id}
-
+                                                            getBadges={getBadges}
                                                         />
                                                     )
                                                 }

@@ -109,22 +109,22 @@ export default function SideBar({ mobileSlideBar, setmobileSlideBar }) {
                             <ul className={`submenu ${masterSubMenu ? 'd-block' : 'd-none'}`}>
 
                                 <li>
-                                    <a href="javascript:void(0);">Prohibited Words</a>
+                                    <NavLink to={'/admin/masters/prohibited-words'}>Prohibited Words</NavLink>
                                 </li>
                                 <li>
-                                    <a href="javascript:void(0);">Gun Master</a>
+                                    <NavLink to={'/admin/masters/gun'}>Gun Master</NavLink>
                                 </li>
                                 <li>
-                                    <a href="javascript:void(0);">Ammunition Master</a>
+                                    <NavLink to={'/admin/masters/ammunition'}>Ammunition Master</NavLink>
                                 </li>
                                 <li>
-                                    <a href="javascript:void(0);">Accessories Master</a>
+                                    <NavLink to={'/admin/masters/accessories'}>Accessories Master</NavLink>
                                 </li>
                                 <li>
-                                    <a href="javascript:void(0);">Category Master</a>
+                                    <NavLink to={'/admin/masters/category'}>Category Master</NavLink>
                                 </li>
                                 <li>
-                                    <a href="javascript:void(0);">Manufacturer Master</a>
+                                    <NavLink to={"/admin/masters/manufacturer"}>Manufacturer Master</NavLink>
                                 </li>
                             </ul>
                         </li>

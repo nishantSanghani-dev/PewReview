@@ -1,6 +1,7 @@
 import { Grid, GridColumn } from '@progress/kendo-react-grid'
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom';
+import { handleDelete } from '../../../utils/DeleteRecords';
 export const ActionCell = (props) => {
     console.log(props.dataItem.eventId);
 
@@ -13,12 +14,12 @@ export const ActionCell = (props) => {
                 >
                     <i className="demo-icon icon-eye-line"></i>
                 </Link>
-                <a
-                    href="javascript:void(0)"
+                <button
+                    onClick={() => handleDelete(props.dataItem.eventId, "events", "eventDelete")}
                     className="small-square-btn danger-btn"
                 >
                     <i className="demo-icon icon-delete-1"></i>
-                </a>
+                </button>
             </div>
         </td>
     );
