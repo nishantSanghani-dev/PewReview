@@ -114,8 +114,8 @@ export const API_ROUTES = {
         ammunitionStatusUpdate: (id) => `Ammunition/UpdateStatus/${id}`,
         ammunitionDelete: (id) => `Ammunition/Delete/${id}`,
         ammunitionAdd: "Ammunition/Add",
-        ammunitionGetById: (id) => `Ammunition/Get/${id}`,
-        ammunitionUpdate: (id) => `Ammunition/Update/${id}`
+        ammunitionGetById: `Ammunition/Get`,
+        ammunitionUpdate: `Ammunition/Update`
     },
     category: {
         getCategoryMaster: "GunCategoryMaster/List",

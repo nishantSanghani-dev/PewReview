@@ -53,7 +53,7 @@ export default function AmmunitionAdd({ id, setid, isAmmunitionOpen, setisAmmuni
     };
 
     const getSingleRecord = async () => {
-        const res = await apiRequest("GET", API_ROUTES.ammunition.ammunitionGetById(id), null, null, {
+        const res = await apiRequest("GET", API_ROUTES.ammunition.ammunitionGetById, null, { id }, {
             showLoader: true
         });
 
@@ -88,7 +88,7 @@ export default function AmmunitionAdd({ id, setid, isAmmunitionOpen, setisAmmuni
         let res;
         if (id) {
             data.id = id;
-            res = await apiRequest("PUT", API_ROUTES.ammunition.ammunitionUpdate(id), data, null, {
+            res = await apiRequest("PUT", API_ROUTES.ammunition.ammunitionUpdate, data, null, {
                 showLoader: true,
                 showToaster: true
             });
@@ -121,7 +121,7 @@ export default function AmmunitionAdd({ id, setid, isAmmunitionOpen, setisAmmuni
             updated = [...selectedCategories, item];
         }
         setSelectedCategories(updated);
-        const updatedIds = updated.map(c => String(c.categoryId || c.id || c.value));
+        const updatedIds = updated.map(c => String(c.key || c.id || c.value));
         setValue("categoryIds", updatedIds, { shouldValidate: true });
         trigger("categoryIds");
     };
@@ -258,7 +258,7 @@ export default function AmmunitionAdd({ id, setid, isAmmunitionOpen, setisAmmuni
                                                         fontSize: '13px',
                                                         fontWeight: 'bold'
                                                     }}>
-                                                        <span>{selectedCategories[0].categoryName || selectedCategories[0].name || selectedCategories[0].text}</span>
+                                                        <span>{selectedCategories[0].value || selectedCategories[0].name || selectedCategories[0].text}</span>
                                                         <span
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
@@ -376,7 +376,7 @@ export default function AmmunitionAdd({ id, setid, isAmmunitionOpen, setisAmmuni
                                                             fontWeight: isSelected ? '500' : 'normal'
                                                         }}
                                                     >
-                                                        {item.categoryName || item.name || item.text}
+                                                        {item.categoryName || item.name || item.text || item.value}
                                                     </div>
                                                 );
                                             })}
@@ -407,8 +407,8 @@ export default function AmmunitionAdd({ id, setid, isAmmunitionOpen, setisAmmuni
                                 >
                                     <option value="">Select Manufacturer</option>
                                     {manufacturers.map((mfg) => {
-                                        const mfgId = mfg.id || mfg.manufacturerId || mfg.value;
-                                        const mfgName = mfg.name || mfg.manufacturerName || mfg.text;
+                                        const mfgId = mfg.key || mfg.id || mfg.manufacturerId || mfg.value;
+                                        const mfgName = mfg.name || mfg.manufacturerName || mfg.text || mfg.value;
                                         return (
                                             <option key={mfgId} value={mfgId}>
                                                 {mfgName}
