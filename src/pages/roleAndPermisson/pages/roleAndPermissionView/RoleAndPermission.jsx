@@ -177,7 +177,7 @@ export default function RoleAndPermission() {
 
                                 pageable={{
                                     buttonCount: 5,
-                                    pageSizes: [10, 20, 50],
+                                    pageSizes: [10, 1, 20, 50],
                                     previousNext: true,
                                     info: true,
                                     type: "numeric"

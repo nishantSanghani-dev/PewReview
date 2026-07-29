@@ -5,6 +5,7 @@ import { Grid, GridColumn } from '@progress/kendo-react-grid'
 import { DateCell } from '../../activity/Activity';
 import { handleStatusChange } from '../../../utils/ChangeStatus';
 import { handleDelete } from '../../../utils/DeleteRecords';
+import AccessoriesAdd from './AccessoriesAdd';
 const ActionCell = (props) => {
     const item = props.dataItem;
 
@@ -14,10 +15,10 @@ const ActionCell = (props) => {
             <span className="d-flex gap-2 align-items-center">
 
                 <button
-                    // onClick={() => {
-                    //     props.setismanufacturerOpen(true)
-                    //     props.setid(item.id)
-                    // }}
+                    onClick={() => {
+                        props.setisAccessoriesOpen(true)
+                        props.setid(item.accessoryId || item.id)
+                    }}
 
                     className="small-square-btn edit-btn"
 
@@ -62,6 +63,8 @@ const TextCell = ({ tdProps, dataItem, field }) => (
 );
 export default function Accessories() {
     const [accessoriesData, setaccessoriesData] = useState([])
+    const [isAccessoriesOpen, setisAccessoriesOpen] = useState(false)
+    const [id, setid] = useState(null)
     const getAccessories = async () => {
         const res = await apiRequest("POST", API_ROUTES.accessories.getaccessories, { page: 1, pageSize: 10 }, null, {
             showLoader: true
@@ -85,103 +88,123 @@ export default function Accessories() {
         getAccessories()
     }, [])
     return (
-        <div className="container-fluid">
-            <div className="mb-3 activity-breadcrumb">
-                <span style={{ color: "#666766" }} className="fw-bold">Masters</span>
-                <span className="mx-2 text-dark">/</span>
-                <span className="fw-bold text-dark">Accessories Master</span>
-            </div>
-            <div className="tabbar-section">
-                <div className="row align-items-center gap-3">
-                    <div className="col-12 col-lg-auto">
-                        <form className="d-md-flex searchbar align-items-center" role="search">
-                            <input
-                                className="form-control search-input"
-                                type="search"
-                                placeholder="Search"
-                                aria-label="Search"
+        <>
 
-                            />
-                            <button
-                                className="btn btn-outline-primary search-toggle"
-                                type="button"
+            <div className="container-fluid">
+                <div className="mb-3 activity-breadcrumb">
+                    <span style={{ color: "#666766" }} className="fw-bold">Masters</span>
+                    <span className="mx-2 text-dark">/</span>
+                    <span className="fw-bold text-dark">Accessories Master</span>
+                </div>
+                <div className="tabbar-section">
+                    <div className="row align-items-center gap-3">
+                        <div className="col-12 col-lg-auto">
+                            <form className="d-md-flex searchbar align-items-center" role="search">
+                                <input
+                                    className="form-control search-input"
+                                    type="search"
+                                    placeholder="Search"
+                                    aria-label="Search"
 
-                            >
-                                <i className="demo-icon icon-search" />
-                            </button>
-                        </form>
-                    </div>
-                    <div className="col-12 col-lg">
-                        <div className="btn-list d-flex justify-content-lg-end flex-wrap gap-2 gap-md-3 text-end">
+                                />
+                                <button
+                                    className="btn btn-outline-primary search-toggle"
+                                    type="button"
 
-                            <button
-                                // onClick={() => setismanufacturerOpen(true)}
-                                className="btn main-btn border-btn blue-btn"
-                                style={{
-                                    background: "linear-gradient(90deg, rgb(193, 39, 45) 0%, rgb(0 0 0 / 92%) 100%)",
-                                    color: "white"
-                                }}
-                            >
-                                Add
-                            </button>
+                                >
+                                    <i className="demo-icon icon-search" />
+                                </button>
+                            </form>
+                        </div>
+                        <div className="col-12 col-lg">
+                            <div className="btn-list d-flex justify-content-lg-end flex-wrap gap-2 gap-md-3 text-end">
+
+                                <button
+                                    onClick={() => {
+                                        setid(null);
+                                        setisAccessoriesOpen(true);
+                                    }}
+                                    className="btn main-btn border-btn blue-btn"
+                                    style={{
+                                        background: "linear-gradient(90deg, rgb(193, 39, 45) 0%, rgb(0 0 0 / 92%) 100%)",
+                                        color: "white"
+                                    }}
+                                >
+                                    Add
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div className="row">
-                    <div className="col-12 mt-3 mt-xxl-4">
-                        <div className="table-responsive">
-                            <Grid
-                                className="table-wrapper"
-                                data={accessoriesData}
-                                pageable={{
-                                    buttonCount: 5,
-                                    pageSizes: [10, 20, 50],
-                                    previousNext: true,
-                                    info: true,
-                                    type: "numeric"
-                                }}
-                            >
-                                {
-                                    accessoriesColumn?.map((col, ind) => {
-                                        return (
-                                            <GridColumn
-                                                key={col.field}
-                                                field={col.field}
-                                                title={col.title}
-                                                width={col.width || "150px"}
-                                                pageable={{
-                                                    buttonCount: 4,
-                                                    pageSizes: [20, 50, 200],
-                                                    previousNext: true,
-                                                    info: true,
-                                                    type: "numeric"
-                                                }}
-                                                cells={
-                                                    col.cell
-                                                        ? {
-                                                            data: (props) => (
-                                                                <col.cell
+                    <div className="row">
+                        <div className="col-12 mt-3 mt-xxl-4">
+                            <div className="table-responsive">
+                                <Grid
+                                    className="table-wrapper"
+                                    data={accessoriesData}
+                                    pageable={{
+                                        buttonCount: 5,
+                                        pageSizes: [10, 20, 50],
+                                        previousNext: true,
+                                        info: true,
+                                        type: "numeric"
+                                    }}
+                                >
+                                    {
+                                        accessoriesColumn?.map((col, ind) => {
+                                            return (
+                                                <GridColumn
+                                                    key={col.field}
+                                                    field={col.field}
+                                                    title={col.title}
+                                                    width={col.width || "150px"}
+                                                    pageable={{
+                                                        buttonCount: 4,
+                                                        pageSizes: [20, 50, 200],
+                                                        previousNext: true,
+                                                        info: true,
+                                                        type: "numeric"
+                                                    }}
+                                                    cells={
+                                                        col.cell
+                                                            ? {
+                                                                data: (props) => (
+                                                                    <col.cell
                                                                     {...props}
                                                                     getAccessories={getAccessories}
+                                                                    setisAccessoriesOpen={setisAccessoriesOpen}
+                                                                    setid={setid}
                                                                 />
-                                                            )
-                                                        }
-                                                        : {
-                                                            data: (props) => (
-                                                                <TextCell {...props} field={col.field} />
-                                                            )
-                                                        }
-                                                }
-                                            />
-                                        )
-                                    })
-                                }
+                                                                )
+                                                            }
+                                                            : {
+                                                                data: (props) => (
+                                                                    <TextCell {...props} field={col.field} />
+                                                                )
+                                                            }
+                                                    }
+                                                />
+                                            )
+                                        })
+                                    }
 
-                            </Grid>
+                                </Grid>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+
+            {
+                isAccessoriesOpen
+                &&
+                <AccessoriesAdd 
+                    id={id}
+                    setid={setid}
+                    isAccessoriesOpen={isAccessoriesOpen}
+                    setisAccessoriesOpen={setisAccessoriesOpen}
+                    getAccessories={getAccessories}
+                />
+            }
+        </>
     )
 }

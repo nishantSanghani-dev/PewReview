@@ -114,8 +114,11 @@ export default function RoleAndPermissionAdd() {
 
                                     <li className="breadcrumb-item">
                                         <a href="javascript:void(0);">
-                                            <h2>Role & Permission
-                                                /
+                                            <h2>
+                                                <span className='text-danger'>
+                                                    Role & Permission
+                                                </span>
+                                                &nbsp;/
                                                 Add Role & Permission</h2>
                                         </a>
                                     </li>
@@ -200,8 +203,10 @@ export default function RoleAndPermissionAdd() {
                                                                     </td>
                                                                     <td>
                                                                         {
+
                                                                             !value?.isCreateHide
                                                                             &&
+
 
                                                                             <label className="custom-checkbox">
                                                                                 <input
@@ -213,7 +218,9 @@ export default function RoleAndPermissionAdd() {
                                                                                 />
                                                                                 <span className="checkmark" />
                                                                             </label>
+
                                                                         }
+
                                                                     </td>
                                                                     <td>
                                                                         {

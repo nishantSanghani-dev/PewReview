@@ -78,10 +78,10 @@ export default function SideBar({ mobileSlideBar, setmobileSlideBar }) {
                             </NavLink>
                         </li>
                         <li>
-                            <a href="javascript:void(0);">
+                            <NavLink to={'/admin/leaderboard'}>
                                 <i className="demo-icon icon-leaderboard" />
                                 <span>Leaderboard</span>
-                            </a>
+                            </NavLink>
                         </li>
                         <li>
                             <NavLink to={'/admin/manage-badges'}>

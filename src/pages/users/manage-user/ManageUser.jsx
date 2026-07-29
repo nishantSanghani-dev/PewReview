@@ -41,6 +41,10 @@ export default function ManageUser() {
     }
 
     const handleDelete = async () => {
+        if (ids.length == 0) {
+            alert("Please Select Records")
+            return
+        }
         if (confirm("Are You Want To Delete User ?")) {
 
             const res = await apiRequest("DELETE", API_ROUTES.user.userDelete, { userIds: ids }, null, {
@@ -49,9 +53,16 @@ export default function ManageUser() {
             })
             if (res.status) {
                 getManageUser()
+                setids([])
             }
         }
 
+    }
+
+    const exportData = async () => {
+        const res = await apiRequest("POST", API_ROUTES.user.userExport, { page: 1, pageSize: 10 }, null, {
+            showLoader: true
+        })
     }
     useEffect(() => {
         getManageUser()
@@ -98,12 +109,12 @@ export default function ManageUser() {
                             >
                                 Import
                             </a>
-                            <a
-                                href="javascript:void(0);"
+                            <button
+                                onClick={exportData}
                                 className="btn main-btn border-btn sky-btn"
                             >
                                 Export
-                            </a>
+                            </button>
                             <Link
                                 to={'/admin/user/add'}
                                 className="btn main-btn border-btn blue-btn"
@@ -120,10 +131,7 @@ export default function ManageUser() {
                                 <thead className="table-dark">
                                     <tr>
                                         <th>
-                                            <label className="custom-checkbox">
-                                                <input type="checkbox" id="parentCheckbox" />
-                                                <span className="checkmark" />
-                                            </label>
+
                                         </th>
                                         <th>Action</th>
                                         <th>First Name</th>

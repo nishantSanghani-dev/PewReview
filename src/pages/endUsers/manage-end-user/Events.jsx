@@ -105,6 +105,9 @@ export default function Events({ data, isUpcomingEvent, setisUpcomingEvent }) {
                             <div className="table-responsive">
                                 <Grid
                                     className="table-wrapper fw-bold text-center"
+                                    style={{
+                                        zIndex: "999"
+                                    }}
                                     data={data}
                                     sortable
                                     pageable={{

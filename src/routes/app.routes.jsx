@@ -32,6 +32,7 @@ import Accessories from "../pages/masters/accessories/Accessories";
 import GunMaster from "../pages/masters/gunMaster/GunMaster";
 import Ammunition from "../pages/masters/ammunition/Ammunition";
 import CategoryMaster from "../pages/masters/category/CategoryMaster";
+import LeaderBoard from "../pages/leaderboards/LeaderBoard";
 
 export const routes = createBrowserRouter([
     {
@@ -204,6 +205,10 @@ export const routes = createBrowserRouter([
                         element: <CategoryMaster />
                     }
                 ]
+            },
+            {
+                path: "leaderboard",
+                element: <LeaderBoard />
             }
         ],
     },

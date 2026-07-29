@@ -7,8 +7,6 @@ export const handleDelete = async (
     routes,
     refreshData
 ) => {
-
-
     if (confirm("Are You Sure To Delete Record ?")) {
         const res = await apiRequest(
             "DELETE",

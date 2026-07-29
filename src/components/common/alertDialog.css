@@ -1,0 +1,32 @@
+.modal-content {
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+}
+
+.modal-header,
+.modal-footer {
+    border-color: #e9ecef !important;
+}
+
+.btn-close:focus {
+    box-shadow: none;
+}
+
+@media (max-width: 576px) {
+    .modal-dialog {
+        margin: 1rem;
+    }
+
+    .modal-footer {
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .modal-footer .btn {
+        flex: 1;
+        max-width: 150px;
+    }
+
+    .modal-title {
+        font-size: 18px !important;
+    }
+}

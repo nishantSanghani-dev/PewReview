@@ -24,8 +24,6 @@ export default function SupportTicketEdit({ showModal, setShowModal, ticketId, s
     const handleTicketEdit = async (event) => {
         event.preventDefault()
         editData.ticketId = ticketId
-      
-
         const payload = {
             ...editData,
             description: editData.description?.trim() || "-",
@@ -162,7 +160,7 @@ export default function SupportTicketEdit({ showModal, setShowModal, ticketId, s
                                     Cancel
                                 </button>
 
-                                <button className="btn btn-save">
+                                <button type='submit' className="btn btn-save">
                                     Save
                                 </button>
 

@@ -1,16 +1,16 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import React, { useEffect, useState, useRef } from 'react'
 import { useForm } from 'react-hook-form';
-import { ammunitionSchema } from '../../../validation/zod.validation';
+import { accessorySchema } from '../../../validation/zod.validation';
 import { apiRequest } from '../../../services/Api';
 import { API_ROUTES } from '../../../routes/api.routes';
 
-export default function AmmunitionAdd({ id, setid, isAmmunitionOpen, setisAmmunitionOpen, getAmmunition }) {
+export default function AccessoriesAdd({ id, setid, isAccessoriesOpen, setisAccessoriesOpen, getAccessories }) {
     const [categories, setCategories] = useState([]);
-    const [manufacturers, setManufacturers] = useState([]);
-    const [selectedCategories, setSelectedCategories] = useState([]);
-    const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
-    const categoryDropdownRef = useRef(null);
+    const [gunData, setgunData] = useState([]);
+    const [selectedGuns, setSelectedGuns] = useState([]);
+    const [isGunOpen, setIsGunOpen] = useState(false);
+    const gunDropdownRef = useRef(null);
 
     const {
         register,
@@ -20,23 +20,23 @@ export default function AmmunitionAdd({ id, setid, isAmmunitionOpen, setisAmmuni
         setValue,
         trigger,
     } = useForm({
-        resolver: zodResolver(ammunitionSchema),
+        resolver: zodResolver(accessorySchema),
         defaultValues: {
-            name: "",
-            categoryIds: [],
-            manufacturerId: "",
+            accessoryName: "",
+            categoryId: "",
+            gunIds: [],
             description: "",
         },
     });
 
     // Register custom field
     useEffect(() => {
-        register("categoryIds");
+        register("gunIds");
     }, [register]);
 
     const fetchCategories = async () => {
         const res = await apiRequest("GET", API_ROUTES.category.categoryDropdown, null, {
-            applicableFor: 1
+            applicableFor: 2
         }, {
             showLoader: true
         });
@@ -45,59 +45,59 @@ export default function AmmunitionAdd({ id, setid, isAmmunitionOpen, setisAmmuni
         }
     };
 
-    const fetchManufacturers = async () => {
-        const res = await apiRequest("GET", API_ROUTES.manufacturer.manufacturerDropdown, null, null, {
+    const getGun = async () => {
+        const res = await apiRequest("GET", API_ROUTES.gun.getGunDropDown, null, null, {
             showLoader: true
         });
         if (res.status && res.data) {
-            setManufacturers(res.data);
+            setgunData(res.data);
         }
     };
 
     const getSingleRecord = async () => {
-        const res = await apiRequest("GET", API_ROUTES.ammunition.ammunitionGetById, null, { id }, {
+        const res = await apiRequest("GET", API_ROUTES.accessories.accessoriesGetById, null, { id }, {
             showLoader: true
         });
 
         if (res.status && res.data) {
-            const fetchedCategoryIds = res.data.categoryIds || (res.data.categoryId ? [res.data.categoryId] : []);
             reset({
-                name: res.data.name || "",
-                categoryIds: fetchedCategoryIds,
-                manufacturerId: res.data.manufacturerId || "",
+                accessoryName: res.data.accessoryName || "",
+                categoryId: res.data.categoryId || "",
+                gunIds: res.data.gunIds || [],
                 description: res.data.description || "",
             });
 
-            // Map and set the selected category objects for pills
-            if (categories.length > 0) {
-                const selected = categories.filter(cat => {
-                    const catId = cat.categoryId || cat.id || cat.value;
-                    return fetchedCategoryIds.includes(String(catId));
+            // Map and set the selected gun objects for pills
+            if (gunData.length > 0 && res.data.gunIds) {
+                const selected = gunData.filter(gun => {
+                    const gunIdStr = String(gun.gunId || gun.id);
+                    return res.data.gunIds.includes(gunIdStr);
                 });
-                setSelectedCategories(selected);
+                setSelectedGuns(selected);
+            } else if (res.data.guns && Array.isArray(res.data.guns)) {
+                setSelectedGuns(res.data.guns);
             }
         }
     };
 
-    // Keep selectedCategories in sync if categories load after single record
+    // Keep selectedGuns in sync if guns load after single record
     useEffect(() => {
-        if (id && categories.length > 0) {
+        if (id && gunData.length > 0) {
             getSingleRecord();
         }
-    }, [categories]);
+    }, [gunData]);
 
     const onSubmit = async (data) => {
         let res;
         if (id) {
-            data.id = id;
-            res = await apiRequest("PUT", API_ROUTES.ammunition.ammunitionUpdate, data, null, {
+            res = await apiRequest("PUT", API_ROUTES.accessories.accessoriesEdit(id), data, null, {
                 showLoader: true,
                 showToaster: true
             });
         } else {
             res = await apiRequest(
                 "POST",
-                API_ROUTES.ammunition.ammunitionAdd,
+                API_ROUTES.accessories.accessoriesAdd,
                 data,
                 null, {
                 showLoader: true,
@@ -107,47 +107,47 @@ export default function AmmunitionAdd({ id, setid, isAmmunitionOpen, setisAmmuni
         }
 
         if (res.status) {
-            setisAmmunitionOpen(false);
+            setisAccessoriesOpen(false);
             setid(null);
-            getAmmunition();
+            getAccessories();
         }
     };
 
-    const handleSelectCategory = (item) => {
-        const itemId = String(item.categoryId || item.id || item.value);
-        const isSelected = selectedCategories.some(c => String(c.categoryId || c.id || c.value) === itemId);
-        let updated = [];
+    const handleSelectGun = (item) => {
+        const itemId = String(item.gunId || item.id);
+        const isSelected = selectedGuns.some(g => String(g.gunId || g.id) === itemId);
+        let updatedGuns = [];
         if (isSelected) {
-            updated = selectedCategories.filter(c => String(c.categoryId || c.id || c.value) !== itemId);
+            updatedGuns = selectedGuns.filter(g => String(g.gunId || g.id) !== itemId);
         } else {
-            updated = [...selectedCategories, item];
+            updatedGuns = [...selectedGuns, item];
         }
-        setSelectedCategories(updated);
-        const updatedIds = updated.map(c => String(c.key || c.id || c.value));
-        setValue("categoryIds", updatedIds, { shouldValidate: true });
-        trigger("categoryIds");
+        setSelectedGuns(updatedGuns);
+        const updatedIds = updatedGuns.map(g => String(g.gunId || g.id));
+        setValue("gunIds", updatedIds, { shouldValidate: true });
+        trigger("gunIds");
     };
 
-    const handleRemoveCategory = (item) => {
-        const itemId = String(item.categoryId || item.id || item.value);
-        const updated = selectedCategories.filter(c => String(c.categoryId || c.id || c.value) !== itemId);
-        setSelectedCategories(updated);
-        const updatedIds = updated.map(c => String(c.categoryId || c.id || c.value));
-        setValue("categoryIds", updatedIds, { shouldValidate: true });
-        trigger("categoryIds");
+    const handleRemoveGun = (item) => {
+        const itemId = String(item.gunId || item.id);
+        const updatedGuns = selectedGuns.filter(g => String(g.gunId || g.id) !== itemId);
+        setSelectedGuns(updatedGuns);
+        const updatedIds = updatedGuns.map(g => String(g.gunId || g.id));
+        setValue("gunIds", updatedIds, { shouldValidate: true });
+        trigger("gunIds");
     };
 
-    const handleClearAllCategories = () => {
-        setSelectedCategories([]);
-        setValue("categoryIds", [], { shouldValidate: true });
-        trigger("categoryIds");
+    const handleClearAllGuns = () => {
+        setSelectedGuns([]);
+        setValue("gunIds", [], { shouldValidate: true });
+        trigger("gunIds");
     };
 
     // Close dropdown on click outside
     useEffect(() => {
         const handleClickOutside = (event) => {
-            if (categoryDropdownRef.current && !categoryDropdownRef.current.contains(event.target)) {
-                setIsCategoryDropdownOpen(false);
+            if (gunDropdownRef.current && !gunDropdownRef.current.contains(event.target)) {
+                setIsGunOpen(false);
             }
         };
         document.addEventListener("mousedown", handleClickOutside);
@@ -158,7 +158,7 @@ export default function AmmunitionAdd({ id, setid, isAmmunitionOpen, setisAmmuni
 
     useEffect(() => {
         fetchCategories();
-        fetchManufacturers();
+        getGun();
     }, []);
 
     return (
@@ -181,14 +181,14 @@ export default function AmmunitionAdd({ id, setid, isAmmunitionOpen, setisAmmuni
                             className="modal-title fw-bold mb-0"
                             style={{ fontSize: "20px" }}
                         >
-                            {id ? "Edit Ammunition" : "Add Ammunition"}
+                            {id ? "Edit Accessory" : "Add Accessory"}
                         </h3>
 
                         <button
                             type="button"
                             className="btn-close fs-5"
                             onClick={() => {
-                                setisAmmunitionOpen(false);
+                                setisAccessoriesOpen(false);
                                 setid(null);
                             }}
                         />
@@ -198,36 +198,69 @@ export default function AmmunitionAdd({ id, setid, isAmmunitionOpen, setisAmmuni
                     <form onSubmit={handleSubmit(onSubmit)}>
                         <div className="modal-body px-4 py-3">
 
-                            {/* Ammunition Name */}
+                            {/* Accessory Name */}
                             <div className="form-group mb-3">
                                 <label className="fw-semibold">
-                                    Ammunition Name <span className="text-danger">*</span>
+                                    Accessory Name <span className="text-danger">*</span>
                                 </label>
 
                                 <input
                                     type="text"
-                                    {...register("name")}
-                                    className={`form-control ${errors.name ? "is-invalid" : ""}`}
+                                    {...register("accessoryName")}
+                                    className={`form-control ${errors.accessoryName ? "is-invalid" : ""}`}
                                     style={{
                                         height: "40px",
                                         borderRadius: "10px"
                                     }}
                                 />
 
-                                {errors.name && (
+                                {errors.accessoryName && (
                                     <div className="invalid-feedback d-block">
-                                        {errors.name.message}
+                                        {errors.accessoryName.message}
                                     </div>
                                 )}
                             </div>
 
-                            {/* Categories Dropdown (Multi-Select) */}
+                            {/* Category Select */}
                             <div className="form-group mb-3">
                                 <label className="fw-semibold">
-                                    Categories
+                                    Category <span className="text-danger">*</span>
                                 </label>
 
-                                <div className={`custom-dropdown ${errors.categoryIds ? "is-invalid" : ""}`} ref={categoryDropdownRef}>
+                                <select
+                                    {...register("categoryId")}
+                                    className={`form-control form-select ${errors.categoryId ? "is-invalid" : ""}`}
+                                    style={{
+                                        height: "40px",
+                                        borderRadius: "10px"
+                                    }}
+                                >
+                                    <option value="">Select Category</option>
+                                    {categories.map((cat) => {
+                                        const catId = cat.key || cat.categoryId || cat.id || cat.value;
+                                        const catName = cat.categoryName || cat.name || cat.text || cat.value;
+                                        return (
+                                            <option key={catId} value={catId}>
+                                                {catName}
+                                            </option>
+                                        );
+                                    })}
+                                </select>
+
+                                {errors.categoryId && (
+                                    <div className="invalid-feedback d-block">
+                                        {errors.categoryId.message}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Gun Dropdown (Multi-Select) */}
+                            <div className="form-group mb-3">
+                                <label className="fw-semibold">
+                                    Gun <span className="text-danger">*</span>
+                                </label>
+
+                                <div className={`custom-dropdown ${errors.gunIds ? "is-invalid" : ""}`} ref={gunDropdownRef}>
                                     <div
                                         className="custom-dropdown-toggle"
                                         style={{
@@ -242,14 +275,14 @@ export default function AmmunitionAdd({ id, setid, isAmmunitionOpen, setisAmmuni
                                             cursor: 'pointer',
                                             backgroundColor: '#fff'
                                         }}
-                                        onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
+                                        onClick={() => setIsGunOpen(!isGunOpen)}
                                     >
                                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', width: '90%' }}>
-                                            {selectedCategories.length === 0 ? (
-                                                <span style={{ color: '#6c757d' }}>Select Categories</span>
+                                            {selectedGuns.length === 0 ? (
+                                                <span style={{ color: '#6c757d' }}>Select guns</span>
                                             ) : (
                                                 <>
-                                                    {/* First Selected Category */}
+                                                    {/* First Selected Gun */}
                                                     <div style={{
                                                         display: 'inline-flex',
                                                         alignItems: 'center',
@@ -260,11 +293,11 @@ export default function AmmunitionAdd({ id, setid, isAmmunitionOpen, setisAmmuni
                                                         fontSize: '13px',
                                                         fontWeight: 'bold'
                                                     }}>
-                                                        <span>{selectedCategories[0].value || selectedCategories[0].name || selectedCategories[0].text}</span>
+                                                        <span>{selectedGuns[0].gunName || selectedGuns[0].name || selectedGuns[0].text}</span>
                                                         <span
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
-                                                                handleRemoveCategory(selectedCategories[0]);
+                                                                handleRemoveGun(selectedGuns[0]);
                                                             }}
                                                             style={{
                                                                 marginLeft: '8px',
@@ -285,7 +318,7 @@ export default function AmmunitionAdd({ id, setid, isAmmunitionOpen, setisAmmuni
                                                     </div>
 
                                                     {/* Remaining Items Summary Tag */}
-                                                    {selectedCategories.length > 1 && (
+                                                    {selectedGuns.length > 1 && (
                                                         <div style={{
                                                             display: 'inline-flex',
                                                             alignItems: 'center',
@@ -296,14 +329,14 @@ export default function AmmunitionAdd({ id, setid, isAmmunitionOpen, setisAmmuni
                                                             fontSize: '13px',
                                                             fontWeight: 'bold'
                                                         }}>
-                                                            <span>{selectedCategories.length - 1} item selected</span>
+                                                            <span>{selectedGuns.length - 1} items selected</span>
                                                             <span
                                                                 onClick={(e) => {
                                                                     e.stopPropagation();
-                                                                    setSelectedCategories([selectedCategories[0]]);
-                                                                    const singleId = String(selectedCategories[0].categoryId || selectedCategories[0].id || selectedCategories[0].value);
-                                                                    setValue("categoryIds", [singleId], { shouldValidate: true });
-                                                                    trigger("categoryIds");
+                                                                    setSelectedGuns([selectedGuns[0]]);
+                                                                    const singleId = String(selectedGuns[0].gunId || selectedGuns[0].id);
+                                                                    setValue("gunIds", [singleId], { shouldValidate: true });
+                                                                    trigger("gunIds");
                                                                 }}
                                                                 style={{
                                                                     marginLeft: '8px',
@@ -328,11 +361,11 @@ export default function AmmunitionAdd({ id, setid, isAmmunitionOpen, setisAmmuni
                                         </div>
 
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                            {selectedCategories.length > 0 && (
+                                            {selectedGuns.length > 0 && (
                                                 <span
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        handleClearAllCategories();
+                                                        handleClearAllGuns();
                                                     }}
                                                     style={{
                                                         cursor: 'pointer',
@@ -344,12 +377,12 @@ export default function AmmunitionAdd({ id, setid, isAmmunitionOpen, setisAmmuni
                                                     &times;
                                                 </span>
                                             )}
-                                            <i className={`demo-icon ${isCategoryDropdownOpen ? "icon-angle-up" : "icon-angle-down"}`}></i>
+                                            <i className={`demo-icon ${isGunOpen ? "icon-angle-up" : "icon-angle-down"}`}></i>
                                         </div>
                                     </div>
 
                                     {/* Dropdown Menu */}
-                                    {isCategoryDropdownOpen && (
+                                    {isGunOpen && (
                                         <div className="custom-dropdown-menu" style={{
                                             position: 'absolute',
                                             zIndex: 1000,
@@ -362,14 +395,14 @@ export default function AmmunitionAdd({ id, setid, isAmmunitionOpen, setisAmmuni
                                             marginTop: '4px',
                                             boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
                                         }}>
-                                            {categories.map((item, index) => {
-                                                const itemId = String(item.categoryId || item.id || item.value);
-                                                const isSelected = selectedCategories.some(c => String(c.categoryId || c.id || c.value) === itemId);
+                                            {gunData.map((item, index) => {
+                                                const itemId = String(item.gunId || item.id);
+                                                const isSelected = selectedGuns.some(g => String(g.gunId || g.id) === itemId);
                                                 return (
                                                     <div
                                                         key={index}
                                                         className="custom-dropdown-item d-flex justify-content-between align-items-center"
-                                                        onClick={() => handleSelectCategory(item)}
+                                                        onClick={() => handleSelectGun(item)}
                                                         style={{
                                                             padding: '8px 14px',
                                                             cursor: 'pointer',
@@ -378,7 +411,7 @@ export default function AmmunitionAdd({ id, setid, isAmmunitionOpen, setisAmmuni
                                                             fontWeight: isSelected ? '500' : 'normal'
                                                         }}
                                                     >
-                                                        {item.categoryName || item.name || item.text || item.value}
+                                                        {item.gunName || item.name || item.text}
                                                     </div>
                                                 );
                                             })}
@@ -386,45 +419,13 @@ export default function AmmunitionAdd({ id, setid, isAmmunitionOpen, setisAmmuni
                                     )}
                                 </div>
 
-                                {errors.categoryIds && (
+                                {errors.gunIds && (
                                     <div className="invalid-feedback d-block">
-                                        {errors.categoryIds.message}
+                                        {errors.gunIds.message}
                                     </div>
                                 )}
                             </div>
 
-                            {/* Manufacturer Select */}
-                            <div className="form-group mb-3">
-                                <label className="fw-semibold">
-                                    Manufacturer <span className="text-danger">*</span>
-                                </label>
-
-                                <select
-                                    {...register("manufacturerId")}
-                                    className={`form-control form-select ${errors.manufacturerId ? "is-invalid" : ""}`}
-                                    style={{
-                                        height: "40px",
-                                        borderRadius: "10px"
-                                    }}
-                                >
-                                    <option value="">Select Manufacturer</option>
-                                    {manufacturers.map((mfg) => {
-                                        const mfgId = mfg.key || mfg.id || mfg.manufacturerId || mfg.value;
-                                        const mfgName = mfg.name || mfg.manufacturerName || mfg.text || mfg.value;
-                                        return (
-                                            <option key={mfgId} value={mfgId}>
-                                                {mfgName}
-                                            </option>
-                                        );
-                                    })}
-                                </select>
-
-                                {errors.manufacturerId && (
-                                    <div className="invalid-feedback d-block">
-                                        {errors.manufacturerId.message}
-                                    </div>
-                                )}
-                            </div>
 
                             {/* Description */}
                             <div className="form-group mb-3">
@@ -464,7 +465,7 @@ export default function AmmunitionAdd({ id, setid, isAmmunitionOpen, setisAmmuni
                                 }}
                                 onClick={() => {
                                     reset();
-                                    setisAmmunitionOpen(false);
+                                    setisAccessoriesOpen(false);
                                     setid(null);
                                 }}
                             >

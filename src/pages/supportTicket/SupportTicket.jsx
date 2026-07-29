@@ -68,17 +68,33 @@ const DetailCell = ({ tdProps, dataItem, field }) => {
         </td>
     )
 }
-const ApprovalStatusCell = ({ tdProps, dataItem, statusOptions }) => {
+const ApprovalStatusCell = ({ tdProps, dataItem, statusOptions, getTickets }) => {
 
+    const supportTicketAsyncEdit = async (id) => {
+        const payload = {
+            statusId: id,
+            ticketId: dataItem.id,
+            adminDescription: null
+        }
+        if (confirm("Are You Want To Chnage Ticket Status ? ")) {
 
+            const res = await apiRequest("POST", API_ROUTES.supportTicket.supportTicketsUpdateAsync, payload, null, {
+                showLoader: true,
+                showToaster: true
+            })
+            if (res.status) {
+                getTickets()
+            }
+        }
+    }
     return (
         <td {...tdProps}>
             <div className="approval-status-wrapper">
 
-                <select className="approval-status-select" defaultValue={dataItem.status}>
+                <select onChange={(e) => supportTicketAsyncEdit(e.target.value)} className="approval-status-select" defaultValue={dataItem.status}>
                     <option value="">{dataItem.status}</option>
                     {statusOptions && statusOptions.map((status, index) => (
-                        <option disabled={dataItem.status === status.description} key={index} value={status}>
+                        <option disabled={dataItem.status === status.description} key={index} value={status.id}>
                             {status.description}
                         </option>
                     ))}

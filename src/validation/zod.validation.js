@@ -162,3 +162,23 @@ export const ammunitionSchema = z.object({
         .optional()
         .or(z.literal(""))
 });
+
+export const accessorySchema = z.object({
+    accessoryName: z
+        .string()
+        .trim()
+        .min(1, "Accessory Name is required")
+        .max(100, "Maximum 100 characters allowed"),
+    categoryId: z
+        .string()
+        .min(1, "Category is required"),
+    gunIds: z
+        .array(z.string())
+        .min(1, "At least one gun is required"),
+    description: z
+        .string()
+        .trim()
+        .max(500, "Maximum 500 characters allowed")
+        .optional()
+        .or(z.literal(""))
+});

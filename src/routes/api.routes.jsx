@@ -10,7 +10,8 @@ export const API_ROUTES = {
         userStatusUpdate: (id) => `User/UpdateStatus/${id}`,
         userDelete: `User`,
         userSingleView: (id) => `User/${id}`,
-        userEdit: `User/update`
+        userEdit: `User/update`,
+        userExport: "User/GetExportUsersToken"
     },
     endUser: {
         endUserView: "EndUser/GetUsers",
@@ -68,9 +69,10 @@ export const API_ROUTES = {
         SupportTicketViewList: "SupportTicket/List",
         supportTicketViewById: (id) => `SupportTicket/${id}`,
         supportTicketUpdate: "SupportTicket/Update",
-        supportTicketDelete: (id) => `SupportTicket/Delete/${id}`
+        supportTicketDelete: (id) => `SupportTicket/Delete/${id}`,
+        supportTicketsUpdateAsync: "SupportTicket/StatusUpadteAsync"
     },
-    report: {
+    reportDashboard: {
         getReportList: "Report/GetReportList"
     },
     groups: {
@@ -107,7 +109,10 @@ export const API_ROUTES = {
     accessories: {
         getaccessories: "Accessory/List",
         accessoriesStatusUpdate: (id) => `Accessory/UpdateStatus/${id}`,
-        accessoroesDelete: (id) => `Accessory/Delete/${id}`
+        accessoroesDelete: (id) => `Accessory/Delete/${id}`,
+        accessoriesAdd: "Accessory/Add",
+        accessoriesGetById: "Accessory/Get",
+        accessoriesEdit: (id) => `Accessory/Edit/${id}`
     },
     ammunition: {
         getammunition: "Ammunition/List",
@@ -121,7 +126,7 @@ export const API_ROUTES = {
         getCategoryMaster: "GunCategoryMaster/List",
         categoryMasterUpdate: (id) => `GunCategoryMaster/UpdateStatus/${id}`,
         categoryMasterDelete: (id) => `GunCategoryMaster/Delete/${id}`,
-        categoryDropdown: "GunCategoryMaster/CategoryDropdown?applicableFor=1"
+        categoryDropdown: "GunCategoryMaster/CategoryDropdown"
     },
     report: {
         getReport: "Report/GetUserReportList"

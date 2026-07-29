@@ -20,7 +20,7 @@ export default function ReportedUser({ reportedId, setisOpenReportedPerson, filt
 
 
     const getReprtedPerson = async () => {
-        const res = await apiRequest("POST", API_ROUTES.report.getReportList, { pageNumber: 1, pageSize: 10, filter: fltr, reportedId, reportTypeId: 3 }, null, {
+        const res = await apiRequest("POST", API_ROUTES.reportDashboard.getReportList, { pageNumber: 1, pageSize: 10, filter: fltr, reportedId, reportTypeId: 3 }, null, {
             showLoader: true
         })
         console.log(res.data);
