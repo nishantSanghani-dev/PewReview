@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { apiRequest } from '../../services/Api'
 import { API_ROUTES } from '../../routes/api.routes'
 import { Grid, GridColumn } from '@progress/kendo-react-grid';
+import BreadCumb from '../../components/common/breadCumb/BreadCumb';
 const MemberCell = (props) => {
 
 
@@ -49,31 +50,7 @@ export default function GroupMember() {
         <div className="container-fluid  ">
 
             {/* Breadcrumb */}
-            <div className="mb-4 activity-breadcrumb">
-                < span className="text-danger fw-bold" > Groups</span >
-                <span className="mx-2 text-dark">/</span>
-                <span className="text-danger fw-bold">Group Details</span>
-                <span className="mx-2 text-dark">/</span>
-                <span className="fw-bold text-dark">Group Members</span>
-            </div >
-
-            <div className='mt-4' style={{ width: "230px" }}>
-                <form className="d-md-flex searchbar align-items-center" role="search">
-                    <input
-                        className="form-control search-input"
-                        type="search"
-                        placeholder="Search"
-                        aria-label="Search"
-
-                    />
-                    <button
-                        className="btn btn-outline-primary search-toggle"
-                        type="button"
-                    >
-                        <i className="demo-icon icon-search" />
-                    </button>
-                </form>
-            </div>
+            <BreadCumb items={[{ label: "Group Details", path: `/admin/groups/view/${id}` }, { label: "Group Members" }]} />
 
             <div className="accordion-body mt-3 mt-xxl-4">
                 <div className="row">

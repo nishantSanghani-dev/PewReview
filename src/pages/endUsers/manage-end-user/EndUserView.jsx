@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import BreadCumb from '../../../components/common/breadCumb/BreadCumb'
 import { apiRequest } from '../../../services/Api'
 import { useParams } from 'react-router-dom'
 import { API_ROUTES } from '../../../routes/api.routes'
@@ -105,18 +106,7 @@ export default function EndUserView() {
                 <div className="tabbar-section">
                     <div className="row">
                         <div className="col-12">
-                            <nav aria-label="breadcrumb">
-                                <ol className="breadcrumb m-0">
-                                    <li className="breadcrumb-item">
-                                        <i className="demo-icon icon-down-arrow" />
-                                    </li>
-                                    <li className="breadcrumb-item">
-                                        <a href="javascript:void(0);">
-                                            <h2>View End Users</h2>
-                                        </a>
-                                    </li>
-                                </ol>
-                            </nav>
+                            <BreadCumb items={[{ label: "End User", path: "/admin/manage-end-user" }, { label: "View End Users" }]} />
                         </div>
                     </div>
                     <div className="row">

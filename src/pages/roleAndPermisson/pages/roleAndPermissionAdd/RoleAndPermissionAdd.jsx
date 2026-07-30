@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { zodResolver } from '@hookform/resolvers/zod';
 import React, { useEffect, useState } from 'react'
+import BreadCumb from '../../../../components/common/breadCumb/BreadCumb'
 import { useForm } from 'react-hook-form';
 import { useFormAction, useNavigate, useParams } from 'react-router-dom';
 import { apiRequest } from '../../../../services/Api';
@@ -109,21 +110,7 @@ export default function RoleAndPermissionAdd() {
                 <div className="tabbar-section">
                     <div className="row">
                         <div className="col-12">
-                            <nav aria-label="breadcrumb">
-                                <ol className="breadcrumb m-0">
-
-                                    <li className="breadcrumb-item">
-                                        <a href="javascript:void(0);">
-                                            <h2>
-                                                <span className='text-danger'>
-                                                    Role & Permission
-                                                </span>
-                                                &nbsp;/
-                                                Add Role & Permission</h2>
-                                        </a>
-                                    </li>
-                                </ol>
-                            </nav>
+                            <BreadCumb items={[{ label: "Role & Permission", path: "/admin/role-and-permission/view" }, { label: "Add Role & Permission" }]} />
                         </div>
                     </div>
                     <div className="row">

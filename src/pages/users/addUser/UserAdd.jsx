@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 
 import React, { useEffect, useState } from 'react'
+import BreadCumb from '../../../components/common/breadCumb/BreadCumb'
 import UserForm from '../components/UserForm'
 import { apiRequest } from '../../../services/Api'
 import { API_ROUTES } from '../../../routes/api.routes'
@@ -68,18 +69,7 @@ export default function UserAdd() {
             <div className="tabbar-section">
                 <div className="row">
                     <div className="col-12">
-                        <nav aria-label="breadcrumb">
-                            <ol className="breadcrumb m-0">
-                                <li className="breadcrumb-item">
-                                    <i className="demo-icon icon-down-arrow" />
-                                </li>
-                                <li className="breadcrumb-item">
-                                    <a href="javascript:void(0);">
-                                        <h2>Add/Edit Users</h2>
-                                    </a>
-                                </li>
-                            </ol>
-                        </nav>
+                            <BreadCumb items={[{ label: "Manage User", path: "/admin/user/manage-user" }, { label: id ? "Edit User" : "Add User" }]} />
                     </div>
                 </div>
                 <div className="row">

@@ -6,6 +6,9 @@ import { DateCell } from '../../activity/Activity';
 import { handleStatusChange } from '../../../utils/ChangeStatus';
 import { handleDelete } from '../../../utils/DeleteRecords';
 import AccessoriesAdd from './AccessoriesAdd';
+import BreadCumb from '../../../components/common/breadCumb/BreadCumb';
+import SerachFilter from '../../../components/common/SerachFilter';
+import useGridPagination from '../../../hooks/useGridPagination'
 const ActionCell = (props) => {
     const item = props.dataItem;
 
@@ -65,8 +68,11 @@ export default function Accessories() {
     const [accessoriesData, setaccessoriesData] = useState([])
     const [isAccessoriesOpen, setisAccessoriesOpen] = useState(false)
     const [id, setid] = useState(null)
+    const [searchText, setSearchText] = useState("")
+    const [customSearch, setcustomSearch] = useState("")
+    const { dataState, onDataStateChange, page, pageSize, resetPage } = useGridPagination(10)
     const getAccessories = async () => {
-        const res = await apiRequest("POST", API_ROUTES.accessories.getaccessories, { page: 1, pageSize: 10 }, null, {
+        const res = await apiRequest("POST", API_ROUTES.accessories.getaccessories, { page, pageSize, customSearch }, null, {
             showLoader: true
         })
         setaccessoriesData(res.data.data)
@@ -86,7 +92,7 @@ export default function Accessories() {
     ]
     useEffect(() => {
         getAccessories()
-    }, [])
+    }, [page, pageSize, customSearch])
     return (
         <>
 
@@ -99,22 +105,11 @@ export default function Accessories() {
                 <div className="tabbar-section">
                     <div className="row align-items-center gap-3">
                         <div className="col-12 col-lg-auto">
-                            <form className="d-md-flex searchbar align-items-center" role="search">
-                                <input
-                                    className="form-control search-input"
-                                    type="search"
-                                    placeholder="Search"
-                                    aria-label="Search"
-
-                                />
-                                <button
-                                    className="btn btn-outline-primary search-toggle"
-                                    type="button"
-
-                                >
-                                    <i className="demo-icon icon-search" />
-                                </button>
-                            </form>
+                            <SerachFilter
+                                value={searchText}
+                                onChange={(e) => setSearchText(e.target.value)}
+                                onSubmit={(value) => setcustomSearch(value)}
+                            />
                         </div>
                         <div className="col-12 col-lg">
                             <div className="btn-list d-flex justify-content-lg-end flex-wrap gap-2 gap-md-3 text-end">
@@ -141,6 +136,8 @@ export default function Accessories() {
                                 <Grid
                                     className="table-wrapper"
                                     data={accessoriesData}
+                                    skip={dataState.skip}
+                                    take={dataState.take}
                                     pageable={{
                                         buttonCount: 5,
                                         pageSizes: [10, 20, 50],
@@ -148,6 +145,7 @@ export default function Accessories() {
                                         info: true,
                                         type: "numeric"
                                     }}
+                                    onDataStateChange={onDataStateChange}
                                 >
                                     {
                                         accessoriesColumn?.map((col, ind) => {
@@ -169,11 +167,11 @@ export default function Accessories() {
                                                             ? {
                                                                 data: (props) => (
                                                                     <col.cell
-                                                                    {...props}
-                                                                    getAccessories={getAccessories}
-                                                                    setisAccessoriesOpen={setisAccessoriesOpen}
-                                                                    setid={setid}
-                                                                />
+                                                                        {...props}
+                                                                        getAccessories={getAccessories}
+                                                                        setisAccessoriesOpen={setisAccessoriesOpen}
+                                                                        setid={setid}
+                                                                    />
                                                                 )
                                                             }
                                                             : {
@@ -197,7 +195,7 @@ export default function Accessories() {
             {
                 isAccessoriesOpen
                 &&
-                <AccessoriesAdd 
+                <AccessoriesAdd
                     id={id}
                     setid={setid}
                     isAccessoriesOpen={isAccessoriesOpen}

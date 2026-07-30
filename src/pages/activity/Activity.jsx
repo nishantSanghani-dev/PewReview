@@ -3,6 +3,8 @@ import { apiRequest } from '../../services/Api'
 import { API_ROUTES } from '../../routes/api.routes'
 import { Grid, GridColumn } from '@progress/kendo-react-grid';
 import { Link } from 'react-router-dom';
+import SerachFilter from '../../components/common/SerachFilter';
+import useGridPagination from '../../hooks/useGridPagination'
 const ActionCell = (props) => {
 
 
@@ -87,7 +89,7 @@ export const DateCell = ({ tdProps, dataItem, field }) => {
 
     return (
         <td {...tdProps}>
-            {new Date(dataItem?.createdDate || dataItem?.createdOn || dataItem?.reportDate || dataItem?.createdAt).toLocaleDateString("en-US")}
+            {new Date(dataItem?.createdDate ||  dataItem?.createdOn || dataItem?.reportDate || dataItem?.createdAt).toLocaleDateString("en-US")}
         </td>
     )
 }
@@ -103,16 +105,13 @@ const UserNameCell = ({ tdProps, dataItem, field }) => {
 export default function Activity() {
     const [activityData, setactivityData] = useState([])
     const [total, setTotal] = useState(0);
-    const [dataState, setDataState] = useState({
-        skip: 0,
-        take: 10,
-    });
+    const { dataState, onDataStateChange, page, pageSize, resetPage } = useGridPagination(10)
 
     const getActivities = async () => {
-        const page = Math.floor(dataState.skip / dataState.take) + 1;
         const payload = {
             page,
-            pageSize: dataState.take
+            pageSize,
+            customSearch
         };
         const res = await apiRequest("POST", API_ROUTES.activities.getActivities, payload, null, {
             showLoader: true
@@ -136,9 +135,12 @@ export default function Activity() {
         { field: "isActive", title: "Status", width: "110px", cell: StatusCell }
     ];
 
+    const [searchText, setSearchText] = useState("")
+    const [customSearch, setcustomSearch] = useState("")
+
     useEffect(() => {
         getActivities()
-    }, [dataState])
+    }, [dataState, customSearch])
     return (
 
         <div className="container-fluid">
@@ -151,21 +153,14 @@ export default function Activity() {
 
                 </div>
                 <div className='mt-4' style={{ width: "230px" }}>
-                    <form className="d-md-flex searchbar align-items-center" role="search">
-                        <input
-                            className="form-control search-input"
-                            type="search"
-                            placeholder="Search"
-                            aria-label="Search"
-
-                        />
-                        <button
-                            className="btn btn-outline-primary search-toggle"
-                            type="button"
-                        >
-                            <i className="demo-icon icon-search" />
-                        </button>
-                    </form>
+                    <SerachFilter
+                        value={searchText}
+                        onChange={(e) => setSearchText(e.target.value)}
+                        onSubmit={(value) => {
+                            resetPage()
+                            setcustomSearch(value)
+                        }}
+                    />
                 </div>
             </div>
             <div className="card-section">
@@ -177,6 +172,8 @@ export default function Activity() {
                                     <Grid
                                         className="table-wrapper  text-center"
                                         data={activityData}
+                                        skip={dataState.skip}
+                                        take={dataState.take}
                                         sortable
                                         pageable={{
                                             buttonCount: 5,
@@ -185,12 +182,7 @@ export default function Activity() {
                                             previousNext: true,
                                             type: "numeric"
                                         }}
-                                        onDataStateChange={(e) => {
-                                            setDataState({
-                                                skip: e.dataState.skip,
-                                                take: e.dataState.take
-                                            });
-                                        }}
+                                        onDataStateChange={onDataStateChange}
                                     >
                                         {
                                             venueActivityTabColumn?.map((col, ind) => {

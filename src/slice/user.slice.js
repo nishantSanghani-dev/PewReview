@@ -10,9 +10,13 @@ export const userSlice = createSlice({
             // console.log(action.payload);
             state.token = action.payload
             localStorage.setItem("TOKEN", state.token)
+        },
+        logOut: (state, action) => {
+            state.token = null
+            localStorage.removeItem("TOKEN")
         }
     }
 
 })
-export const { logIn } = userSlice.actions
+export const { logIn ,logOut} = userSlice.actions
 export default userSlice.reducer

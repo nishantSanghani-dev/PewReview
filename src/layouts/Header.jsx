@@ -1,11 +1,15 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import React, { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { apiRequest } from '../services/Api'
 import { API_ROUTES } from '../routes/api.routes'
+import { useDispatch } from 'react-redux'
+import { logOut } from '../slice/user.slice'
 
 export default function Header({ mobileSlideBar, setmobileSlideBar }) {
     const [userData, setuserData] = useState(null)
+    const dispatch = useDispatch()
+    const navigate = useNavigate()
     const getUser = async () => {
         const res = await apiRequest("GET", API_ROUTES.user.getUserProfile, null, null, {
             useToken: true,
@@ -19,10 +23,10 @@ export default function Header({ mobileSlideBar, setmobileSlideBar }) {
     }, [])
     return (
         <>
-        {
-            console.log(userData)
-            
-        }
+            {
+                console.log(userData)
+
+            }
             <header>
                 <div className="container-fluid">
                     <div className="row justify-content-between align-items-center flex-row g-2 g-sm-3 g-xl-4">
@@ -99,14 +103,21 @@ export default function Header({ mobileSlideBar, setmobileSlideBar }) {
                                     </a>
                                     <ul className="dropdown-menu">
                                         <li>
-                                            <a className="dropdown-item" href="profile.html">
+                                            <Link className="dropdown-item" to={'/admin/profile'}>
                                                 Profile
-                                            </a>
+                                            </Link>
                                         </li>
                                         <li>
-                                            <a className="dropdown-item" href="#">
-                                                Logout
-                                            </a>
+                                            <Link
+                                                onClick={() => {
+                                                    if (confirm("Want To LogOut ? ")) {
+                                                        dispatch(logOut())
+                                                        navigate("/")
+                                                    }
+                                                }}
+                                                className="dropdown-item" href="#">
+                                                logout
+                                            </Link>
                                         </li>
                                     </ul>
                                 </div>

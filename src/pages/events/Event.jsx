@@ -3,13 +3,18 @@ import { apiRequest } from '../../services/Api'
 import { API_ROUTES } from '../../routes/api.routes'
 import { Grid, GridColumn } from '@progress/kendo-react-grid'
 import { ActionCell, AddressCell, DateTimeCell, EventNameCell, HostNameCell } from '../endUsers/manage-end-user/Events'
+import SerachFilter from '../../components/common/SerachFilter'
+import useGridPagination from '../../hooks/useGridPagination'
 
 export default function Event() {
     const [eventTabs, seteventTabs] = useState("upcomingEvents")
     const [params, setParams] = useState({ isUpcomingEvents: true, isAdminRequest: null })
     const [eventsData, seteventsData] = useState([])
+    const [searchText, setSearchText] = useState("")
+    const [customSearch, setcustomSearch] = useState("")
+    const { dataState, onDataStateChange, page, pageSize, resetPage } = useGridPagination(10)
     const getEevent = async () => {
-        const res = await apiRequest("POST", API_ROUTES.events.getAllEvent, { page: 1, pageSize: 10 }, params, {
+        const res = await apiRequest("POST", API_ROUTES.events.getAllEvent, { page, pageSize, customSearch }, params, {
             showLoader: true
         })
         seteventsData(res.data.data)
@@ -17,7 +22,7 @@ export default function Event() {
     useEffect(() => {
         console.log(eventTabs);
         getEevent()
-    }, [eventTabs])
+    }, [eventTabs, params, page, pageSize, customSearch])
     return (
         <div className="container-fluid">
             <div className="col mb-3">
@@ -26,20 +31,14 @@ export default function Event() {
             <div className="tabbar-section mb-3">
                 <div className="row align-items-center gap-3">
                     <div className="col-12 col-lg-auto">
-                        <form className="d-md-flex searchbar align-items-center" role="search">
-                            <input
-                                className="form-control search-input"
-                                type="search"
-                                placeholder="Search"
-                                aria-label="Search"
-                            />
-                            <button
-                                className="btn btn-outline-primary search-toggle"
-                                type="button"
-                            >
-                                <i className="demo-icon icon-search" />
-                            </button>
-                        </form>
+                        <SerachFilter
+                            value={searchText}
+                            onChange={(e) => setSearchText(e.target.value)}
+                            onSubmit={(value) => {
+                                resetPage()
+                                setcustomSearch(value)
+                            }}
+                        />
                     </div>
                 </div>
             </div>
@@ -135,6 +134,8 @@ export default function Event() {
                                                     <Grid
                                                         className="table-wrapper fw-bold text-center"
                                                         data={eventsData}
+                                                        skip={dataState.skip}
+                                                        take={dataState.take}
                                                         sortable
                                                         pageable={{
                                                             buttonCount: 5,
@@ -143,6 +144,7 @@ export default function Event() {
                                                             previousNext: true,
                                                             type: "numeric"
                                                         }}
+                                                        onDataStateChange={onDataStateChange}
                                                     >
                                                         <GridColumn
                                                             title="Action"

@@ -21,6 +21,7 @@ export const API_ROUTES = {
     },
     role: {
         roleList: "Role/List",
+        getRolesForDropdown: "Role/GetRolesForDropdown",
         roleView: "Role/Get",
         roleAdd: "Role/Add",
         roleDelete: (id) => `Role/Delete/${id}`,
@@ -30,6 +31,7 @@ export const API_ROUTES = {
     common: {
         gender: "Common/GetGenders",
         getCommincateWith: "common/GetCommincateWith",
+        communicationWithDropdown: "Common/CommunicationWithDropdown",
         getCountry: "Common/country-codes",
         getVenueType: "Common/GetVenueTypes",
         getSupportStatus: "Common/GetSupportStatus",

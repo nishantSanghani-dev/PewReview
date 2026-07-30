@@ -4,24 +4,25 @@ import { apiRequest } from '../../../services/Api'
 import { API_ROUTES } from '../../../routes/api.routes'
 import { Link } from 'react-router-dom'
 import { handleDelete } from '../../../utils/DeleteRecords'
+import SerachFilter from '../../../components/common/SerachFilter'
+import useGridPagination from '../../../hooks/useGridPagination'
 
 export default function EndUser() {
     const [manageUserData, setmanageUserData] = useState([])
     const [total, setTotal] = useState(0);
-    const [dataState, setDataState] = useState({
-        skip: 0,
-        take: 10,
-    });
+    const { dataState, onDataStateChange, page, pageSize, resetPage } = useGridPagination(10)
     const [kendoSort, setKendoSort] = useState([]);
     const [sort, setsort] = useState([]);
+    const [searchText, setSearchText] = useState("");
+    const [customSearch, setcustomSearch] = useState("");
 
     const getManageEndUser = async () => {
         try {
-            const page = Math.floor(dataState.skip / dataState.take) + 1;
 
             const payload = {
                 page,
-                pageSize: dataState.take,
+                pageSize,
+                customSearch,
                 Sorts: sort
             };
 
@@ -115,10 +116,10 @@ export default function EndUser() {
             </td>
         );
     };
-    // fetch on mount and whenever paging or sort (API payload) changes
+    // fetch on mount and whenever paging, sort, or search changes
     useEffect(() => {
         getManageEndUser()
-    }, [dataState.skip, dataState.take, sort])
+    }, [page, pageSize, sort, customSearch])
     return (
         <div className="container-fluid">
             <div className="col mb-3">
@@ -127,20 +128,11 @@ export default function EndUser() {
             <div className="tabbar-section">
                 <div className="row align-items-center gap-3">
                     <div className="col-12 col-lg-auto">
-                        <form className="d-md-flex searchbar align-items-center" role="search">
-                            <input
-                                className="form-control search-input"
-                                type="search"
-                                placeholder="Search"
-                                aria-label="Search"
-                            />
-                            <button
-                                className="btn btn-outline-primary search-toggle"
-                                type="button"
-                            >
-                                <i className="demo-icon icon-search" />
-                            </button>
-                        </form>
+                        <SerachFilter
+                            value={searchText}
+                            onChange={(e) => setSearchText(e.target.value)}
+                            onSubmit={(value) => setcustomSearch(value)}
+                        />
                     </div>
                     <div className="col-12 col-lg">
                         <div className="btn-list d-flex justify-content-lg-end flex-wrap gap-2 gap-md-3 text-end">
@@ -184,11 +176,7 @@ export default function EndUser() {
                                 }}
 
                                 onDataStateChange={(e) => {
-
-                                    setDataState({
-                                        skip: e.dataState.skip,
-                                        take: e.dataState.take
-                                    });
+                                    onDataStateChange(e)
 
                                     const nextSort = e.dataState.sort || [];
 

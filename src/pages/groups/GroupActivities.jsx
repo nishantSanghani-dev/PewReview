@@ -1,5 +1,6 @@
 import { Grid, GridColumn } from '@progress/kendo-react-grid';
 import React, { useEffect, useState } from 'react'
+import BreadCumb from '../../components/common/breadCumb/BreadCumb'
 import { Link, useParams } from 'react-router-dom';
 import { apiRequest } from '../../services/Api';
 import { API_ROUTES } from '../../routes/api.routes';
@@ -151,11 +152,7 @@ export default function GroupActivities() {
     }, [dataState])
     return (
         <div className="container-fluid">
-            <div className="activity-breadcrumb">
-                <span className="text-danger fw-bold">Groups</span>
-                <span className="mx-2 text-dark">/</span>
-                <span className="fw-bold text-dark">Group Activities</span>
-            </div>
+            <BreadCumb items={[{ label: "Groups", path: "/admin/groups" }, { label: "Group Activities" }]} />
             <div className="card-section">
                 <div className="row">
                     <div className="col-xl-12 mt-3 mt-xxl-4">

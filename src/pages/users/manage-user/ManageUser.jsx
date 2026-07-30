@@ -2,12 +2,17 @@ import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { apiRequest } from '../../../services/Api'
 import { API_ROUTES } from '../../../routes/api.routes'
+import SerachFilter from '../../../components/common/SerachFilter'
+import useGridPagination from '../../../hooks/useGridPagination'
 
 export default function ManageUser() {
     const [manageUserData, setmanageUserData] = useState([])
     const [ids, setids] = useState([])
+    const [searchText, setSearchText] = useState("")
+    const [customSearch, setcustomSearch] = useState("")
+    const { page, pageSize, resetPage } = useGridPagination(10)
     const getManageUser = async () => {
-        const res = await apiRequest("POST", API_ROUTES.user.userView, { page: 1, pageSize: 10 }, null, {
+        const res = await apiRequest("POST", API_ROUTES.user.userView, { page, pageSize, customSearch }, null, {
             showLoader: true
         })
         console.log(res.data);
@@ -60,34 +65,28 @@ export default function ManageUser() {
     }
 
     const exportData = async () => {
-        const res = await apiRequest("POST", API_ROUTES.user.userExport, { page: 1, pageSize: 10 }, null, {
+        const res = await apiRequest("POST", API_ROUTES.user.userExport, { page, pageSize }, null, {
             showLoader: true
         })
     }
     useEffect(() => {
         getManageUser()
-    }, [])
+    }, [page, pageSize, customSearch])
 
+    const handleSearchSubmit = (searchValue) => {
+        setcustomSearch(searchValue)
+    }
 
     return (
         <div className="container-fluid">
             <div className="tabbar-section">
                 <div className="row align-items-center gap-3">
                     <div className="col-12 col-lg-auto">
-                        <form className="d-md-flex searchbar align-items-center" role="search">
-                            <input
-                                className="form-control search-input"
-                                type="search"
-                                placeholder="Search"
-                                aria-label="Search"
-                            />
-                            <button
-                                className="btn btn-outline-primary search-toggle"
-                                type="button"
-                            >
-                                <i className="demo-icon icon-search" />
-                            </button>
-                        </form>
+                        <SerachFilter
+                            value={searchText}
+                            onChange={(e) => setSearchText(e.target.value)}
+                            onSubmit={handleSearchSubmit}
+                        />
                     </div>
                     <div className="col-12 col-lg">
                         <div className="btn-list d-flex justify-content-lg-end flex-wrap gap-2 gap-md-3 text-end">

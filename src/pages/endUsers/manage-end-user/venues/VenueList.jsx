@@ -7,6 +7,8 @@ import GunDetails from '../../../../components/common/gunDetails/GunDetails'
 import { DateTimeCell } from '../Events'
 import VenueAdd from './VenueAdd'
 import { handleStatusChange } from '../../../../utils/ChangeStatus'
+import SerachFilter from '../../../../components/common/SerachFilter'
+import useGridPagination from '../../../../hooks/useGridPagination'
 
 const DetailCell = ({ tdProps, dataItem, field }) => {
     return (
@@ -94,9 +96,11 @@ export default function VenueList() {
     const [showGunDetails, setShowGunDetails] = useState(false);
     const [venueAddBtn, setvenueAddBtn] = useState(false)
     const [editVenueId, setEditVenueId] = useState(null)
-
+    const [searchText, setSearchText] = useState("")
+    const [customSearch, setcustomSearch] = useState("")
+    const { dataState, onDataStateChange, page, pageSize, resetPage } = useGridPagination(10)
     const getVenueList = async () => {
-        const res = await apiRequest("POST", API_ROUTES.venue.getVenueList, { page: 1, pageSize: 10 }, null, {
+        const res = await apiRequest("POST", API_ROUTES.venue.getVenueList, { page, pageSize, customSearch }, null, {
             showLoader: true
         })
         setvenueListData(res.data.data)
@@ -235,7 +239,7 @@ export default function VenueList() {
     ];
     useEffect(() => {
         getVenueList()
-    }, [])
+    }, [page, pageSize, customSearch])
 
     return (
         <div className='container-fluid'>
@@ -245,21 +249,14 @@ export default function VenueList() {
             </div>
             <div className="row align-items-center gap-3">
                 <div className="col-12 col-lg-auto">
-                    <form className="d-md-flex searchbar align-items-center" role="search">
-                        <input
-                            className="form-control search-input"
-                            type="search"
-                            placeholder="Search"
-                            aria-label="Search"
-
-                        />
-                        <button
-                            className="btn btn-outline-primary search-toggle"
-                            type="button"
-                        >
-                            <i className="demo-icon icon-search" />
-                        </button>
-                    </form>
+                    <SerachFilter
+                        value={searchText}
+                        onChange={(e) => setSearchText(e.target.value)}
+                        onSubmit={(value) => {
+                            resetPage()
+                            setcustomSearch(value)
+                        }}
+                    />
                 </div>
                 <div className="col-12 col-lg">
                     <div className="btn-list d-flex justify-content-lg-end flex-wrap gap-2 gap-md-3 text-end">
@@ -307,7 +304,8 @@ export default function VenueList() {
                                     <Grid
                                         className="table-wrapper  text-center"
                                         data={venueListData}
-
+                                        skip={dataState.skip}
+                                        take={dataState.take}
                                         pageable={{
                                             buttonCount: 5,
                                             pageSizes: [10, 20, 50],
@@ -315,6 +313,7 @@ export default function VenueList() {
                                             previousNext: true,
                                             type: "numeric"
                                         }}
+                                        onDataStateChange={onDataStateChange}
 
                                     >
                                         {venueColumns.map((col) => (

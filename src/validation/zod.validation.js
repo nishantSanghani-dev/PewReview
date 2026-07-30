@@ -75,6 +75,39 @@ export const userSchema = z.object({
         .optional()
 })
 
+export const profileSchema = z.object({
+    firstName: z
+        .string()
+        .trim()
+        .min(1, "First name is required"),
+    lastName: z
+        .string()
+        .trim()
+        .min(1, "Last name is required"),
+    birthDay: z
+        .string()
+        .optional()
+        .refine(val => !val || !isNaN(Date.parse(val)), "Please enter a valid birthday"),
+    gender: z
+        .string()
+        .min(1, "Gender is required"),
+    address: z
+        .string()
+        .optional(),
+    contactNumber: z
+        .string()
+        .trim()
+        .min(1, "Contact number is required")
+        .regex(/^\d+$/, "Contact number must contain only digits")
+        .min(10, "Contact number must be at least 10 digits"),
+    countryCode: z
+        .string()
+        .min(1, "Country code is required"),
+    profileImage: z
+        .any()
+        .optional()
+})
+
 export const venueSchema = z.object({
     // userId: z
     //     .string()

@@ -1,17 +1,15 @@
 import React from 'react'
-import { Navigate, Outlet, useNavigate } from 'react-router-dom'
+
 import { useAuth } from '../hooks/useAuth'
+import { Navigate, Outlet } from 'react-router-dom'
 
 export default function AuthLayouts() {
-    const { token } = useAuth()
 
+    const {token} = useAuth()
+
+    
     if (token) {
-        return <Navigate to="/admin/dashboard" replace />;
-    }
-    else{
-        // console.log("hhihih");
-        
-        return <Navigate to={'/'}/>
+        return <Navigate to={'/admin/dashboard'} />
     }
 
     return (

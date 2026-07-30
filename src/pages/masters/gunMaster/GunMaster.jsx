@@ -5,6 +5,9 @@ import { Grid, GridColumn } from '@progress/kendo-react-grid'
 import { DateCell } from '../../activity/Activity';
 import { handleStatusChange } from '../../../utils/ChangeStatus';
 import { handleDelete } from '../../../utils/DeleteRecords';
+import BreadCumb from '../../../components/common/breadCumb/BreadCumb';
+import SerachFilter from '../../../components/common/SerachFilter';
+import useGridPagination from '../../../hooks/useGridPagination';
 const ActionCell = (props) => {
     const item = props.dataItem;
     return (
@@ -102,8 +105,11 @@ const ApprovalStatusCell = ({ tdProps, dataItem, statusOptions }) => {
 export default function GunMaster() {
     const [gunData, setgunData] = useState([])
     const [statusOptions, setstatusOptions] = useState([])
+    const [searchText, setSearchText] = useState("")
+    const [customSearch, setcustomSearch] = useState("")
+    const { dataState, onDataStateChange, page, pageSize, resetPage } = useGridPagination(10)
     const getGun = async () => {
-        const res = await apiRequest("POST", API_ROUTES.gun.getGun, { page: 1, pageSize: 10 }, null, {
+        const res = await apiRequest("POST", API_ROUTES.gun.getGun, { page, pageSize, customSearch }, null, {
             showLoader: true
         })
         setgunData(res.data.data)
@@ -132,7 +138,7 @@ export default function GunMaster() {
     useEffect(() => {
         getGun()
         getSuppportStatus()
-    }, [])
+    }, [page, pageSize, customSearch])
     return (
         <div className="container-fluid">
             <div className="mb-3 activity-breadcrumb">
@@ -143,22 +149,14 @@ export default function GunMaster() {
             <div className="tabbar-section">
                 <div className="row align-items-center gap-3">
                     <div className="col-12 col-lg-auto">
-                        <form className="d-md-flex searchbar align-items-center" role="search">
-                            <input
-                                className="form-control search-input"
-                                type="search"
-                                placeholder="Search"
-                                aria-label="Search"
-
-                            />
-                            <button
-                                className="btn btn-outline-primary search-toggle"
-                                type="button"
-
-                            >
-                                <i className="demo-icon icon-search" />
-                            </button>
-                        </form>
+                        <SerachFilter
+                            value={searchText}
+                            onChange={(e) => setSearchText(e.target.value)}
+                            onSubmit={(value) => {
+                                resetPage()
+                                setcustomSearch(value)
+                            }}
+                        />
                     </div>
                     <div className="col-12 col-lg">
                         <div className="btn-list d-flex justify-content-lg-end flex-wrap gap-2 gap-md-3 text-end">
@@ -182,6 +180,8 @@ export default function GunMaster() {
                             <Grid
                                 className="table-wrapper"
                                 data={gunData}
+                                skip={dataState.skip}
+                                take={dataState.take}
                                 pageable={{
                                     buttonCount: 5,
                                     pageSizes: [10, 20, 50],
@@ -189,6 +189,7 @@ export default function GunMaster() {
                                     info: true,
                                     type: "numeric"
                                 }}
+                                onDataStateChange={onDataStateChange}
                             >
                                 {
                                     gunCoulmn?.map((col, ind) => {

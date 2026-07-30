@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { apiRequest } from "../../services/Api";
 import { API_ROUTES } from "../../routes/api.routes";
 import { Link, useParams } from "react-router-dom";
+import BreadCumb from "../../components/common/breadCumb/BreadCumb";
 
 export default function GroupDetails() {
     const { id } = useParams()
@@ -19,11 +20,7 @@ export default function GroupDetails() {
         <div className="container-fluid ">
 
             {/* Breadcrumb */}
-            <div className="mb-4 activity-breadcrumb">
-                <span className="text-danger fw-bold">Groups</span>
-                <span className="mx-2 text-dark">/</span>
-                <span className="fw-bold text-dark">Group Details</span>
-            </div>
+            <BreadCumb items={[{ label: "Groups", path: "/admin/groups" }, { label: "Group Details" }]} />
 
             {/* Group Header */}
             <div className="row justify-content-center">

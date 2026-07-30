@@ -1,9 +1,12 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import LoginForm from '../components/LoginForm'
 
 
 export default function Login() {
-    
+    useEffect(() => {
+        console.log("renderenidffdf");
+        
+    },[])
     return (
         <>
             {/* Main Wrapper Start */}

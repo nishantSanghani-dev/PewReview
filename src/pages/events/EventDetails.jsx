@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import BreadCumb from '../../components/common/breadCumb/BreadCumb'
 import { useParams } from 'react-router-dom'
 import { apiRequest } from '../../services/Api'
 import { API_ROUTES } from '../../routes/api.routes'
@@ -21,11 +22,7 @@ export default function EventDetails() {
     return (
         <div className="container-fluid py-3">
 
-            {/* Breadcrumb */}
-            <h3 className="page-title mb-4">
-                <span className="text-danger fw-bold">Events</span>
-                <span className="text-dark fw-bold"> / Event Details</span>
-            </h3>
+            <BreadCumb items={[{ label: "Events", path: "/admin/events/view" }, { label: "Event Details" }]} />
 
             {/* Top Section */}
             <div className="row g-4">

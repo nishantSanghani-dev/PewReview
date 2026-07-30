@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import BreadCumb from '../../../../components/common/breadCumb/BreadCumb'
 import "../venues/venueDetails.css"
 import { useParams } from 'react-router-dom'
 import { apiRequest } from '../../../../services/Api'
@@ -43,10 +44,7 @@ export default function VenueDetails() {
 
     return (
         <div className="container-fluid venue-page">
-            {/* Breadcrumb */}
-            <div className="venue-breadcrumb">
-                <span>Venues</span> / <b>Venue Details</b>
-            </div>
+            <BreadCumb items={[{ label: "Venues", path: "/admin/venues/list" }, { label: "Venue Details" }]} />
 
             {/* Main Card */}
             <div className="venue-card">

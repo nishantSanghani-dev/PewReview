@@ -1,5 +1,5 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
-import AuthLayouts from "../layouts/AuthLayouts";
+
 
 import MainLayout from "../layouts/MainLayout";
 import Dashboard from "../pages/dashboard/Dashboard";
@@ -33,12 +33,14 @@ import GunMaster from "../pages/masters/gunMaster/GunMaster";
 import Ammunition from "../pages/masters/ammunition/Ammunition";
 import CategoryMaster from "../pages/masters/category/CategoryMaster";
 import LeaderBoard from "../pages/leaderboards/LeaderBoard";
+import AuthLayouts from "../layouts/authLayouts";
+import Profile from "../pages/profile/Profile";
 
 export const routes = createBrowserRouter([
     {
         path: "/",
+        element: <AuthLayouts />,
         children: [
-
             {
                 index: true,
                 element: <Login />,
@@ -209,6 +211,10 @@ export const routes = createBrowserRouter([
             {
                 path: "leaderboard",
                 element: <LeaderBoard />
+            },
+            {
+                path: "profile",
+                element:<Profile/>
             }
         ],
     },

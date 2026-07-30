@@ -6,6 +6,7 @@ import { API_ROUTES } from '../../../../routes/api.routes'
 import RoleRow from '../../components/RoleRow'
 import { Grid, GridColumn } from '@progress/kendo-react-grid'
 import { handleStatusChange } from '../../../../utils/ChangeStatus'
+import SerachFilter from '../../../../components/common/SerachFilter'
 const RoleActionCell = (props) => {
     const item = props.dataItem;
 
@@ -118,6 +119,8 @@ export default function RoleAndPermission() {
         getRole()
     }, [customSearch, dataState.skip, dataState.take, sort, filters])
 
+    const [searchText, setSearchText] = useState("")
+
     return (
         <div className="container-fluid">
             <div className="col mb-3">
@@ -126,21 +129,11 @@ export default function RoleAndPermission() {
             <div className="tabbar-section">
                 <div className="row align-items-center gap-3">
                     <div className="col-12 col-lg-auto">
-                        <form className="d-md-flex searchbar align-items-center" role="search">
-                            <input
-                                className="form-control search-input"
-                                type="search"
-                                placeholder="Search"
-                                aria-label="Search"
-                                onChange={(e) => setcustomSearch(e.target.value)}
-                            />
-                            <button
-                                className="btn btn-outline-primary search-toggle"
-                                type="button"
-                            >
-                                <i className="demo-icon icon-search" />
-                            </button>
-                        </form>
+                        <SerachFilter
+                            value={searchText}
+                            onChange={(e) => setSearchText(e.target.value)}
+                            onSubmit={(value) => setcustomSearch(value)}
+                        />
                     </div>
                     <div className="col-12 col-lg">
                         <div className="btn-list d-flex justify-content-lg-end flex-wrap gap-2 gap-md-3 text-end">

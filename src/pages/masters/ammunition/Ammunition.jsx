@@ -6,6 +6,9 @@ import { DateCell } from '../../activity/Activity';
 import { handleStatusChange } from '../../../utils/ChangeStatus';
 import { handleDelete } from '../../../utils/DeleteRecords';
 import AmmunitionAdd from './AmmunitionAdd';
+import BreadCumb from '../../../components/common/breadCumb/BreadCumb';
+import SerachFilter from '../../../components/common/SerachFilter';
+import useGridPagination from '../../../hooks/useGridPagination'
 const ActionCell = (props) => {
     const item = props.dataItem;
 
@@ -65,8 +68,11 @@ export default function Ammunition() {
     const [ammunitionData, setammunitionData] = useState([])
     const [isAmmunitionOpen, setisAmmunitionOpen] = useState(false)
     const [id, setid] = useState(null)
+    const [searchText, setSearchText] = useState("")
+    const [customSearch, setcustomSearch] = useState("")
+    const { dataState, onDataStateChange, page, pageSize, resetPage } = useGridPagination(10)
     const getAmmunition = async () => {
-        const res = await apiRequest("POST", API_ROUTES.ammunition.getammunition, { page: 1, pageSize: 10 }, null, {
+        const res = await apiRequest("POST", API_ROUTES.ammunition.getammunition, { page, pageSize, customSearch }, null, {
             showLoader: true
         })
         setammunitionData(res.data.data)
@@ -79,13 +85,13 @@ export default function Ammunition() {
         { field: "manufacturer", title: "Manufacturer Name" },
         { field: "description", title: "Description" },
         { field: "createdByUserName", title: "Created By" },
-        { field: "createdOn", title: "Creadted On", cell: DateCell },
+        { field: "updatedOn", title: "Creadted On", cell: DateCell },
         { field: "updatedByUserName", title: "Modified By" },
         { field: "isActive", title: "Status", cell: StatusCell }
     ]
     useEffect(() => {
         getAmmunition()
-    }, [])
+    }, [page, pageSize, customSearch])
     return (
         <div className="container-fluid">
             <div className="mb-3 activity-breadcrumb">
@@ -96,22 +102,11 @@ export default function Ammunition() {
             <div className="tabbar-section">
                 <div className="row align-items-center gap-3">
                     <div className="col-12 col-lg-auto">
-                        <form className="d-md-flex searchbar align-items-center" role="search">
-                            <input
-                                className="form-control search-input"
-                                type="search"
-                                placeholder="Search"
-                                aria-label="Search"
-
-                            />
-                            <button
-                                className="btn btn-outline-primary search-toggle"
-                                type="button"
-
-                            >
-                                <i className="demo-icon icon-search" />
-                            </button>
-                        </form>
+                        <SerachFilter
+                            value={searchText}
+                            onChange={(e) => setSearchText(e.target.value)}
+                            onSubmit={(value) => setcustomSearch(value)}
+                        />
                     </div>
                     <div className="col-12 col-lg">
                         <div className="btn-list d-flex justify-content-lg-end flex-wrap gap-2 gap-md-3 text-end">
@@ -135,6 +130,8 @@ export default function Ammunition() {
                             <Grid
                                 className="table-wrapper"
                                 data={ammunitionData}
+                                skip={dataState.skip}
+                                take={dataState.take}
                                 pageable={{
                                     buttonCount: 5,
                                     pageSizes: [10, 20, 50],
@@ -142,6 +139,7 @@ export default function Ammunition() {
                                     info: true,
                                     type: "numeric"
                                 }}
+                                onDataStateChange={onDataStateChange}
                             >
                                 {
                                     ammunitionColumns?.map((col, ind) => {

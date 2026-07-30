@@ -6,6 +6,9 @@ import { handleStatusChange } from '../../../utils/ChangeStatus';
 import { handleDelete } from '../../../utils/DeleteRecords';
 import { DateCell } from '../../activity/Activity';
 import ManufacturerAdd from './ManufacturerAdd';
+import BreadCumb from '../../../components/common/breadCumb/BreadCumb';
+import SerachFilter from '../../../components/common/SerachFilter';
+import useGridPagination from '../../../hooks/useGridPagination'
 const ActionCell = (props) => {
     const item = props.dataItem;
 
@@ -65,8 +68,11 @@ export default function Manufacturer() {
     const [manufacturerData, setmanufacturerData] = useState([])
     const [ismanufacturerOpen, setismanufacturerOpen] = useState(false)
     const [id, setid] = useState(null)
+    const [searchText, setSearchText] = useState("")
+    const [customSearch, setcustomSearch] = useState("")
+    const { dataState, onDataStateChange, page, pageSize, resetPage } = useGridPagination(10)
     const getManufacturer = async () => {
-        const res = await apiRequest("POST", API_ROUTES.manufacturer.getManufacturer, { page: 1, PageSize: 10 }, null, {
+        const res = await apiRequest("POST", API_ROUTES.manufacturer.getManufacturer, { page, PageSize: pageSize, customSearch }, null, {
             showLoader: true
         })
         setmanufacturerData(res.data.data)
@@ -83,7 +89,7 @@ export default function Manufacturer() {
 
     useEffect(() => {
         getManufacturer()
-    }, [])
+    }, [page, pageSize, customSearch])
     return (
         <>
             <div className="container-fluid">
@@ -95,22 +101,14 @@ export default function Manufacturer() {
                 <div className="tabbar-section">
                     <div className="row align-items-center gap-3">
                         <div className="col-12 col-lg-auto">
-                            <form className="d-md-flex searchbar align-items-center" role="search">
-                                <input
-                                    className="form-control search-input"
-                                    type="search"
-                                    placeholder="Search"
-                                    aria-label="Search"
-
-                                />
-                                <button
-                                    className="btn btn-outline-primary search-toggle"
-                                    type="button"
-
-                                >
-                                    <i className="demo-icon icon-search" />
-                                </button>
-                            </form>
+                            <SerachFilter
+                                value={searchText}
+                                onChange={(e) => setSearchText(e.target.value)}
+                                onSubmit={(value) => {
+                                    resetPage()
+                                    setcustomSearch(value)
+                                }}
+                            />
                         </div>
                         <div className="col-12 col-lg">
                             <div className="btn-list d-flex justify-content-lg-end flex-wrap gap-2 gap-md-3 text-end">
@@ -134,6 +132,8 @@ export default function Manufacturer() {
                                 <Grid
                                     className="table-wrapper"
                                     data={manufacturerData}
+                                    skip={dataState.skip}
+                                    take={dataState.take}
                                     pageable={{
                                         buttonCount: 5,
                                         pageSizes: [10, 20, 50],
@@ -141,6 +141,7 @@ export default function Manufacturer() {
                                         info: true,
                                         type: "numeric"
                                     }}
+                                    onDataStateChange={onDataStateChange}
                                 >
                                     {
                                         manufectureColumns?.map((col, ind) => {

@@ -6,6 +6,8 @@ import { Link } from 'react-router-dom';
 import { DateCell } from '../activity/Activity';
 import { handleStatusChange } from '../../utils/ChangeStatus';
 import { handleDelete } from '../../utils/DeleteRecords';
+import SerachFilter from '../../components/common/SerachFilter';
+import useGridPagination from '../../hooks/useGridPagination'
 const ActionCell = (props) => {
 
     return (
@@ -120,8 +122,11 @@ const AvtivityCell = ({ tdProps, dataItem, field }) => {
 export default function Groups() {
 
     const [groupData, setgroupData] = useState([])
+    const [searchText, setSearchText] = useState("")
+    const [customSearch, setcustomSearch] = useState("")
+    const { dataState, onDataStateChange, page, pageSize, resetPage } = useGridPagination(10)
     const getGroups = async () => {
-        const res = await apiRequest("POST", API_ROUTES.groups.getGroups, { page: 1, pageSize: 10 }, null, {
+        const res = await apiRequest("POST", API_ROUTES.groups.getGroups, { page, pageSize, customSearch }, null, {
             showLoader: true
         })
         setgroupData(res.data.data)
@@ -142,7 +147,7 @@ export default function Groups() {
 
     useEffect(() => {
         getGroups()
-    }, [])
+    }, [page, pageSize, customSearch])
 
     return (
         <div className="container-fluid">
@@ -155,21 +160,14 @@ export default function Groups() {
 
                 </div>
                 <div className='mt-4' style={{ width: "230px" }}>
-                    <form className="d-md-flex searchbar align-items-center" role="search">
-                        <input
-                            className="form-control search-input"
-                            type="search"
-                            placeholder="Search"
-                            aria-label="Search"
-
-                        />
-                        <button
-                            className="btn btn-outline-primary search-toggle"
-                            type="button"
-                        >
-                            <i className="demo-icon icon-search" />
-                        </button>
-                    </form>
+                    <SerachFilter
+                        value={searchText}
+                        onChange={(e) => setSearchText(e.target.value)}
+                        onSubmit={(value) => {
+                            resetPage()
+                            setcustomSearch(value)
+                        }}
+                    />
                 </div>
             </div>
             <div className="accordion-body mt-3 mt-xxl-4">
@@ -179,7 +177,8 @@ export default function Groups() {
                             <Grid
                                 className="table-wrapper  text-center"
                                 data={groupData}
-
+                                skip={dataState.skip}
+                                take={dataState.take}
                                 pageable={{
                                     buttonCount: 5,
                                     pageSizes: [10, 20, 50],
@@ -187,6 +186,7 @@ export default function Groups() {
                                     previousNext: true,
                                     type: "numeric"
                                 }}
+                                onDataStateChange={onDataStateChange}
 
                             >
                                 {groupColumns.map((col) => (

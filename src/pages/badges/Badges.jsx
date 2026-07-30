@@ -5,6 +5,7 @@ import { API_ROUTES } from '../../routes/api.routes'
 import { Grid, GridColumn } from '@progress/kendo-react-grid'
 import BdagesAdd from './BdagesAdd'
 import { handleDelete } from '../../utils/DeleteRecords'
+import useGridPagination from '../../hooks/useGridPagination'
 const ActionCell = (props) => {
     console.log(props.dataItem.id);
     console.log(props);
@@ -59,8 +60,9 @@ export default function Badges() {
     const [isBadgeOpen, setisBadgeOpen] = useState(false)
     const [badgesData, setbadgesData] = useState([])
     const [id, setid] = useState(null)
+    const { dataState, onDataStateChange, page, pageSize } = useGridPagination(10)
     const getBadges = async () => {
-        const res = await apiRequest("POST", API_ROUTES.badges.getBadges, { page: 1, pageSize: 10 }, null, {
+        const res = await apiRequest("POST", API_ROUTES.badges.getBadges, { page, pageSize }, null, {
             showLoader: true
         })
 
@@ -136,7 +138,8 @@ export default function Badges() {
                             <Grid
                                 className="table-wrapper  text-center"
                                 data={badgesData}
-
+                                skip={dataState.skip}
+                                take={dataState.take}
                                 pageable={{
                                     buttonCount: 5,
                                     pageSizes: [10, 20, 50],
@@ -144,7 +147,7 @@ export default function Badges() {
                                     previousNext: true,
                                     type: "numeric"
                                 }}
-
+                                onDataStateChange={onDataStateChange}
                             >
                                 {badgesColumns.map((col) => (
                                     <GridColumn

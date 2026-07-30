@@ -5,6 +5,8 @@ import { Link, useLocation } from 'react-router-dom';
 import { Grid, GridColumn } from '@progress/kendo-react-grid';
 import "../supportTicket/supportTicket.css"
 import SupportTicketEdit from './SupportTicketEdit';
+import SerachFilter from '../../components/common/SerachFilter';
+import useGridPagination from '../../hooks/useGridPagination'
 const ActionCell = (props) => {
 
 
@@ -109,6 +111,9 @@ export default function SupportTicket() {
     const [statusOptions, setStatusOptions] = useState([])
     const [showModal, setShowModal] = useState(false);
     const [ticketId, setticketId] = useState(null)
+    const [searchText, setSearchText] = useState("");
+    const [customSearch, setcustomSearch] = useState("");
+    const { dataState, onDataStateChange, page, pageSize, resetPage } = useGridPagination(10)
     const getSuppportStatus = async () => {
         const res = await apiRequest("GET", API_ROUTES.common.getSupportStatus, null, null, {
             showLoader: true
@@ -119,7 +124,7 @@ export default function SupportTicket() {
     }
 
     const getTickets = async () => {
-        const res = await apiRequest("POST", API_ROUTES.supportTicket.SupportTicketViewList, { page: 1, pageSize: 10 }, null, {
+        const res = await apiRequest("POST", API_ROUTES.supportTicket.SupportTicketViewList, { page, pageSize, customSearch }, null, {
             showLoader: true
         })
         console.log(res.data);
@@ -129,7 +134,7 @@ export default function SupportTicket() {
     useEffect(() => {
         getSuppportStatus()
         getTickets()
-    }, [])
+    }, [page, pageSize, customSearch])
 
 
     const supportTicketsColumns = [
@@ -151,21 +156,14 @@ export default function SupportTicket() {
                 </div>
                 <div className="row align-items-center gap-3">
                     <div className="col-12 col-lg-auto">
-                        <form className="d-md-flex searchbar align-items-center" role="search">
-                            <input
-                                className="form-control search-input"
-                                type="search"
-                                placeholder="Search"
-                                aria-label="Search"
-
-                            />
-                            <button
-                                className="btn btn-outline-primary search-toggle"
-                                type="button"
-                            >
-                                <i className="demo-icon icon-search" />
-                            </button>
-                        </form>
+                        <SerachFilter
+                            value={searchText}
+                            onChange={(e) => setSearchText(e.target.value)}
+                            onSubmit={(value) => {
+                                resetPage()
+                                setcustomSearch(value)
+                            }}
+                        />
                     </div>
                 </div>
 
@@ -179,7 +177,8 @@ export default function SupportTicket() {
                                 <Grid
                                     className="table-wrapper  text-center"
                                     data={supportTicketsData}
-
+                                    skip={dataState.skip}
+                                    take={dataState.take}
                                     pageable={{
                                         buttonCount: 5,
                                         pageSizes: [10, 20, 50],
@@ -187,7 +186,7 @@ export default function SupportTicket() {
                                         previousNext: true,
                                         type: "numeric"
                                     }}
-
+                                    onDataStateChange={onDataStateChange}
                                 >
                                     {supportTicketsColumns.map((col) => (
                                         <GridColumn

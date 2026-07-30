@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react'
 import { apiRequest } from '../../services/Api'
 import { API_ROUTES } from '../../routes/api.routes'
 import { Grid, GridColumn } from '@progress/kendo-react-grid'
+import BreadCumb from '../../components/common/breadCumb/BreadCumb';
+import SerachFilter from '../../components/common/SerachFilter';
+import useGridPagination from '../../hooks/useGridPagination'
 const TextCell = ({ tdProps, dataItem, field }) => (
     <td {...tdProps}>
 
@@ -10,8 +13,11 @@ const TextCell = ({ tdProps, dataItem, field }) => (
 );
 export default function ReportedUser() {
     const [reportUserData, setreportUserData] = useState([])
+    const [searchText, setSearchText] = useState("")
+    const [customSearch, setcustomSearch] = useState("")
+    const { dataState, onDataStateChange, page, pageSize, resetPage } = useGridPagination(10)
     const getReportedUser = async () => {
-        const res = await apiRequest("POST", API_ROUTES.report.getReport, { page: 1, pageSize: 10 }, null, {
+        const res = await apiRequest("POST", API_ROUTES.report.getReport, { page, pageSize, customSearch }, null, {
             showLoader: true
         })
         setreportUserData(res.data)
@@ -27,34 +33,23 @@ export default function ReportedUser() {
 
     useEffect(() => {
         getReportedUser()
-    }, [])
+    }, [customSearch])
 
     return (
 
         <div className="container-fluid">
-            <div className="mb-3 activity-breadcrumb">
-
-                <span className="fw-bold text-dark">Reported User</span>
-            </div>
+            <BreadCumb items={[{ label: "Reported User" }]} />
             <div className="tabbar-section">
                 <div className="row align-items-center gap-3">
                     <div className="col-12 col-lg-auto">
-                        <form className="d-md-flex searchbar align-items-center" role="search">
-                            <input
-                                className="form-control search-input"
-                                type="search"
-                                placeholder="Search"
-                                aria-label="Search"
-
-                            />
-                            <button
-                                className="btn btn-outline-primary search-toggle"
-                                type="button"
-
-                            >
-                                <i className="demo-icon icon-search" />
-                            </button>
-                        </form>
+                        <SerachFilter
+                            value={searchText}
+                            onChange={(e) => setSearchText(e.target.value)}
+                            onSubmit={(value) => {
+                                resetPage()
+                                setcustomSearch(value)
+                            }}
+                        />
                     </div>
 
                 </div>
@@ -64,6 +59,8 @@ export default function ReportedUser() {
                             <Grid
                                 className="table-wrapper"
                                 data={reportUserData}
+                                skip={dataState.skip}
+                                take={dataState.take}
                                 pageable={{
                                     buttonCount: 5,
                                     pageSizes: [10, 20, 50],
@@ -71,6 +68,7 @@ export default function ReportedUser() {
                                     info: true,
                                     type: "numeric"
                                 }}
+                                onDataStateChange={onDataStateChange}
                             >
                                 {
                                     reportedUserColumn?.map((col, ind) => {
