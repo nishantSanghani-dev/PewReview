@@ -36,7 +36,8 @@ export const API_ROUTES = {
         getVenueType: "Common/GetVenueTypes",
         getSupportStatus: "Common/GetSupportStatus",
         getDashboardFilter: "Common/GetDashboardFilters",
-        getBadgeApplicableFor: "Common/GetBadgeApplicableFor"
+        getBadgeApplicableFor: "Common/GetBadgeApplicableFor",
+        getGunApplicationFor: "Common/GetGunCategoryApplicableForType"
     },
     gun: {
         gunListByUser: "GUN/GunListByUser",
@@ -128,7 +129,8 @@ export const API_ROUTES = {
         getCategoryMaster: "GunCategoryMaster/List",
         categoryMasterUpdate: (id) => `GunCategoryMaster/UpdateStatus/${id}`,
         categoryMasterDelete: (id) => `GunCategoryMaster/Delete/${id}`,
-        categoryDropdown: "GunCategoryMaster/CategoryDropdown"
+        categoryDropdown: "GunCategoryMaster/CategoryDropdown",
+        categoryAdd:"GunCategoryMaster/Add"
     },
     report: {
         getReport: "Report/GetUserReportList"

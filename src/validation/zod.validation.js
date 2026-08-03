@@ -215,3 +215,28 @@ export const accessorySchema = z.object({
         .optional()
         .or(z.literal(""))
 });
+
+
+
+
+export const categorySchema = z.object({
+    applicationFor: z
+        .string()
+        .min(1, "Please select Applicable For"),
+
+    categoryName: z
+        .string()
+        .trim()
+        .min(1, "Category Name is required")
+        .max(100, "Category Name must not exceed 100 characters"),
+
+    description: z
+        .string()
+        .trim()
+        .min(1, "Description is required")
+        .max(500, "Description must not exceed 500 characters"),
+
+    parentCategory: z
+        .string()
+        .optional()
+});

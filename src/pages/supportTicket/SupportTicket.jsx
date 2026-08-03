@@ -113,7 +113,16 @@ export default function SupportTicket() {
     const [ticketId, setticketId] = useState(null)
     const [searchText, setSearchText] = useState("");
     const [customSearch, setcustomSearch] = useState("");
-    const { dataState, onDataStateChange, page, pageSize, resetPage } = useGridPagination(10)
+    const {
+        dataState,
+        onDataStateChange,
+        page,
+        pageSize,
+        resetPage,
+        sort,
+        kendoSort,
+        setKendoSort,
+    } = useGridPagination(10)
     const getSuppportStatus = async () => {
         const res = await apiRequest("GET", API_ROUTES.common.getSupportStatus, null, null, {
             showLoader: true
@@ -124,17 +133,22 @@ export default function SupportTicket() {
     }
 
     const getTickets = async () => {
-        const res = await apiRequest("POST", API_ROUTES.supportTicket.SupportTicketViewList, { page, pageSize, customSearch }, null, {
+        const res = await apiRequest("POST", API_ROUTES.supportTicket.SupportTicketViewList, { page, pageSize, customSearch, Sorts: sort }, null, {
             showLoader: true
         })
         console.log(res.data);
         setsupportTicketsData(res.data)
     }
 
+    const handleGridDataStateChange = (event) => {
+        onDataStateChange(event)
+        setKendoSort(event.dataState?.sort || [])
+    }
+
     useEffect(() => {
         getSuppportStatus()
         getTickets()
-    }, [page, pageSize, customSearch])
+    }, [page, pageSize, customSearch, sort])
 
 
     const supportTicketsColumns = [
@@ -179,6 +193,8 @@ export default function SupportTicket() {
                                     data={supportTicketsData}
                                     skip={dataState.skip}
                                     take={dataState.take}
+                                    sortable={{ allowUnsort: true, mode: 'single' }}
+                                    sort={kendoSort}
                                     pageable={{
                                         buttonCount: 5,
                                         pageSizes: [10, 20, 50],
@@ -186,7 +202,7 @@ export default function SupportTicket() {
                                         previousNext: true,
                                         type: "numeric"
                                     }}
-                                    onDataStateChange={onDataStateChange}
+                                    onDataStateChange={handleGridDataStateChange}
                                 >
                                     {supportTicketsColumns.map((col) => (
                                         <GridColumn
@@ -194,6 +210,7 @@ export default function SupportTicket() {
                                             field={col.field}
                                             title={col.title}
                                             width={col.width || "150px"}
+                                            sortable={col.field === 'action' ? false : true}
                                             cells={
                                                 col.cell
                                                     ? {

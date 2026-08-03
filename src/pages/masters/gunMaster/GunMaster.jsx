@@ -107,9 +107,18 @@ export default function GunMaster() {
     const [statusOptions, setstatusOptions] = useState([])
     const [searchText, setSearchText] = useState("")
     const [customSearch, setcustomSearch] = useState("")
-    const { dataState, onDataStateChange, page, pageSize, resetPage } = useGridPagination(10)
+    const {
+        dataState,
+        onDataStateChange,
+        page,
+        pageSize,
+        resetPage,
+        sort,
+        kendoSort,
+        setKendoSort,
+    } = useGridPagination(10)
     const getGun = async () => {
-        const res = await apiRequest("POST", API_ROUTES.gun.getGun, { page, pageSize, customSearch }, null, {
+        const res = await apiRequest("POST", API_ROUTES.gun.getGun, { page, pageSize, customSearch, Sorts: sort }, null, {
             showLoader: true
         })
         setgunData(res.data.data)
@@ -135,10 +144,15 @@ export default function GunMaster() {
             setstatusOptions(res.data)
         }
     }
+    const handleGridDataStateChange = (event) => {
+        onDataStateChange(event)
+        setKendoSort(event.dataState?.sort || [])
+    }
+
     useEffect(() => {
         getGun()
         getSuppportStatus()
-    }, [page, pageSize, customSearch])
+    }, [page, pageSize, customSearch, sort])
     return (
         <div className="container-fluid">
             <div className="mb-3 activity-breadcrumb">
@@ -182,6 +196,8 @@ export default function GunMaster() {
                                 data={gunData}
                                 skip={dataState.skip}
                                 take={dataState.take}
+                                sortable={{ allowUnsort: true, mode: 'single' }}
+                                sort={kendoSort}
                                 pageable={{
                                     buttonCount: 5,
                                     pageSizes: [10, 20, 50],
@@ -189,7 +205,7 @@ export default function GunMaster() {
                                     info: true,
                                     type: "numeric"
                                 }}
-                                onDataStateChange={onDataStateChange}
+                                onDataStateChange={handleGridDataStateChange}
                             >
                                 {
                                     gunCoulmn?.map((col, ind) => {
@@ -199,6 +215,7 @@ export default function GunMaster() {
                                                 field={col.field}
                                                 title={col.title}
                                                 width={col.width || "150px"}
+                                                sortable={col.field === 'action' || col.field=='attachmentFullPath' ? false : true}
                                                 pageable={{
                                                     buttonCount: 4,
                                                     pageSizes: [20, 50, 200],

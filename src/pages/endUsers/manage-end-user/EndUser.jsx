@@ -10,9 +10,16 @@ import useGridPagination from '../../../hooks/useGridPagination'
 export default function EndUser() {
     const [manageUserData, setmanageUserData] = useState([])
     const [total, setTotal] = useState(0);
-    const { dataState, onDataStateChange, page, pageSize, resetPage } = useGridPagination(10)
-    const [kendoSort, setKendoSort] = useState([]);
-    const [sort, setsort] = useState([]);
+    const {
+        dataState,
+        onDataStateChange,
+        page,
+        pageSize,
+        resetPage,
+        sort,
+        kendoSort,
+        setKendoSort,
+    } = useGridPagination(10)
     const [searchText, setSearchText] = useState("");
     const [customSearch, setcustomSearch] = useState("");
 
@@ -116,10 +123,15 @@ export default function EndUser() {
             </td>
         );
     };
+    const handleGridDataStateChange = (event) => {
+        onDataStateChange(event)
+        setKendoSort(event.dataState?.sort || [])
+    }
+
     // fetch on mount and whenever paging, sort, or search changes
     useEffect(() => {
         getManageEndUser()
-    }, [page, pageSize, sort, customSearch])
+    }, [page, pageSize, customSearch, sort])
     return (
         <div className="container-fluid">
             <div className="col mb-3">
@@ -131,7 +143,10 @@ export default function EndUser() {
                         <SerachFilter
                             value={searchText}
                             onChange={(e) => setSearchText(e.target.value)}
-                            onSubmit={(value) => setcustomSearch(value)}
+                            onSubmit={(value) => {
+                                resetPage()
+                                setcustomSearch(value)
+                            }}
                         />
                     </div>
                     <div className="col-12 col-lg">
@@ -175,29 +190,7 @@ export default function EndUser() {
                                     type: "numeric"
                                 }}
 
-                                onDataStateChange={(e) => {
-                                    onDataStateChange(e)
-
-                                    const nextSort = e.dataState.sort || [];
-
-                                    setKendoSort(nextSort);
-
-                                    if (nextSort.length > 0) {
-
-                                        setsort([
-                                            {
-                                                field: nextSort[0].field,
-                                                direction: nextSort[0].dir === "asc" ? 0 : 1
-                                            }
-                                        ]);
-
-                                    } else {
-
-                                        setsort([]);
-
-                                    }
-
-                                }}
+                                onDataStateChange={handleGridDataStateChange}
                             >
 
                                 <GridColumn

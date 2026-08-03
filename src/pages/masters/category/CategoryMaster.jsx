@@ -8,6 +8,8 @@ import { handleDelete } from '../../../utils/DeleteRecords';
 import BreadCumb from '../../../components/common/breadCumb/BreadCumb';
 import SerachFilter from '../../../components/common/SerachFilter';
 import useGridPagination from '../../../hooks/useGridPagination'
+import CategoryModel from './CategoryModel';
+import ManufacturerAdd from '../manufacturer/ManufacturerAdd';
 const ActionCell = (props) => {
     const item = props.dataItem;
     return (
@@ -66,9 +68,19 @@ export default function CategoryMaster() {
     const [categoryMasterData, setcategoryMasterData] = useState([])
     const [searchText, setSearchText] = useState("")
     const [customSearch, setcustomSearch] = useState("")
-    const { dataState, onDataStateChange, page, pageSize, resetPage } = useGridPagination(10)
+    const {
+        dataState,
+        onDataStateChange,
+        page,
+        pageSize,
+        resetPage,
+        sort,
+        kendoSort,
+        setKendoSort,
+    } = useGridPagination(10)
+    const [isCategoryOpen, setisCategoryOpen] = useState(false)
     const getCategoryMaster = async () => {
-        const res = await apiRequest("POST", API_ROUTES.category.getCategoryMaster, { page, pageSize, customSearch }, null, {
+        const res = await apiRequest("POST", API_ROUTES.category.getCategoryMaster, { page, pageSize, customSearch, Sorts: sort }, null, {
             showLoader: true
         })
         setcategoryMasterData(res.data.data)
@@ -84,103 +96,126 @@ export default function CategoryMaster() {
         { field: "updatedByUserName", title: "Modified By" },
         { field: "isActive", title: "Status", cell: StatusCell, width: "70px" }
     ]
+    const handleGridDataStateChange = (event) => {
+        onDataStateChange(event)
+        setKendoSort(event.dataState?.sort || [])
+    }
+
     useEffect(() => {
         getCategoryMaster()
-    }, [page, pageSize, customSearch])
+    }, [page, pageSize, customSearch, sort])
     return (
-        <div className="container-fluid">
-            <div className="mb-3 activity-breadcrumb">
-                <span style={{ color: "#666766" }} className="fw-bold">Masters</span>
-                <span className="mx-2 text-dark">/</span>
-                <span className="fw-bold text-dark">Category Master</span>
-            </div>
-            <div className="tabbar-section">
-                <div className="row align-items-center gap-3">
-                    <div className="col-12 col-lg-auto">
-                        <SerachFilter
-                            value={searchText}
-                            onChange={(e) => setSearchText(e.target.value)}
-                            onSubmit={(value) => {
-                                resetPage()
-                                setcustomSearch(value)
-                            }}
-                        />
-                    </div>
-                    <div className="col-12 col-lg">
-                        <div className="btn-list d-flex justify-content-lg-end flex-wrap gap-2 gap-md-3 text-end">
 
-                            <button
-                                // onClick={() => setismanufacturerOpen(true)}
-                                className="btn main-btn border-btn blue-btn"
-                                style={{
-                                    background: "linear-gradient(90deg, rgb(193, 39, 45) 0%, rgb(0 0 0 / 92%) 100%)",
-                                    color: "white"
+        <>
+
+            <div className="container-fluid">
+                <div className="mb-3 activity-breadcrumb">
+                    <span style={{ color: "#666766" }} className="fw-bold">Masters</span>
+                    <span className="mx-2 text-dark">/</span>
+                    <span className="fw-bold text-dark">Category Master</span>
+                </div>
+                <div className="tabbar-section">
+                    <div className="row align-items-center gap-3">
+                        <div className="col-12 col-lg-auto">
+                            <SerachFilter
+                                value={searchText}
+                                onChange={(e) => setSearchText(e.target.value)}
+                                onSubmit={(value) => {
+                                    resetPage()
+                                    setcustomSearch(value)
                                 }}
-                            >
-                                Add
-                            </button>
+                            />
+                        </div>
+                        <div className="col-12 col-lg">
+                            <div className="btn-list d-flex justify-content-lg-end flex-wrap gap-2 gap-md-3 text-end">
+
+                                <button
+                                    onClick={() => setisCategoryOpen(true)}
+                                    className="btn main-btn border-btn blue-btn"
+                                    style={{
+                                        background: "linear-gradient(90deg, rgb(193, 39, 45) 0%, rgb(0 0 0 / 92%) 100%)",
+                                        color: "white"
+                                    }}
+                                >
+                                    Add
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="row">
+                        <div className="col-12 mt-3 mt-xxl-4">
+                            <div className="table-responsive">
+                                <Grid
+                                    className="table-wrapper"
+                                    data={categoryMasterData}
+                                    skip={dataState.skip}
+                                    take={dataState.take}
+                                    sortable={{ allowUnsort: true, mode: 'single' }}
+                                    sort={kendoSort}
+                                    pageable={{
+                                        buttonCount: 5,
+                                        pageSizes: [10, 20, 50],
+                                        previousNext: true,
+                                        info: true,
+                                        type: "numeric"
+                                    }}
+                                    onDataStateChange={handleGridDataStateChange}
+                                >
+                                    {
+                                        categoryMasterColumns?.map((col, ind) => {
+                                            return (
+                                                <GridColumn
+                                                    key={col.field}
+                                                    field={col.field}
+                                                    title={col.title}
+                                                    width={col.width || "150px"}
+                                                    sortable={col.field === 'action' ? false : true}
+                                                    pageable={{
+                                                        buttonCount: 4,
+                                                        pageSizes: [20, 50, 200],
+                                                        previousNext: true,
+                                                        info: true,
+                                                        type: "numeric"
+                                                    }}
+                                                    cells={
+                                                        col.cell
+                                                            ? {
+                                                                data: (props) => (
+                                                                    <col.cell
+                                                                        {...props}
+                                                                        getCategoryMaster={getCategoryMaster}
+                                                                    />
+                                                                )
+                                                            }
+                                                            : {
+                                                                data: (props) => (
+                                                                    <TextCell {...props} field={col.field} />
+                                                                )
+                                                            }
+                                                    }
+                                                />
+                                            )
+                                        })
+                                    }
+
+                                </Grid>
+                            </div>
                         </div>
                     </div>
                 </div>
-
-                <div className="row">
-                    <div className="col-12 mt-3 mt-xxl-4">
-                        <div className="table-responsive">
-                            <Grid
-                                className="table-wrapper"
-                                data={categoryMasterData}
-                                skip={dataState.skip}
-                                take={dataState.take}
-                                pageable={{
-                                    buttonCount: 5,
-                                    pageSizes: [10, 20, 50],
-                                    previousNext: true,
-                                    info: true,
-                                    type: "numeric"
-                                }}
-                                onDataStateChange={onDataStateChange}
-                            >
-                                {
-                                    categoryMasterColumns?.map((col, ind) => {
-                                        return (
-                                            <GridColumn
-                                                key={col.field}
-                                                field={col.field}
-                                                title={col.title}
-                                                width={col.width || "150px"}
-                                                pageable={{
-                                                    buttonCount: 4,
-                                                    pageSizes: [20, 50, 200],
-                                                    previousNext: true,
-                                                    info: true,
-                                                    type: "numeric"
-                                                }}
-                                                cells={
-                                                    col.cell
-                                                        ? {
-                                                            data: (props) => (
-                                                                <col.cell
-                                                                    {...props}
-                                                                    getCategoryMaster={getCategoryMaster}
-                                                                />
-                                                            )
-                                                        }
-                                                        : {
-                                                            data: (props) => (
-                                                                <TextCell {...props} field={col.field} />
-                                                            )
-                                                        }
-                                                }
-                                            />
-                                        )
-                                    })
-                                }
-
-                            </Grid>
-                        </div>
-                    </div>
-                </div>
             </div>
-        </div>
+
+            {
+                isCategoryOpen
+                &&
+
+                <CategoryModel
+                getCategoryMaster={getCategoryMaster}
+                    isCategoryOpen={isCategoryOpen}
+                    setisCategoryOpen={setisCategoryOpen}
+                />
+            }
+        </>
     )
 }

@@ -70,9 +70,18 @@ export default function Ammunition() {
     const [id, setid] = useState(null)
     const [searchText, setSearchText] = useState("")
     const [customSearch, setcustomSearch] = useState("")
-    const { dataState, onDataStateChange, page, pageSize, resetPage } = useGridPagination(10)
+    const {
+        dataState,
+        onDataStateChange,
+        page,
+        pageSize,
+        resetPage,
+        sort,
+        kendoSort,
+        setKendoSort,
+    } = useGridPagination(10)
     const getAmmunition = async () => {
-        const res = await apiRequest("POST", API_ROUTES.ammunition.getammunition, { page, pageSize, customSearch }, null, {
+        const res = await apiRequest("POST", API_ROUTES.ammunition.getammunition, { page, pageSize, customSearch, Sorts: sort }, null, {
             showLoader: true
         })
         setammunitionData(res.data.data)
@@ -89,9 +98,14 @@ export default function Ammunition() {
         { field: "updatedByUserName", title: "Modified By" },
         { field: "isActive", title: "Status", cell: StatusCell }
     ]
+    const handleGridDataStateChange = (event) => {
+        onDataStateChange(event)
+        setKendoSort(event.dataState?.sort || [])
+    }
+
     useEffect(() => {
         getAmmunition()
-    }, [page, pageSize, customSearch])
+    }, [page, pageSize, customSearch, sort])
     return (
         <div className="container-fluid">
             <div className="mb-3 activity-breadcrumb">
@@ -132,6 +146,8 @@ export default function Ammunition() {
                                 data={ammunitionData}
                                 skip={dataState.skip}
                                 take={dataState.take}
+                                sortable={{ allowUnsort: true, mode: 'single' }}
+                                sort={kendoSort}
                                 pageable={{
                                     buttonCount: 5,
                                     pageSizes: [10, 20, 50],
@@ -139,7 +155,7 @@ export default function Ammunition() {
                                     info: true,
                                     type: "numeric"
                                 }}
-                                onDataStateChange={onDataStateChange}
+                                onDataStateChange={handleGridDataStateChange}
                             >
                                 {
                                     ammunitionColumns?.map((col, ind) => {
@@ -149,6 +165,7 @@ export default function Ammunition() {
                                                 field={col.field}
                                                 title={col.title}
                                                 width={col.width || "150px"}
+                                                sortable={col.field === 'action' ? false : true}
                                                 pageable={{
                                                     buttonCount: 4,
                                                     pageSizes: [20, 50, 200],

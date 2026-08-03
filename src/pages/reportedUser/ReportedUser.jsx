@@ -15,9 +15,18 @@ export default function ReportedUser() {
     const [reportUserData, setreportUserData] = useState([])
     const [searchText, setSearchText] = useState("")
     const [customSearch, setcustomSearch] = useState("")
-    const { dataState, onDataStateChange, page, pageSize, resetPage } = useGridPagination(10)
+    const {
+        dataState,
+        onDataStateChange,
+        page,
+        pageSize,
+        resetPage,
+        sort,
+        kendoSort,
+        setKendoSort,
+    } = useGridPagination(10)
     const getReportedUser = async () => {
-        const res = await apiRequest("POST", API_ROUTES.report.getReport, { page, pageSize, customSearch }, null, {
+        const res = await apiRequest("POST", API_ROUTES.report.getReport, { page, pageSize, customSearch, Sorts: sort }, null, {
             showLoader: true
         })
         setreportUserData(res.data)
@@ -31,9 +40,14 @@ export default function ReportedUser() {
         { field: "Status", title: "Status" }
     ]
 
+    const handleGridDataStateChange = (event) => {
+        onDataStateChange(event)
+        setKendoSort(event.dataState?.sort || [])
+    }
+
     useEffect(() => {
         getReportedUser()
-    }, [customSearch])
+    }, [page, pageSize, customSearch, sort])
 
     return (
 
@@ -61,6 +75,8 @@ export default function ReportedUser() {
                                 data={reportUserData}
                                 skip={dataState.skip}
                                 take={dataState.take}
+                                sortable={{ allowUnsort: true, mode: 'single' }}
+                                sort={kendoSort}
                                 pageable={{
                                     buttonCount: 5,
                                     pageSizes: [10, 20, 50],
@@ -68,7 +84,7 @@ export default function ReportedUser() {
                                     info: true,
                                     type: "numeric"
                                 }}
-                                onDataStateChange={onDataStateChange}
+                                onDataStateChange={handleGridDataStateChange}
                             >
                                 {
                                     reportedUserColumn?.map((col, ind) => {
@@ -78,6 +94,7 @@ export default function ReportedUser() {
                                                 field={col.field}
                                                 title={col.title}
                                                 width={col.width || "150px"}
+                                                sortable={false}
                                                 pageable={{
                                                     buttonCount: 4,
                                                     pageSizes: [20, 50, 200],

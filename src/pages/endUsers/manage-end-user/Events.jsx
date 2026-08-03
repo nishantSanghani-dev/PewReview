@@ -1,5 +1,6 @@
 import { Grid, GridColumn } from '@progress/kendo-react-grid'
-import React, { useState } from 'react'
+import { process } from '@progress/kendo-data-query'
+import React, { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom';
 import { handleDelete } from '../../../utils/DeleteRecords';
 export const ActionCell = (props) => {
@@ -66,7 +67,8 @@ export const AddressCell = (props) => {
     );
 };
 export default function Events({ data, isUpcomingEvent, setisUpcomingEvent }) {
-    // const [activeTab, setActiveTab] = useState("upcoming");
+    const [gridSort, setGridSort] = useState([])
+    const sortedData = useMemo(() => process(data, { sort: gridSort }).data, [data, gridSort])
 
     return (
         <>
@@ -108,8 +110,9 @@ export default function Events({ data, isUpcomingEvent, setisUpcomingEvent }) {
                                     style={{
                                         zIndex: "999"
                                     }}
-                                    data={data}
-                                    sortable
+                                    data={sortedData}
+                                    sortable={{ allowUnsort: true, mode: 'single' }}
+                                    sort={gridSort}
                                     pageable={{
                                         buttonCount: 5,
                                         pageSizes: [10, 20, 50],
@@ -117,6 +120,7 @@ export default function Events({ data, isUpcomingEvent, setisUpcomingEvent }) {
                                         previousNext: true,
                                         type: "numeric"
                                     }}
+                                    onDataStateChange={(event) => setGridSort(event.dataState?.sort || [])}
                                 >
                                     <GridColumn
                                         title="Action"

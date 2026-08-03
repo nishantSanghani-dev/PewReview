@@ -1,0 +1,39 @@
+.modal-content {
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.18);
+}
+
+.form-control,
+.form-select {
+  font-size: 14px;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #b71c1c;
+  box-shadow: none;
+}
+
+.form-check-input {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.form-check-input:checked {
+  background-color: #b71c1c;
+  border-color: #b71c1c;
+}
+
+.form-check-label {
+  margin-left: 6px;
+  font-size: 15px;
+}
+
+.modal-header {
+  padding-top: 18px;
+  padding-bottom: 18px;
+}
+
+.modal-footer {
+  border-top: 1px solid #ececec;
+}

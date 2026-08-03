@@ -91,6 +91,7 @@ export const apiRequest = async (method, endPoint, body = null, params = null, a
       return
     }
     toast.error(error?.response?.data?.message)
+    
     throw error
   } finally {
     if (mergedApiOption.showLoader) {

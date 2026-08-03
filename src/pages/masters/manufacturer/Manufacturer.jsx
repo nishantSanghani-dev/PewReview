@@ -70,9 +70,18 @@ export default function Manufacturer() {
     const [id, setid] = useState(null)
     const [searchText, setSearchText] = useState("")
     const [customSearch, setcustomSearch] = useState("")
-    const { dataState, onDataStateChange, page, pageSize, resetPage } = useGridPagination(10)
+    const {
+        dataState,
+        onDataStateChange,
+        page,
+        pageSize,
+        resetPage,
+        sort,
+        kendoSort,
+        setKendoSort,
+    } = useGridPagination(10)
     const getManufacturer = async () => {
-        const res = await apiRequest("POST", API_ROUTES.manufacturer.getManufacturer, { page, PageSize: pageSize, customSearch }, null, {
+        const res = await apiRequest("POST", API_ROUTES.manufacturer.getManufacturer, { page, PageSize: pageSize, customSearch, Sorts: sort }, null, {
             showLoader: true
         })
         setmanufacturerData(res.data.data)
@@ -87,9 +96,14 @@ export default function Manufacturer() {
         { field: "status", title: "Status", cell: StatusCell, width: "80px" }
     ]
 
+    const handleGridDataStateChange = (event) => {
+        onDataStateChange(event)
+        setKendoSort(event.dataState?.sort || [])
+    }
+
     useEffect(() => {
         getManufacturer()
-    }, [page, pageSize, customSearch])
+    }, [page, pageSize, customSearch, sort])
     return (
         <>
             <div className="container-fluid">
@@ -134,6 +148,8 @@ export default function Manufacturer() {
                                     data={manufacturerData}
                                     skip={dataState.skip}
                                     take={dataState.take}
+                                    sortable={{ allowUnsort: true, mode: 'single' }}
+                                    sort={kendoSort}
                                     pageable={{
                                         buttonCount: 5,
                                         pageSizes: [10, 20, 50],
@@ -141,7 +157,7 @@ export default function Manufacturer() {
                                         info: true,
                                         type: "numeric"
                                     }}
-                                    onDataStateChange={onDataStateChange}
+                                    onDataStateChange={handleGridDataStateChange}
                                 >
                                     {
                                         manufectureColumns?.map((col, ind) => {
@@ -151,6 +167,7 @@ export default function Manufacturer() {
                                                     field={col.field}
                                                     title={col.title}
                                                     width={col.width || "150px"}
+                                                    sortable={col.field === 'action' ? false : true}
                                                     pageable={{
                                                         buttonCount: 4,
                                                         pageSizes: [20, 50, 200],

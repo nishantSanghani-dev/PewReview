@@ -89,7 +89,7 @@ export const DateCell = ({ tdProps, dataItem, field }) => {
 
     return (
         <td {...tdProps}>
-            {new Date(dataItem?.createdDate ||  dataItem?.createdOn || dataItem?.reportDate || dataItem?.createdAt).toLocaleDateString("en-US")}
+            {new Date(dataItem?.createdDate || dataItem?.createdOn || dataItem?.reportDate || dataItem?.createdAt).toLocaleDateString("en-US")}
         </td>
     )
 }
@@ -105,13 +105,23 @@ const UserNameCell = ({ tdProps, dataItem, field }) => {
 export default function Activity() {
     const [activityData, setactivityData] = useState([])
     const [total, setTotal] = useState(0);
-    const { dataState, onDataStateChange, page, pageSize, resetPage } = useGridPagination(10)
+    const {
+        dataState,
+        onDataStateChange,
+        page,
+        pageSize,
+        resetPage,
+        sort,
+        kendoSort,
+        setKendoSort,
+    } = useGridPagination(10)
 
     const getActivities = async () => {
         const payload = {
             page,
             pageSize,
-            customSearch
+            customSearch,
+            Sorts: sort
         };
         const res = await apiRequest("POST", API_ROUTES.activities.getActivities, payload, null, {
             showLoader: true
@@ -138,9 +148,14 @@ export default function Activity() {
     const [searchText, setSearchText] = useState("")
     const [customSearch, setcustomSearch] = useState("")
 
+    const handleGridDataStateChange = (event) => {
+        onDataStateChange(event)
+        setKendoSort(event.dataState?.sort || [])
+    }
+
     useEffect(() => {
         getActivities()
-    }, [dataState, customSearch])
+    }, [page, pageSize, customSearch, sort])
     return (
 
         <div className="container-fluid">
@@ -174,7 +189,8 @@ export default function Activity() {
                                         data={activityData}
                                         skip={dataState.skip}
                                         take={dataState.take}
-                                        sortable
+                                        sortable={{ allowUnsort: true, mode: 'single' }}
+                                        sort={kendoSort}
                                         pageable={{
                                             buttonCount: 5,
                                             pageSizes: [20, 50, 150],
@@ -182,8 +198,9 @@ export default function Activity() {
                                             previousNext: true,
                                             type: "numeric"
                                         }}
-                                        onDataStateChange={onDataStateChange}
+                                        onDataStateChange={handleGridDataStateChange}
                                     >
+
                                         {
                                             venueActivityTabColumn?.map((col, ind) => {
                                                 console.log(col.width);
@@ -194,6 +211,7 @@ export default function Activity() {
                                                         field={col.field}
                                                         title={col.title}
                                                         width={col.width}
+                                                        sortable={col.field === 'action' ? false : true}
                                                         pageable={{
                                                             buttonCount: 4,
                                                             pageSizes: [20, 50, 200],

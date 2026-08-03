@@ -98,9 +98,18 @@ export default function VenueList() {
     const [editVenueId, setEditVenueId] = useState(null)
     const [searchText, setSearchText] = useState("")
     const [customSearch, setcustomSearch] = useState("")
-    const { dataState, onDataStateChange, page, pageSize, resetPage } = useGridPagination(10)
+    const {
+        dataState,
+        onDataStateChange,
+        page,
+        pageSize,
+        resetPage,
+        sort,
+        kendoSort,
+        setKendoSort,
+    } = useGridPagination(10)
     const getVenueList = async () => {
-        const res = await apiRequest("POST", API_ROUTES.venue.getVenueList, { page, pageSize, customSearch }, null, {
+        const res = await apiRequest("POST", API_ROUTES.venue.getVenueList, { page, pageSize, customSearch, Sorts: sort }, null, {
             showLoader: true
         })
         setvenueListData(res.data.data)
@@ -237,9 +246,14 @@ export default function VenueList() {
         { field: "approvalStatusName", title: "Approval Status", cell: ApprovalStatusCell },
         { field: "isActive", title: "Status", cell: StatusCell }
     ];
+    const handleGridDataStateChange = (event) => {
+        onDataStateChange(event)
+        setKendoSort(event.dataState?.sort || [])
+    }
+
     useEffect(() => {
         getVenueList()
-    }, [page, pageSize, customSearch])
+    }, [page, pageSize, customSearch, sort])
 
     return (
         <div className='container-fluid'>
@@ -306,6 +320,8 @@ export default function VenueList() {
                                         data={venueListData}
                                         skip={dataState.skip}
                                         take={dataState.take}
+                                        sortable={{ allowUnsort: true, mode: 'single' }}
+                                        sort={kendoSort}
                                         pageable={{
                                             buttonCount: 5,
                                             pageSizes: [10, 20, 50],
@@ -313,7 +329,7 @@ export default function VenueList() {
                                             previousNext: true,
                                             type: "numeric"
                                         }}
-                                        onDataStateChange={onDataStateChange}
+                                        onDataStateChange={handleGridDataStateChange}
 
                                     >
                                         {venueColumns.map((col) => (
@@ -321,6 +337,7 @@ export default function VenueList() {
                                                 key={col.field}
                                                 field={col.field}
                                                 title={col.title}
+                                                sortable={col.field === 'action' ? false : true}
                                                 width={col.width || "150px"}
                                                 cells={
                                                     col.cell

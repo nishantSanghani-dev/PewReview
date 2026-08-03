@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/set-state-in-effect */
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { apiRequest } from '../../../../services/Api'
 import { API_ROUTES } from '../../../../routes/api.routes'
@@ -66,13 +66,17 @@ export default function RoleAndPermission() {
     const [kendoSort, setKendoSort] = useState([])
     const [sort, setsort] = useState([])
     const [filters, setFilters] = useState([]);
+    const sortPayload = useMemo(() => (kendoSort || []).map((item) => ({
+        field: item.field,
+        direction: item.dir === 'asc' ? 0 : 1,
+    })), [kendoSort])
     const getRole = async () => {
         const page = Math.floor(dataState.skip / dataState.take) + 1
         const payload = {
             page,
             pageSize: dataState.take,
             customSearch,
-            Sorts: sort,
+            Sorts: sortPayload,
             Filters: filters
         }
         const res = await apiRequest("POST", API_ROUTES.role.roleList, payload, null, {
@@ -117,7 +121,7 @@ export default function RoleAndPermission() {
     // fetch on mount and when paging, sorting or search changes
     useEffect(() => {
         getRole()
-    }, [customSearch, dataState.skip, dataState.take, sort, filters])
+    }, [customSearch, dataState.skip, dataState.take, sortPayload, filters])
 
     const [searchText, setSearchText] = useState("")
 
@@ -179,15 +183,23 @@ export default function RoleAndPermission() {
                                 onDataStateChange={(e) => {
                                     setDataState(e.dataState)
                                     const nextSort = e.dataState.sort || []
-                                    setKendoSort(nextSort)
+                                    setKendoSort((prevSort) => {
+                                        if (prevSort.length === nextSort.length && prevSort.every((item, index) => item.field === nextSort[index]?.field && item.dir === nextSort[index]?.dir)) {
+                                            return prevSort
+                                        }
+                                        return nextSort
+                                    })
                                     if (nextSort.length > 0) {
-                                        setsort([
-                                            { field: nextSort[0].field, direction: nextSort[0].dir === 'asc' ? 0 : 1 }
-                                        ])
+                                        setsort((prevSort) => {
+                                            const nextPayload = [{ field: nextSort[0].field, direction: nextSort[0].dir === 'asc' ? 0 : 1 }]
+                                            if (prevSort.length === 1 && prevSort[0]?.field === nextPayload[0].field && prevSort[0]?.direction === nextPayload[0].direction) {
+                                                return prevSort
+                                            }
+                                            return nextPayload
+                                        })
                                     } else {
-                                        setsort([])
+                                        setsort((prevSort) => (prevSort.length === 0 ? prevSort : []))
                                     }
-
 
                                     const nextFilter = e.dataState.filter;
 
@@ -212,7 +224,7 @@ export default function RoleAndPermission() {
                                 <GridColumn
                                     title="Action"
                                     width="120px"
-
+                                    sortable={false}
                                     cells={{
                                         data: (props) => (
                                             <RoleActionCell

@@ -70,9 +70,18 @@ export default function Accessories() {
     const [id, setid] = useState(null)
     const [searchText, setSearchText] = useState("")
     const [customSearch, setcustomSearch] = useState("")
-    const { dataState, onDataStateChange, page, pageSize, resetPage } = useGridPagination(10)
+    const {
+        dataState,
+        onDataStateChange,
+        page,
+        pageSize,
+        resetPage,
+        sort,
+        kendoSort,
+        setKendoSort,
+    } = useGridPagination(10)
     const getAccessories = async () => {
-        const res = await apiRequest("POST", API_ROUTES.accessories.getaccessories, { page, pageSize, customSearch }, null, {
+        const res = await apiRequest("POST", API_ROUTES.accessories.getaccessories, { page, pageSize, customSearch, Sorts: sort }, null, {
             showLoader: true
         })
         setaccessoriesData(res.data.data)
@@ -90,9 +99,14 @@ export default function Accessories() {
         { field: "modifiedBy", title: "Modified By", width: "120px" },
         { field: "isActive", title: "status", cell: StatusCell, width: "80px" }
     ]
+    const handleGridDataStateChange = (event) => {
+        onDataStateChange(event)
+        setKendoSort(event.dataState?.sort || [])
+    }
+
     useEffect(() => {
         getAccessories()
-    }, [page, pageSize, customSearch])
+    }, [page, pageSize, customSearch, sort])
     return (
         <>
 
@@ -138,6 +152,8 @@ export default function Accessories() {
                                     data={accessoriesData}
                                     skip={dataState.skip}
                                     take={dataState.take}
+                                    sortable={{ allowUnsort: true, mode: 'single' }}
+                                    sort={kendoSort}
                                     pageable={{
                                         buttonCount: 5,
                                         pageSizes: [10, 20, 50],
@@ -145,7 +161,7 @@ export default function Accessories() {
                                         info: true,
                                         type: "numeric"
                                     }}
-                                    onDataStateChange={onDataStateChange}
+                                    onDataStateChange={handleGridDataStateChange}
                                 >
                                     {
                                         accessoriesColumn?.map((col, ind) => {
@@ -155,6 +171,7 @@ export default function Accessories() {
                                                     field={col.field}
                                                     title={col.title}
                                                     width={col.width || "150px"}
+                                                    sortable={col.field === 'action' ? false : true}
                                                     pageable={{
                                                         buttonCount: 4,
                                                         pageSizes: [20, 50, 200],

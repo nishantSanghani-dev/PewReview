@@ -12,17 +12,31 @@ export default function Event() {
     const [eventsData, seteventsData] = useState([])
     const [searchText, setSearchText] = useState("")
     const [customSearch, setcustomSearch] = useState("")
-    const { dataState, onDataStateChange, page, pageSize, resetPage } = useGridPagination(10)
+    const {
+        dataState,
+        onDataStateChange,
+        page,
+        pageSize,
+        resetPage,
+        sort,
+        kendoSort,
+        setKendoSort,
+    } = useGridPagination(10)
     const getEevent = async () => {
-        const res = await apiRequest("POST", API_ROUTES.events.getAllEvent, { page, pageSize, customSearch }, params, {
+        const res = await apiRequest("POST", API_ROUTES.events.getAllEvent, { page, pageSize, customSearch, Sorts: sort }, params, {
             showLoader: true
         })
         seteventsData(res.data.data)
     }
+    const handleGridDataStateChange = (event) => {
+        onDataStateChange(event)
+        setKendoSort(event.dataState?.sort || [])
+    }
+
     useEffect(() => {
         console.log(eventTabs);
         getEevent()
-    }, [eventTabs, params, page, pageSize, customSearch])
+    }, [eventTabs, params, page, pageSize, customSearch, sort])
     return (
         <div className="container-fluid">
             <div className="col mb-3">
@@ -136,7 +150,8 @@ export default function Event() {
                                                         data={eventsData}
                                                         skip={dataState.skip}
                                                         take={dataState.take}
-                                                        sortable
+                                                        sortable={{ allowUnsort: true, mode: 'single' }}
+                                                        sort={kendoSort}
                                                         pageable={{
                                                             buttonCount: 5,
                                                             pageSizes: [10, 20, 50],
@@ -144,7 +159,7 @@ export default function Event() {
                                                             previousNext: true,
                                                             type: "numeric"
                                                         }}
-                                                        onDataStateChange={onDataStateChange}
+                                                        onDataStateChange={handleGridDataStateChange}
                                                     >
                                                         <GridColumn
                                                             title="Action"

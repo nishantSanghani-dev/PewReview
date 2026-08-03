@@ -124,9 +124,18 @@ export default function Groups() {
     const [groupData, setgroupData] = useState([])
     const [searchText, setSearchText] = useState("")
     const [customSearch, setcustomSearch] = useState("")
-    const { dataState, onDataStateChange, page, pageSize, resetPage } = useGridPagination(10)
+    const {
+        dataState,
+        onDataStateChange,
+        page,
+        pageSize,
+        resetPage,
+        sort,
+        kendoSort,
+        setKendoSort,
+    } = useGridPagination(10)
     const getGroups = async () => {
-        const res = await apiRequest("POST", API_ROUTES.groups.getGroups, { page, pageSize, customSearch }, null, {
+        const res = await apiRequest("POST", API_ROUTES.groups.getGroups, { page, pageSize, customSearch, Sorts: sort }, null, {
             showLoader: true
         })
         setgroupData(res.data.data)
@@ -145,9 +154,14 @@ export default function Groups() {
         { field: "isActive", title: "Status", cell: StatusCell },
     ]
 
+    const handleGridDataStateChange = (event) => {
+        onDataStateChange(event)
+        setKendoSort(event.dataState?.sort || [])
+    }
+
     useEffect(() => {
         getGroups()
-    }, [page, pageSize, customSearch])
+    }, [page, pageSize, customSearch, sort])
 
     return (
         <div className="container-fluid">
@@ -179,6 +193,8 @@ export default function Groups() {
                                 data={groupData}
                                 skip={dataState.skip}
                                 take={dataState.take}
+                                sortable={{ allowUnsort: true, mode: 'single' }}
+                                sort={kendoSort}
                                 pageable={{
                                     buttonCount: 5,
                                     pageSizes: [10, 20, 50],
@@ -186,7 +202,7 @@ export default function Groups() {
                                     previousNext: true,
                                     type: "numeric"
                                 }}
-                                onDataStateChange={onDataStateChange}
+                                onDataStateChange={handleGridDataStateChange}
 
                             >
                                 {groupColumns.map((col) => (
@@ -195,6 +211,7 @@ export default function Groups() {
                                         field={col.field}
                                         title={col.title}
                                         width={col.width || "150px"}
+                                        sortable={col.field === 'action' || col.field == 'groupImageFullUrl' ? false : true}
                                         cells={
                                             col.cell
                                                 ? {

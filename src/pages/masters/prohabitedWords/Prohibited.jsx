@@ -71,9 +71,18 @@ export default function Prohibited() {
     const [id, setid] = useState(null)
     const [searchText, setSearchText] = useState("")
     const [customSearch, setcustomSearch] = useState("")
-    const { dataState, onDataStateChange, page, pageSize, resetPage } = useGridPagination(10)
+    const {
+        dataState,
+        onDataStateChange,
+        page,
+        pageSize,
+        resetPage,
+        sort,
+        kendoSort,
+        setKendoSort,
+    } = useGridPagination(10)
     const getProhibited = async () => {
-        const res = await apiRequest("POST", API_ROUTES.prohibited.getProhibited, { page, pageSize, customSearch }, null, {
+        const res = await apiRequest("POST", API_ROUTES.prohibited.getProhibited, { page, pageSize, customSearch, Sorts: sort }, null, {
             showLoader: true
         })
         setprohibitedData(res.data.data)
@@ -89,9 +98,14 @@ export default function Prohibited() {
         { field: "status", title: "Status", cell: StatusCell, width: "100px" }
     ]
 
+    const handleGridDataStateChange = (event) => {
+        onDataStateChange(event)
+        setKendoSort(event.dataState?.sort || [])
+    }
+
     useEffect(() => {
         getProhibited()
-    }, [page, pageSize, customSearch])
+    }, [page, pageSize, customSearch, sort])
     return (
         <>
             <div className="container-fluid">
@@ -137,6 +151,8 @@ export default function Prohibited() {
                                     data={prohibitedData}
                                     skip={dataState.skip}
                                     take={dataState.take}
+                                    sortable={{ allowUnsort: true, mode: 'single' }}
+                                    sort={kendoSort}
                                     pageable={{
                                         buttonCount: 5,
                                         pageSizes: [10, 20, 50],
@@ -144,7 +160,7 @@ export default function Prohibited() {
                                         info: true,
                                         type: "numeric"
                                     }}
-                                    onDataStateChange={onDataStateChange}
+                                    onDataStateChange={handleGridDataStateChange}
                                 >
                                     {
                                         prohibitedColumns?.map((col, ind) => {
@@ -154,6 +170,7 @@ export default function Prohibited() {
                                                     field={col.field}
                                                     title={col.title}
                                                     width={col.width}
+                                                    sortable={col.field === 'action' ? false : true}
                                                     pageable={{
                                                         buttonCount: 4,
                                                         pageSizes: [20, 50, 200],
