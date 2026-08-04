@@ -31,7 +31,8 @@ export default function LoginForm() {
         })
         console.log(res);
         if (res.status) {
-            dispatch(logIn(res.data.token))
+            dispatch(logIn({ token: res.data.token ,permission:res.data.userDetails
+.menuPermissions}))
             navigate("/admin/dashboard")
         }
 

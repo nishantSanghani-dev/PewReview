@@ -5,9 +5,8 @@ import { Grid, GridColumn } from '@progress/kendo-react-grid';
 import { Link } from 'react-router-dom';
 import SerachFilter from '../../components/common/SerachFilter';
 import useGridPagination from '../../hooks/useGridPagination'
+import { Tooltip } from '@progress/kendo-react-tooltip';
 const ActionCell = (props) => {
-
-
     return (
         <td {...props.tdProps}>
             <div className="d-flex gap-2 align-items-center">
@@ -23,8 +22,21 @@ const ActionCell = (props) => {
 };
 const TextCell = ({ tdProps, dataItem, field }) => (
     <td {...tdProps}>
-
-        {dataItem[field] ?? "-"}
+        <Tooltip anchorElement="target" position="top">
+            <span
+                title={dataItem[field]}
+                style={{
+                    display: "inline-block",
+                    width: "100%",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                }}
+            >
+                {dataItem[field] ?? "-"}
+            </span>
+        </Tooltip>
+        {/* {dataItem[field] ?? "-"} */}
     </td>
 );
 const ImagesVdeo = ({ tdProps, dataItem }) => {
@@ -104,6 +116,7 @@ const UserNameCell = ({ tdProps, dataItem, field }) => {
 }
 export default function Activity() {
     const [activityData, setactivityData] = useState([])
+    const [totalRecords, settotalRecords] = useState(null)
     const [total, setTotal] = useState(0);
     const {
         dataState,
@@ -127,6 +140,7 @@ export default function Activity() {
             showLoader: true
         })
         setactivityData(res.data.data)
+        settotalRecords(res.data.totalRecord)
     }
     const venueActivityTabColumn = [
         { field: "action", title: "Action", cell: ActionCell, width: "80px" },
@@ -185,6 +199,7 @@ export default function Activity() {
                             <div className="col-12">
                                 <div className="table-responsive">
                                     <Grid
+                                        total={totalRecords}
                                         className="table-wrapper  text-center"
                                         data={activityData}
                                         skip={dataState.skip}

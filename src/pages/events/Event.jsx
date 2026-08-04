@@ -5,6 +5,8 @@ import { Grid, GridColumn } from '@progress/kendo-react-grid'
 import { ActionCell, AddressCell, DateTimeCell, EventNameCell, HostNameCell } from '../endUsers/manage-end-user/Events'
 import SerachFilter from '../../components/common/SerachFilter'
 import useGridPagination from '../../hooks/useGridPagination'
+import { usePermission } from '../../hooks/UsePermission'
+import { MENU } from '../../data/Menu'
 
 export default function Event() {
     const [eventTabs, seteventTabs] = useState("upcomingEvents")
@@ -22,6 +24,13 @@ export default function Event() {
         kendoSort,
         setKendoSort,
     } = useGridPagination(10)
+    const permission = usePermission()
+    const eventPermission = permission.find((value, index) => value.menuId === MENU.EVENT)
+    console.log(eventPermission);
+
+
+
+
     const getEevent = async () => {
         const res = await apiRequest("POST", API_ROUTES.events.getAllEvent, { page, pageSize, customSearch, Sorts: sort }, params, {
             showLoader: true
@@ -164,7 +173,14 @@ export default function Event() {
                                                         <GridColumn
                                                             title="Action"
                                                             width="120px"
-                                                            cells={{ data: ActionCell }}
+                                                            cells={{
+                                                                data: (props) => (
+                                                                    <ActionCell
+                                                                        {...props}
+                                                                        eventPermission={eventPermission}
+                                                                    />
+                                                                ),
+                                                            }}
                                                         />
 
                                                         <GridColumn

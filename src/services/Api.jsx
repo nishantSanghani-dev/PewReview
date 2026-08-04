@@ -85,6 +85,10 @@ export const apiRequest = async (method, endPoint, body = null, params = null, a
     }
     return responseMessage
   } catch (error) {
+    console.log(error.response.status===401)
+    if(error.response.status===401){
+      localStorage.removeItem("TOKEN")
+    }
     console.log(error.response.data.strError);
     if (error.response.data.strError) {
       toast.error(error.response.data.strError)

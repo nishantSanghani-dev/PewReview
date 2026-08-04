@@ -9,13 +9,31 @@ import VenueAdd from './VenueAdd'
 import { handleStatusChange } from '../../../../utils/ChangeStatus'
 import SerachFilter from '../../../../components/common/SerachFilter'
 import useGridPagination from '../../../../hooks/useGridPagination'
+import { Tooltip } from '@progress/kendo-react-tooltip'
+import { useSelector } from 'react-redux'
+import { usePermission } from '../../../../hooks/UsePermission'
+import { MENU } from '../../../../data/Menu'
 
 const DetailCell = ({ tdProps, dataItem, field }) => {
     return (
         <td  {...tdProps}>
-            <div className="text-ellipsis">
+            <Tooltip anchorElement="target" position="top">
+                <span
+                    title={dataItem.description}
+                    style={{
+                        display: "inline-block",
+                        width: "100%",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                    }}
+                >
+                    {dataItem.description || "-"}
+                </span>
+            </Tooltip>
+            {/* <div className="text-ellipsis">
                 {dataItem.description || "-"}
-            </div>
+            </div> */}
         </td>
     )
 }
@@ -40,12 +58,27 @@ const WebsiteCell = ({ tdProps, dataItem }) => {
 const AddressCell = (props) => {
     const item = props.dataItem;
     return (
+
         <td {...props.tdProps}>
-            <div className="text-ellipsis">
+            <Tooltip anchorElement="target" position="top">
+                <span
+                    title={item.address || item.location || item.fullAddress}
+                    style={{
+                        display: "inline-block",
+                        width: "100%",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                    }}
+                >
+                    {item.address || item.location || item.fullAddress || "-"}
+                </span>
+            </Tooltip>
+            {/* <div className="text-ellipsis">
                 <p className="mb-0">
                     {item.address || item.location || item.fullAddress || "-"}
                 </p>
-            </div>
+            </div> */}
         </td>
     );
 };
@@ -98,6 +131,7 @@ export default function VenueList() {
     const [editVenueId, setEditVenueId] = useState(null)
     const [searchText, setSearchText] = useState("")
     const [customSearch, setcustomSearch] = useState("")
+    const [totalRecords, settotalRecords] = useState(null)
     const {
         dataState,
         onDataStateChange,
@@ -108,11 +142,18 @@ export default function VenueList() {
         kendoSort,
         setKendoSort,
     } = useGridPagination(10)
+
+    const permission = usePermission()
+    const venuePermission = permission.find((value, index) => value.menuId === MENU.VENUE)
+    console.log(venuePermission);
+    
+
     const getVenueList = async () => {
         const res = await apiRequest("POST", API_ROUTES.venue.getVenueList, { page, pageSize, customSearch, Sorts: sort }, null, {
             showLoader: true
         })
         setvenueListData(res.data.data)
+        settotalRecords(res.data.totalRecord)
     }
     const getVenueGunDetails = async (venueId) => {
         const res = await apiRequest("GET", API_ROUTES.venue.getVenueGunDetails, null, {
@@ -187,30 +228,44 @@ export default function VenueList() {
         return (
             <td {...props.tdProps}>
                 <div className="d-flex gap-2 align-items-center">
+                    {
+                        props.venuePermission.canRead
+                        &&
 
-                    <Link to={`/admin/venues/view/${props.dataItem.venueId}`}
+                        <Link to={`/admin/venues/view/${props.dataItem.venueId}`}
 
-                        className="small-square-btn edit-btn"
-                    >
-                        <i className="demo-icon icon-eye-line"></i>
-                    </Link>
-                    <a
-                        href="javascript:void(0)"
-                        className="small-square-btn edit-btn"
-                        onClick={() => {
-                            setEditVenueId(props.dataItem.venueId);
-                            setvenueAddBtn(true);
-                        }}
-                    >
-                        <i className="demo-icon icon-edit-1" />
-                    </a>
-                    <button
+                            className="small-square-btn edit-btn"
+                        >
+                            <i className="demo-icon icon-eye-line"></i>
+                        </Link>
+                    }
+                    {
+                        props.venuePermission.canUpdate
+                        &&
 
-                        onClick={() => deleteEvent()}
-                        className="small-square-btn danger-btn"
-                    >
-                        <i className="demo-icon icon-delete-1"></i>
-                    </button>
+                        <a
+                            href="javascript:void(0)"
+                            className="small-square-btn edit-btn"
+                            onClick={() => {
+                                setEditVenueId(props.dataItem.venueId);
+                                setvenueAddBtn(true);
+                            }}
+                        >
+                            <i className="demo-icon icon-edit-1" />
+                        </a>
+                    }
+                    {
+                        props.venuePermission.canDelete
+                        &&
+
+                        <button
+
+                            onClick={() => deleteEvent()}
+                            className="small-square-btn danger-btn"
+                        >
+                            <i className="demo-icon icon-delete-1"></i>
+                        </button>
+                    }
                 </div>
             </td>
         );
@@ -272,19 +327,24 @@ export default function VenueList() {
                         }}
                     />
                 </div>
-                <div className="col-12 col-lg">
-                    <div className="btn-list d-flex justify-content-lg-end flex-wrap gap-2 gap-md-3 text-end">
+                {
+                    venuePermission.canCreate
+                    &&
 
-                        <button
-                            onClick={() => setvenueAddBtn(true)}
-                            href="javascript:void(0);"
-                            className="btn main-btn border-btn sky-btn"
-                        >
-                            Add Venue
-                        </button>
+                    <div className="col-12 col-lg">
+                        <div className="btn-list d-flex justify-content-lg-end flex-wrap gap-2 gap-md-3 text-end">
 
+                            <button
+                                onClick={() => setvenueAddBtn(true)}
+                                href="javascript:void(0);"
+                                className="btn main-btn border-btn sky-btn"
+                            >
+                                Add Venue
+                            </button>
+
+                        </div>
                     </div>
-                </div>
+                }   
             </div>
             <div
 
@@ -322,6 +382,7 @@ export default function VenueList() {
                                         take={dataState.take}
                                         sortable={{ allowUnsort: true, mode: 'single' }}
                                         sort={kendoSort}
+                                        total={totalRecords}
                                         pageable={{
                                             buttonCount: 5,
                                             pageSizes: [10, 20, 50],
@@ -345,6 +406,7 @@ export default function VenueList() {
                                                             data: (props) => (
                                                                 <col.cell
                                                                     {...props}
+                                                                    venuePermission={venuePermission}
                                                                     getVenueList={getVenueList}
                                                                     setShowGunDetails={setShowGunDetails}
                                                                 />

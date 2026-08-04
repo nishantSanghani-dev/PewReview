@@ -3340,11 +3340,12 @@ span.chat-time {
 
 /* --- Responsive End --- */
 .verify-switch {
-  position: relative;
-  display: inline-block;
-  width: 78px;
-  height: 28px;
-  cursor: pointer;
+    padding: 2px 0px;
+    position: relative;
+    display: inline-block;
+    width: 77px;
+    height: auto;
+    cursor: pointer;
 }
 
 .verify-switch input {
@@ -3367,7 +3368,7 @@ span.chat-time {
   width: 14px;
   height: 14px;
   left: 5px;
-  top: 7px;
+  top: 6px;
   background: #fff;
   border-radius: 50%;
   transition: transform .3s;
@@ -3375,11 +3376,11 @@ span.chat-time {
 
 .verify-text {
   position: absolute;
-  left: 56%;
-  top: 54%;
+  left: 59%;
+  top: 53%;
   transform: translate(-50%, -50%);
   color: #6c757d;
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 600;
   user-select: none;
 }

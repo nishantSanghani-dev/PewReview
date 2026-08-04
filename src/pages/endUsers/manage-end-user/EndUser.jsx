@@ -6,6 +6,8 @@ import { Link } from 'react-router-dom'
 import { handleDelete } from '../../../utils/DeleteRecords'
 import SerachFilter from '../../../components/common/SerachFilter'
 import useGridPagination from '../../../hooks/useGridPagination'
+import { usePermission } from '../../../hooks/UsePermission'
+import { MENU } from '../../../data/Menu'
 
 export default function EndUser() {
     const [manageUserData, setmanageUserData] = useState([])
@@ -22,6 +24,10 @@ export default function EndUser() {
     } = useGridPagination(10)
     const [searchText, setSearchText] = useState("");
     const [customSearch, setcustomSearch] = useState("");
+    const permission = usePermission()
+    const endUserPermission = permission.find((value, index) => value.menuId === MENU.END_USER)
+    console.log(endUserPermission);
+
 
     const getManageEndUser = async () => {
         try {
@@ -44,7 +50,7 @@ export default function EndUser() {
             );
 
             setmanageUserData(res.data.data);
-            setTotal(res.data.data.totalRecord);
+            setTotal(res.data.totalRecord);
 
         } catch (err) {
             console.log(err);
@@ -53,10 +59,14 @@ export default function EndUser() {
     const CheckboxCell = (props) => {
         return (
             <td {...props.tdProps} className="text-center">
+
+
+
                 <label className="custom-checkbox mb-0">
                     <input type="checkbox" />
                     <span className="checkmark"></span>
                 </label>
+
             </td>
         );
     };
@@ -67,34 +77,49 @@ export default function EndUser() {
         return (
             <td {...props.tdProps}>
                 <span className="d-flex gap-2 align-items-center">
+                    {
+                        props.endUserPermission.canRead
+                        &&
 
-                    <Link
-                        to={`/admin/manage-end-user/view/${item.id}`}
-                        className="small-square-btn edit-btn"
-                    >
-                        <i className="demo-icon icon-eye-line" />
-                    </Link>
+                        <Link
+                            to={`/admin/manage-end-user/view/${item.id}`}
+                            className="small-square-btn edit-btn"
+                        >
+                            <i className="demo-icon icon-eye-line" />
+                        </Link>
+                    }
 
-                    <button
-                        onClick={() => handleDelete(item.id, "endUser", "endUserDelete", getManageEndUser)}
-                        type="button"
-                        className="small-square-btn danger-btn"
-                    >
-                        <i className="demo-icon icon-delete-1" />
-                    </button>
+                    {
+                        props.endUserPermission.canDelete
+                        &&
 
-                    <label className="verify-switch">
-                        <input
-                            type="checkbox"
-                            defaultChecked={item.isVerify}
-                        />
+                        <button
+                            onClick={() => handleDelete(item.id, "endUser", "endUserDelete", getManageEndUser)}
+                            type="button"
+                            className="small-square-btn danger-btn"
+                        >
+                            <i className="demo-icon icon-delete-1" />
+                        </button>
+                    }
 
-                        <span className="verify-slider">
-                            <span className="verify-text">
-                                {item.isVerify ? "Enabled" : "Verified"}
+                    {
+                        props.endUserPermission.canUpdate
+                        &&
+
+                        <label className="verify-switch">
+                            <input
+                                type="checkbox"
+                                defaultChecked={item.isVerify}
+                            />
+
+                            <span className="verify-slider">
+                                <span className="verify-text">
+                                    {item.isVerify ? "Enabled" : "Verified"}
+                                </span>
                             </span>
-                        </span>
-                    </label>
+                        </label>
+                    }
+
 
                 </span>
             </td>
@@ -192,21 +217,33 @@ export default function EndUser() {
 
                                 onDataStateChange={handleGridDataStateChange}
                             >
+                                {
+                                    endUserPermission.canDelete
+                                    &&
 
-                                <GridColumn
-                                    title=""
-                                    sortable={false}
-                                    filterable={false}
-                                    width="70px"
-                                    cells={{ data: CheckboxCell }}
-                                />
+                                    <GridColumn
+                                        title=""
+                                        sortable={false}
+                                        filterable={false}
+                                        width="70px"
+                                        cells={{ data: CheckboxCell }}
+                                    />
+                                }
 
                                 <GridColumn
                                     title="Action"
                                     sortable={false}
                                     filterable={false}
                                     width="180px"
-                                    cells={{ data: ActionCell }}
+                                    cells={{
+                                        data: (props) => (
+                                            <ActionCell
+                                                {...props}
+                                                endUserPermission={endUserPermission}
+                                            />
+                                        ),
+                                    }}
+
                                 />
 
                                 <GridColumn

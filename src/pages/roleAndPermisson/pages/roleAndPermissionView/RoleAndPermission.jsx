@@ -7,27 +7,37 @@ import RoleRow from '../../components/RoleRow'
 import { Grid, GridColumn } from '@progress/kendo-react-grid'
 import { handleStatusChange } from '../../../../utils/ChangeStatus'
 import SerachFilter from '../../../../components/common/SerachFilter'
+import { usePermission } from '../../../../hooks/UsePermission'
+import { MENU } from '../../../../data/Menu'
 const RoleActionCell = (props) => {
     const item = props.dataItem;
 
     return (
         <td {...props.tdProps}>
             <div className="d-flex gap-2 align-items-center">
+                {
+                    props.rolePermission.canUpdate
+                    &&
 
-                <Link
-                    to={`/admin/role-and-permission/edit/${item.id}`}
-                    className="small-square-btn edit-btn"
-                >
-                    <i className="demo-icon icon-edit-1" />
-                </Link>
+                    <Link
+                        to={`/admin/role-and-permission/edit/${item.id}`}
+                        className="small-square-btn edit-btn"
+                    >
+                        <i className="demo-icon icon-edit-1" />
+                    </Link>
+                }
+                {
+                    props.rolePermission.canDelete
+                    &&
 
-                <button
-                    type="button"
-                    className="small-square-btn danger-btn border-0"
-                    onClick={() => props.onDelete(item.id)}
-                >
-                    <i className="demo-icon icon-delete-1" />
-                </button>
+                    <button
+                        type="button"
+                        className="small-square-btn danger-btn border-0"
+                        onClick={() => props.onDelete(item.id)}
+                    >
+                        <i className="demo-icon icon-delete-1" />
+                    </button>
+                }
 
             </div>
         </td>
@@ -70,6 +80,10 @@ export default function RoleAndPermission() {
         field: item.field,
         direction: item.dir === 'asc' ? 0 : 1,
     })), [kendoSort])
+    const permission = usePermission()
+    const rolePermission = permission.find((value, index) => value.menuId === MENU.ROLE)
+    console.log(rolePermission);
+
     const getRole = async () => {
         const page = Math.floor(dataState.skip / dataState.take) + 1
         const payload = {
@@ -83,7 +97,7 @@ export default function RoleAndPermission() {
             showLoader: true,
         })
         setroleData(res.data.data)
-        setTotal(res.data.data.totalRecord || 0)
+        setTotal(res.data.totalRecord || 0)
     }
     const handleRoleDelete = async (id) => {
         if (confirm("Are You Want To Delete Role ?")) {
@@ -139,21 +153,26 @@ export default function RoleAndPermission() {
                             onSubmit={(value) => setcustomSearch(value)}
                         />
                     </div>
-                    <div className="col-12 col-lg">
-                        <div className="btn-list d-flex justify-content-lg-end flex-wrap gap-2 gap-md-3 text-end">
+                    {
+                        rolePermission.canCreate
+                        &&
 
-                            <Link
-                                to="/admin/role-and-permission/add"
-                                className="btn main-btn border-btn blue-btn"
-                                style={{
-                                    background: "linear-gradient(90deg, rgb(193, 39, 45) 0%, rgb(0 0 0 / 92%) 100%)",
-                                    color: "white"
-                                }}
-                            >
-                                Add
-                            </Link>
+                        <div className="col-12 col-lg">
+                            <div className="btn-list d-flex justify-content-lg-end flex-wrap gap-2 gap-md-3 text-end">
+
+                                <Link
+                                    to="/admin/role-and-permission/add"
+                                    className="btn main-btn border-btn blue-btn"
+                                    style={{
+                                        background: "linear-gradient(90deg, rgb(193, 39, 45) 0%, rgb(0 0 0 / 92%) 100%)",
+                                        color: "white"
+                                    }}
+                                >
+                                    Add
+                                </Link>
+                            </div>
                         </div>
-                    </div>
+                    }
                 </div>
                 <div className="row">
                     <div className="col-12 mt-3 mt-xxl-4">
@@ -220,21 +239,27 @@ export default function RoleAndPermission() {
                                     }
                                 }}
                             >
+                                {
+                                    rolePermission.canDelete
+                                    &&
+                                    rolePermission.canUpdate
+                                    &&
 
-                                <GridColumn
-                                    title="Action"
-                                    width="120px"
-                                    sortable={false}
-                                    cells={{
-                                        data: (props) => (
-                                            <RoleActionCell
-                                                {...props}
-                                                onDelete={handleRoleDelete}
-
-                                            />
-                                        )
-                                    }}
-                                />
+                                    <GridColumn
+                                        title="Action"
+                                        width="120px"
+                                        sortable={false}
+                                        cells={{
+                                            data: (props) => (
+                                                <RoleActionCell
+                                                    {...props}
+                                                    onDelete={handleRoleDelete}
+                                                    rolePermission={rolePermission}
+                                                />
+                                            )
+                                        }}
+                                    />
+                                }
 
                                 <GridColumn
                                     field="role"

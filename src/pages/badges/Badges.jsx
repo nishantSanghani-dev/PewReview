@@ -6,32 +6,42 @@ import { Grid, GridColumn } from '@progress/kendo-react-grid'
 import BdagesAdd from './BdagesAdd'
 import { handleDelete } from '../../utils/DeleteRecords'
 import useGridPagination from '../../hooks/useGridPagination'
+import { usePermission } from '../../hooks/UsePermission'
+import { MENU } from '../../data/Menu'
 const ActionCell = (props) => {
-    console.log(props.dataItem.id);
-    console.log(props);
+
 
     return (
         <td {...props.tdProps}>
             <div className="d-flex gap-2 align-items-center">
-                <button
-                    onClick={() => {
-                        props.setid(props.dataItem.id)
-                        props.setisBadgeOpen(true)
-                    }}
-                    href="javascript:void(0)"
-                    className="small-square-btn edit-btn"
+                {
+                    props.badgePermission.canUpdate
+                    &&
 
-                >
-                    <i className="demo-icon icon-edit-1" />
-                </button>
+                    <button
+                        onClick={() => {
+                            props.setid(props.dataItem.id)
+                            props.setisBadgeOpen(true)
+                        }}
+                        href="javascript:void(0)"
+                        className="small-square-btn edit-btn"
 
-                <button
-                    onClick={() => handleDelete(props.dataItem.id, "badges", "badgeDelete", props.getBadges)}
+                    >
+                        <i className="demo-icon icon-edit-1" />
+                    </button>
+                }
+                {
+                    props.badgePermission.canDelete
+                    &&
 
-                    className="small-square-btn danger-btn"
-                >
-                    <i className="demo-icon icon-delete-1"></i>
-                </button>
+                    <button
+                        onClick={() => handleDelete(props.dataItem.id, "badges", "badgeDelete", props.getBadges)}
+
+                        className="small-square-btn danger-btn"
+                    >
+                        <i className="demo-icon icon-delete-1"></i>
+                    </button>
+                }
 
             </div>
         </td>
@@ -61,6 +71,9 @@ export default function Badges() {
     const [badgesData, setbadgesData] = useState([])
     const [id, setid] = useState(null)
     const { dataState, onDataStateChange, page, pageSize } = useGridPagination(10)
+    const permission = usePermission()
+    const badgePermission = permission.find((value, index) => value.menuId === MENU.BADGE)
+    console.log(badgePermission);
     const getBadges = async () => {
         const res = await apiRequest("POST", API_ROUTES.badges.getBadges, { page, pageSize }, null, {
             showLoader: true
@@ -112,21 +125,26 @@ export default function Badges() {
                             </button>
                         </form>
                     </div>
-                    <div className="col-12 col-lg">
-                        <div className="btn-list d-flex justify-content-lg-end flex-wrap gap-2 gap-md-3 text-end">
+                    {
+                        badgePermission.canCreate
+                        &&
 
-                            <button
-                                onClick={() => setisBadgeOpen(true)}
-                                className="btn main-btn border-btn blue-btn"
-                                style={{
-                                    background: "linear-gradient(90deg, rgb(193, 39, 45) 0%, rgb(0 0 0 / 92%) 100%)",
-                                    color: "white"
-                                }}
-                            >
-                                Add
-                            </button>
+                        <div className="col-12 col-lg">
+                            <div className="btn-list d-flex justify-content-lg-end flex-wrap gap-2 gap-md-3 text-end">
+
+                                <button
+                                    onClick={() => setisBadgeOpen(true)}
+                                    className="btn main-btn border-btn blue-btn"
+                                    style={{
+                                        background: "linear-gradient(90deg, rgb(193, 39, 45) 0%, rgb(0 0 0 / 92%) 100%)",
+                                        color: "white"
+                                    }}
+                                >
+                                    Add
+                                </button>
+                            </div>
                         </div>
-                    </div>
+                    }
                 </div>
             </div>
 
@@ -134,49 +152,55 @@ export default function Badges() {
                 <div className="row">
                     <div className="col-12">
                         <div className="table-responsive">
+                            {
+                                badgePermission.canRead
+                                &&
 
-                            <Grid
-                                className="table-wrapper  text-center"
-                                data={badgesData}
-                                skip={dataState.skip}
-                                take={dataState.take}
-                                pageable={{
-                                    buttonCount: 5,
-                                    pageSizes: [10, 20, 50],
-                                    info: true,
-                                    previousNext: true,
-                                    type: "numeric"
-                                }}
-                                onDataStateChange={onDataStateChange}
-                            >
-                                {badgesColumns.map((col) => (
-                                    <GridColumn
-                                        key={col.field}
-                                        field={col.field}
-                                        title={col.title}
-                                        width={col.width || "150px"}
-                                        cells={
-                                            col.cell
-                                                ? {
-                                                    data: (props) => (
-                                                        <col.cell
-                                                            setisBadgeOpen={setisBadgeOpen}
-                                                            {...props}
-                                                            setid={setid}
-                                                            id={id}
-                                                            getBadges={getBadges}
-                                                        />
-                                                    )
-                                                }
-                                                : {
-                                                    data: (props) => (
-                                                        <TextCell {...props} field={col.field} />
-                                                    )
-                                                }
-                                        }
-                                    />
-                                ))}
-                            </Grid>
+                                <Grid
+                                    className="table-wrapper  text-center"
+                                    data={badgesData}
+                                    skip={dataState.skip}
+                                    take={dataState.take}
+                                    pageable={{
+                                        buttonCount: 5,
+                                        pageSizes: [10, 20, 50],
+                                        info: true,
+                                        previousNext: true,
+                                        type: "numeric"
+                                    }}
+                                    onDataStateChange={onDataStateChange}
+                                >
+                                    {badgesColumns.map((col) => (
+                                        <GridColumn
+                                            key={col.field}
+                                            field={col.field}
+                                            title={col.title}
+                                            width={col.width || "150px"}
+                                            cells={
+                                                col.cell
+                                                    ? {
+                                                        data: (props) => (
+                                                            <col.cell
+                                                                setisBadgeOpen={setisBadgeOpen}
+                                                                {...props}
+                                                                setid={setid}
+                                                                id={id}
+                                                                getBadges={getBadges}
+                                                                badgePermission={badgePermission}
+                                                            />
+
+                                                        )
+                                                    }
+                                                    : {
+                                                        data: (props) => (
+                                                            <TextCell {...props} field={col.field} />
+                                                        )
+                                                    }
+                                            }
+                                        />
+                                    ))}
+                                </Grid>
+                            }
                         </div>
                     </div>
                 </div>

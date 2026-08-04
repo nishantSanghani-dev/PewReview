@@ -8,6 +8,8 @@ import { handleStatusChange } from '../../utils/ChangeStatus';
 import { handleDelete } from '../../utils/DeleteRecords';
 import SerachFilter from '../../components/common/SerachFilter';
 import useGridPagination from '../../hooks/useGridPagination'
+import { useSelector } from 'react-redux';
+import { MENU } from '../../data/Menu';
 const ActionCell = (props) => {
 
     return (
@@ -20,13 +22,17 @@ const ActionCell = (props) => {
                 >
                     <i className="demo-icon icon-eye-line"></i>
                 </Link>
+                {
+                    props.grpPermission.canDelete
+                    &&
 
-                <button
-                    onClick={() => handleDelete(props.dataItem.id, "groups", "groupDelete", props.getGroups)}
-                    className="small-square-btn danger-btn"
-                >
-                    <i className="demo-icon icon-delete-1"></i>
-                </button>
+                    <button
+                        onClick={() => handleDelete(props.dataItem.id, "groups", "groupDelete", props.getGroups)}
+                        className="small-square-btn danger-btn"
+                    >
+                        <i className="demo-icon icon-delete-1"></i>
+                    </button>
+                }
             </div>
         </td>
     );
@@ -124,6 +130,7 @@ export default function Groups() {
     const [groupData, setgroupData] = useState([])
     const [searchText, setSearchText] = useState("")
     const [customSearch, setcustomSearch] = useState("")
+    const [totalRecords, settotalRecords] = useState(null)
     const {
         dataState,
         onDataStateChange,
@@ -134,11 +141,18 @@ export default function Groups() {
         kendoSort,
         setKendoSort,
     } = useGridPagination(10)
+
+    const { permissions } = useSelector((store) => store.user)
+    console.log(permissions);
+    const grpPermission = permissions.find((value, index) => value.menuId === MENU.GROUP)
+    console.log(grpPermission);
+
     const getGroups = async () => {
         const res = await apiRequest("POST", API_ROUTES.groups.getGroups, { page, pageSize, customSearch, Sorts: sort }, null, {
             showLoader: true
         })
         setgroupData(res.data.data)
+        settotalRecords(res.data.totalRecord)
     }
     const groupColumns = [
         { field: "action", title: "Action", cell: ActionCell, width: "130px" },
@@ -188,50 +202,56 @@ export default function Groups() {
                 <div className="row">
                     <div className="col-12">
                         <div className="table-responsive">
-                            <Grid
-                                className="table-wrapper  text-center"
-                                data={groupData}
-                                skip={dataState.skip}
-                                take={dataState.take}
-                                sortable={{ allowUnsort: true, mode: 'single' }}
-                                sort={kendoSort}
-                                pageable={{
-                                    buttonCount: 5,
-                                    pageSizes: [10, 20, 50],
-                                    info: true,
-                                    previousNext: true,
-                                    type: "numeric"
-                                }}
-                                onDataStateChange={handleGridDataStateChange}
+                            {
+                                grpPermission?.canRead
+                                &&
 
-                            >
-                                {groupColumns.map((col) => (
-                                    <GridColumn
-                                        key={col.field}
-                                        field={col.field}
-                                        title={col.title}
-                                        width={col.width || "150px"}
-                                        sortable={col.field === 'action' || col.field == 'groupImageFullUrl' ? false : true}
-                                        cells={
-                                            col.cell
-                                                ? {
-                                                    data: (props) => (
-                                                        <col.cell
-                                                            {...props}
+                                <Grid
+                                    className="table-wrapper  text-center"
+                                    data={groupData}
+                                    skip={dataState.skip}
+                                    take={dataState.take}
+                                    sortable={{ allowUnsort: true, mode: 'single' }}
+                                    sort={kendoSort}
+                                    pageable={{
+                                        buttonCount: 5,
+                                        pageSizes: [10, 20, 50],
+                                        info: true,
+                                        previousNext: true,
+                                        type: "numeric"
+                                    }}
+                                    onDataStateChange={handleGridDataStateChange}
 
-                                                            getGroups={getGroups}
-                                                        />
-                                                    )
-                                                }
-                                                : {
-                                                    data: (props) => (
-                                                        <TextCell {...props} field={col.field} />
-                                                    )
-                                                }
-                                        }
-                                    />
-                                ))}
-                            </Grid>
+                                >
+                                    {groupColumns.map((col) => (
+                                        <GridColumn
+                                            key={col.field}
+                                            total={totalRecords}
+                                            field={col.field}
+                                            title={col.title}
+                                            width={col.width || "150px"}
+                                            sortable={col.field === 'action' || col.field == 'groupImageFullUrl' ? false : true}
+                                            cells={
+                                                col.cell
+                                                    ? {
+                                                        data: (props) => (
+                                                            <col.cell
+                                                                {...props}
+                                                                grpPermission={grpPermission}
+                                                                getGroups={getGroups}
+                                                            />
+                                                        )
+                                                    }
+                                                    : {
+                                                        data: (props) => (
+                                                            <TextCell {...props} field={col.field} />
+                                                        )
+                                                    }
+                                            }
+                                        />
+                                    ))}
+                                </Grid>
+                            }
                         </div>
                     </div>
                 </div>

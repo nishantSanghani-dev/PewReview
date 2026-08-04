@@ -7,6 +7,9 @@ import "../supportTicket/supportTicket.css"
 import SupportTicketEdit from './SupportTicketEdit';
 import SerachFilter from '../../components/common/SerachFilter';
 import useGridPagination from '../../hooks/useGridPagination'
+import { Tooltip } from "@progress/kendo-react-tooltip";
+import { usePermission } from '../../hooks/UsePermission';
+import { MENU } from '../../data/Menu';
 const ActionCell = (props) => {
 
 
@@ -27,19 +30,25 @@ const ActionCell = (props) => {
     return (
         <td {...props.tdProps}>
             <div className="d-flex gap-2 align-items-center">
-                <button
-                    onClick={() => {
-                        props.setShowModal(true)
-                        props.setticketId(props.dataItem.id)
-                    }}
-                    href="javascript:void(0)"
-                    className="small-square-btn edit-btn"
-
-                >
-                    <i className="demo-icon icon-edit-1" />
-                </button>
                 {
+                    props.supportTicketPermission.canUpdate
+                    &&
 
+                    <button
+                        onClick={() => {
+                            props.setShowModal(true)
+                            props.setticketId(props.dataItem.id)
+                        }}
+                        href="javascript:void(0)"
+                        className="small-square-btn edit-btn"
+
+                    >
+                        <i className="demo-icon icon-edit-1" />
+                    </button>
+                }
+                {
+                    props.supportTicketPermission.canDelete
+                    &&
                     props.dataItem.status === "Resolved / Closed"
                     &&
 
@@ -55,18 +64,52 @@ const ActionCell = (props) => {
         </td>
     );
 };
-const TextCell = ({ tdProps, dataItem, field }) => (
-    <td {...tdProps}>
 
-        {dataItem[field] ?? "-"}
-    </td>
-);
+
+const TextCell = ({ tdProps, dataItem, field }) => {
+    const value = dataItem[field]
+
+    return (
+        <td {...tdProps}>
+            <Tooltip anchorElement="target" position="top">
+                <span
+                    title={value}
+                    style={{
+                        display: "inline-block",
+                        width: "100%",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                    }}
+                >
+                    {value ?? '-'}
+                </span>
+            </Tooltip>
+        </td>
+    );
+};
+
+
 const DetailCell = ({ tdProps, dataItem, field }) => {
     return (
         <td  {...tdProps}>
-            <div className="text-ellipsis">
+            <Tooltip anchorElement="target" position="top">
+                <span
+                    title={dataItem.emailePhone}
+                    style={{
+                        display: "inline-block",
+                        width: "100%",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                    }}
+                >
+                    {dataItem.emailePhone}
+                </span>
+            </Tooltip>
+            {/* <div className="text-ellipsis">
                 {dataItem.emailePhone || "-"}
-            </div>
+            </div> */}
         </td>
     )
 }
@@ -123,6 +166,9 @@ export default function SupportTicket() {
         kendoSort,
         setKendoSort,
     } = useGridPagination(10)
+    const permission = usePermission()
+    const supportTicketPermission = permission.find((value, index) => value.menuId === MENU.SUPPORT)
+    console.log(supportTicketPermission);
     const getSuppportStatus = async () => {
         const res = await apiRequest("GET", API_ROUTES.common.getSupportStatus, null, null, {
             showLoader: true
@@ -187,51 +233,56 @@ export default function SupportTicket() {
                     <div className="row">
                         <div className="col-12">
                             <div className="table-responsive">
+                                {
+                                    supportTicketPermission.canRead
+                                    &&
 
-                                <Grid
-                                    className="table-wrapper  text-center"
-                                    data={supportTicketsData}
-                                    skip={dataState.skip}
-                                    take={dataState.take}
-                                    sortable={{ allowUnsort: true, mode: 'single' }}
-                                    sort={kendoSort}
-                                    pageable={{
-                                        buttonCount: 5,
-                                        pageSizes: [10, 20, 50],
-                                        info: true,
-                                        previousNext: true,
-                                        type: "numeric"
-                                    }}
-                                    onDataStateChange={handleGridDataStateChange}
-                                >
-                                    {supportTicketsColumns.map((col) => (
-                                        <GridColumn
-                                            key={col.field}
-                                            field={col.field}
-                                            title={col.title}
-                                            width={col.width || "150px"}
-                                            sortable={col.field === 'action' ? false : true}
-                                            cells={
-                                                col.cell
-                                                    ? {
-                                                        data: (props) => (
-                                                            <col.cell
-                                                                {...props}
-                                                                setShowModal={setShowModal}
-                                                                setticketId={setticketId}
-                                                                getTickets={getTickets}
-                                                            />
-                                                        )
-                                                    }
-                                                    : {
-                                                        data: (props) => (
-                                                            <TextCell {...props} field={col.field} />
-                                                        )
-                                                    }
-                                            }
-                                        />
-                                    ))}
-                                </Grid>
+                                    <Grid
+                                        className="table-wrapper  text-center"
+                                        data={supportTicketsData}
+                                        skip={dataState.skip}
+                                        take={dataState.take}
+                                        sortable={{ allowUnsort: true, mode: 'single' }}
+                                        sort={kendoSort}
+                                        pageable={{
+                                            buttonCount: 5,
+                                            pageSizes: [10, 20, 50],
+                                            info: true,
+                                            previousNext: true,
+                                            type: "numeric"
+                                        }}
+                                        onDataStateChange={handleGridDataStateChange}
+                                    >
+                                        {supportTicketsColumns.map((col) => (
+                                            <GridColumn
+                                                key={col.field}
+                                                field={col.field}
+                                                title={col.title}
+                                                width={col.width || "150px"}
+                                                sortable={col.field === 'action' ? false : true}
+                                                cells={
+                                                    col.cell
+                                                        ? {
+                                                            data: (props) => (
+                                                                <col.cell
+                                                                    {...props}
+                                                                    supportTicketPermission={supportTicketPermission}
+                                                                    setShowModal={setShowModal}
+                                                                    setticketId={setticketId}
+                                                                    getTickets={getTickets}
+                                                                />
+                                                            )
+                                                        }
+                                                        : {
+                                                            data: (props) => (
+                                                                <TextCell {...props} field={col.field} />
+                                                            )
+                                                        }
+                                                }
+                                            />
+                                        ))}
+                                    </Grid>
+                                }
                             </div>
                         </div>
                     </div>

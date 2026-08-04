@@ -3,6 +3,8 @@ import { process } from '@progress/kendo-data-query'
 import React, { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom';
 import { handleDelete } from '../../../utils/DeleteRecords';
+import { useSelector } from 'react-redux';
+import { MENU } from '../../../data/Menu';
 export const ActionCell = (props) => {
     console.log(props.dataItem.eventId);
 
@@ -15,12 +17,17 @@ export const ActionCell = (props) => {
                 >
                     <i className="demo-icon icon-eye-line"></i>
                 </Link>
-                <button
-                    onClick={() => handleDelete(props.dataItem.eventId, "events", "eventDelete")}
-                    className="small-square-btn danger-btn"
-                >
-                    <i className="demo-icon icon-delete-1"></i>
-                </button>
+                {
+                    props.eventPermission.canDelete
+                    &&
+
+                    <button
+                        onClick={() => handleDelete(props.dataItem.eventId, "events", "eventDelete")}
+                        className="small-square-btn danger-btn"
+                    >
+                        <i className="demo-icon icon-delete-1"></i>
+                    </button>
+                }
             </div>
         </td>
     );
@@ -69,7 +76,11 @@ export const AddressCell = (props) => {
 export default function Events({ data, isUpcomingEvent, setisUpcomingEvent }) {
     const [gridSort, setGridSort] = useState([])
     const sortedData = useMemo(() => process(data, { sort: gridSort }).data, [data, gridSort])
+    const { permissions } = useSelector((store) => store.permissions)
+    console.log(permissions);
 
+    const eventPermission = permissions.find((value, index) => value.menuId === MENU.EVENT)
+    console.log(eventPermission);
     return (
         <>
             <div className="event-tabs">
@@ -105,65 +116,71 @@ export default function Events({ data, isUpcomingEvent, setisUpcomingEvent }) {
                     <div className="row">
                         <div className="col-12">
                             <div className="table-responsive">
-                                <Grid
-                                    className="table-wrapper fw-bold text-center"
-                                    style={{
-                                        zIndex: "999"
-                                    }}
-                                    data={sortedData}
-                                    sortable={{ allowUnsort: true, mode: 'single' }}
-                                    sort={gridSort}
-                                    pageable={{
-                                        buttonCount: 5,
-                                        pageSizes: [10, 20, 50],
-                                        info: true,
-                                        previousNext: true,
-                                        type: "numeric"
-                                    }}
-                                    onDataStateChange={(event) => setGridSort(event.dataState?.sort || [])}
-                                >
-                                    <GridColumn
-                                        title="Action"
-                                        width="120px"
-                                        cells={{ data: ActionCell }}
-                                    />
 
-                                    <GridColumn
-                                        title="Host Name"
-                                        width="200px"
-                                        cells={{ data: HostNameCell }}
-                                    />
+                                {
+                                    eventPermission.canRead
+                                    &&
 
-                                    <GridColumn
-                                        title="Event Name"
-                                        width="200px"
-                                        cells={{ data: EventNameCell }}
-                                    />
+                                    <Grid
+                                        className="table-wrapper fw-bold text-center"
+                                        style={{
+                                            zIndex: "999"
+                                        }}
+                                        data={sortedData}
+                                        sortable={{ allowUnsort: true, mode: 'single' }}
+                                        sort={gridSort}
+                                        pageable={{
+                                            buttonCount: 5,
+                                            pageSizes: [10, 20, 50],
+                                            info: true,
+                                            previousNext: true,
+                                            type: "numeric"
+                                        }}
+                                        onDataStateChange={(event) => setGridSort(event.dataState?.sort || [])}
+                                    >
+                                        <GridColumn
+                                            title="Action"
+                                            width="120px"
+                                            cells={{ data: ActionCell }}
+                                        />
 
-                                    <GridColumn
-                                        title="Date & Time"
-                                        width="200px"
-                                        cells={{ data: DateTimeCell }}
-                                    />
+                                        <GridColumn
+                                            title="Host Name"
+                                            width="200px"
+                                            cells={{ data: HostNameCell }}
+                                        />
 
-                                    <GridColumn
-                                        title="Address"
-                                        width="250px"
-                                        cells={{ data: AddressCell }}
-                                    />
-                                    <GridColumn
-                                        field='userName'
-                                        title="Created By"
-                                        width="150px"
+                                        <GridColumn
+                                            title="Event Name"
+                                            width="200px"
+                                            cells={{ data: EventNameCell }}
+                                        />
 
-                                    />
-                                    <GridColumn
-                                        field='approvalStatusName'
-                                        title="status"
-                                        width="150px"
+                                        <GridColumn
+                                            title="Date & Time"
+                                            width="200px"
+                                            cells={{ data: DateTimeCell }}
+                                        />
 
-                                    />
-                                </Grid>
+                                        <GridColumn
+                                            title="Address"
+                                            width="250px"
+                                            cells={{ data: AddressCell }}
+                                        />
+                                        <GridColumn
+                                            field='userName'
+                                            title="Created By"
+                                            width="150px"
+
+                                        />
+                                        <GridColumn
+                                            field='approvalStatusName'
+                                            title="status"
+                                            width="150px"
+
+                                        />
+                                    </Grid>
+                                }
                             </div>
                         </div>
                     </div>

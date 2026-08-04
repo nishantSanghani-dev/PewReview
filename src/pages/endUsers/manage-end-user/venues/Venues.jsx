@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import GunDetails from '../../../../components/common/gunDetails/GunDetails';
 import { apiRequest } from '../../../../services/Api';
 import { API_ROUTES } from '../../../../routes/api.routes';
+import { useSelector } from 'react-redux';
 
 
 const ActionCell = (props) => {
@@ -74,6 +75,8 @@ const WebsiteCell = ({ tdProps, dataItem, field }) => (
 export default function Venues({ data }) {
     const [showGunDetails, setShowGunDetails] = useState(false);
     const [gunDetailsData, setgunDetailsData] = useState([])
+    
+    
     const getVenueGunDetails = async (venueId) => {
         const res = await apiRequest("GET", API_ROUTES.venue.getVenueGunDetails, null, {
             venueId
