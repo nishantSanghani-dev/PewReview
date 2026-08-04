@@ -8,6 +8,23 @@ import { apiRequest } from '../../../../services/Api';
 import { API_ROUTES } from '../../../../routes/api.routes';
 import { roleSchema } from '../../../../validation/zod.validation';
 
+const mergePermissions = (menuPermissions = [], rolePermissions = []) => {
+    const rolePermissionMap = new Map((rolePermissions || []).map((permission) => [permission.menuId, permission]));
+
+    return (menuPermissions || []).map((menu) => {
+        const matchedPermission = rolePermissionMap.get(menu.menuId);
+
+        if (!matchedPermission) {
+            return menu;
+        }
+
+        return {
+            ...menu,
+            ...matchedPermission,
+        };
+    });
+};
+
 export default function RoleAndPermissionAdd() {
 
     const [permissions, setpermissions] = useState([])
@@ -20,17 +37,19 @@ export default function RoleAndPermissionAdd() {
     const {
         register,
         handleSubmit,
+        setValue,
         formState: { errors, touchedFields, isSubmitting },
     } = useForm({
         resolver: zodResolver(roleSchema)
     })
 
-    const getPermissionMenu = async () => {
+    const getPermissionMenu = async (rolePermissions = []) => {
         const res = await apiRequest("GET", API_ROUTES.role.roleView, null, null, {
             showLoader: true
         })
-        console.log(res.data.permissions);
-        setpermissions(res.data.permissions)
+
+        const menuPermissions = res?.data?.permissions ?? [];
+        setpermissions(mergePermissions(menuPermissions, rolePermissions))
 
     }
     const handleChange = (menuId, key, checked) => {
@@ -77,15 +96,17 @@ export default function RoleAndPermissionAdd() {
     }
 
     const getSingleRole = async () => {
-        // console.log(id);
-
         const res = await apiRequest("GET", API_ROUTES.role.roleView, null, {
             id
         }, {
             showLoader: true
         })
-        // console.log(res.data);
-        setsinglePermissionData(res.data)
+
+        const roleData = res?.data;
+        setsinglePermissionData(roleData)
+        setValue("roleName", roleData?.roleName ?? "")
+        setValue("description", roleData?.description ?? "")
+        getPermissionMenu(roleData?.permissions ?? [])
 
     }
 
@@ -118,7 +139,7 @@ export default function RoleAndPermissionAdd() {
                             <form onSubmit={handleSubmit(roleSubmit)} className="mt-3 mt-xxl-4">
                                 <fieldset className="row">
 
-                                    <div className=" mt-3">
+                                    <div className="">
                                         <div className="form-group">
                                             <label htmlFor="roleName" className="fw-semibold">
                                                 Role Name  <span className="danger-color">*</span>
@@ -179,7 +200,7 @@ export default function RoleAndPermissionAdd() {
                                                                         <label className="custom-checkbox">
                                                                             <input
 
-                                                                                checked={value.isRead || singlePermissionData?.isRead}
+                                                                                checked={Boolean(value.isRead)}
                                                                                 onChange={(e) => handleChange(value?.menuId, "isRead", e.target.checked)}
                                                                                 type="checkbox"
                                                                                 className="child-checkbox"
@@ -197,7 +218,7 @@ export default function RoleAndPermissionAdd() {
 
                                                                             <label className="custom-checkbox">
                                                                                 <input
-                                                                                    checked={value.isCreate || singlePermissionData?.isCreate}
+                                                                                    checked={Boolean(value.isCreate)}
                                                                                     onChange={(e) => handleChange(value?.menuId, "isCreate", e.target.checked)}
                                                                                     type="checkbox"
                                                                                     className="child-checkbox"
@@ -216,7 +237,7 @@ export default function RoleAndPermissionAdd() {
 
                                                                             <label className="custom-checkbox">
                                                                                 <input
-                                                                                    checked={value.isUpdate}
+                                                                                    checked={Boolean(value.isUpdate)}
                                                                                     onChange={(e) => handleChange(value?.menuId, "isUpdate", e.target.checked)}
                                                                                     type="checkbox"
                                                                                     className="child-checkbox"
@@ -233,7 +254,7 @@ export default function RoleAndPermissionAdd() {
 
                                                                             <label className="custom-checkbox">
                                                                                 <input
-                                                                                    checked={value.isDelete}
+                                                                                    checked={Boolean(value.isDelete)}
                                                                                     onChange={(e) => handleChange(value?.menuId, "isDelete", e.target.checked)}
                                                                                     type="checkbox"
                                                                                     className="child-checkbox"

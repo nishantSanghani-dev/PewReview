@@ -106,6 +106,7 @@ const StatusCell = (props) => {
                     }
                     className="form-check-input"
                     type="checkbox"
+                    disabled={!props.venuePermission.canUpdate}
                     checked={item.isActive}
                     readOnly
                 />
@@ -117,6 +118,9 @@ const StatusCell = (props) => {
 export const UserNameCell = ({ tdProps, dataItem, field }) => {
     return (
         <td {...tdProps}>
+            {
+                
+            }
             <Link className='text-primary' to={`/admin/user/edit/${dataItem.userId}`}>
                 {dataItem.venueOwnerUserName || dataItem.userName}
             </Link>

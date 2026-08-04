@@ -52,6 +52,7 @@ const RoleStatusCell = (props) => {
                 <input
                     className="form-check-input"
                     type="checkbox"
+                    disabled={!props.rolePermission.canUpdate}
                     checked={item.isActive}
                     onChange={(e) =>
                         handleStatusChange(
@@ -288,6 +289,7 @@ export default function RoleAndPermission() {
                                             <RoleStatusCell
                                                 {...props}
                                                 getRole={getRole}
+                                                rolePermission={rolePermission}
                                             />
                                         )
                                     }}

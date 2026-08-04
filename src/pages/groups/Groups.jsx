@@ -79,13 +79,16 @@ const StatusCell = (props) => {
                     type="checkbox"
                     checked={props.dataItem.isActive}
                     readOnly
+                    disabled={!props.grpPermission.canUpdate}
                     onChange={(e) =>
                         handleStatusChange(
                             props.dataItem.id,
                             e.target.checked,
                             "groups",
                             "groupUpdateStatus",
+
                             props.getGroups // callback
+
                         )
                     }
                 />
