@@ -3,10 +3,15 @@ import { apiRequest } from "../../services/Api";
 import { API_ROUTES } from "../../routes/api.routes";
 import { Link, useParams } from "react-router-dom";
 import BreadCumb from "../../components/common/breadCumb/BreadCumb";
+import { usePermission } from "../../hooks/UsePermission";
+import { MENU } from "../../data/Menu";
 
 export default function GroupDetails() {
     const { id } = useParams()
     const [grpData, setgrpData] = useState(null)
+    const permission = usePermission()
+    const endUserPermission = permission.find((value, index) => value.menuId === MENU.END_USER)
+    const activityPermission = permission.find((value, index) => value.menuId === MENU.ACTIVITY)
     const getGroupDetails = async () => {
         const res = await apiRequest("GET", API_ROUTES.groups.getByGroupId(id), null, null, {
             showLoader: true
@@ -108,11 +113,19 @@ export default function GroupDetails() {
                                         Members
                                     </td>
 
-                                    <td className="text-primary text-decoration-underline">
+                                    <td >
+                                        {
+                                            endUserPermission?.canRead
+                                                ?
 
-                                        <Link to={`/admin/groups/view/${id}/members`} >
-                                            {grpData?.memberCount}
-                                        </Link>
+                                                <Link className="text-primary text-decoration-underline" to={`/admin/groups/view/${id}/members`} >
+                                                    {grpData?.memberCount}
+                                                </Link>
+                                                :
+                                                <span>
+                                                    {grpData?.memberCount}
+                                                </span>
+                                        }
                                     </td>
                                 </tr>
 
@@ -132,11 +145,21 @@ export default function GroupDetails() {
                                     </td>
 
                                     <td>
-                                        <Link
-                                            className="text-primary text-decoration-underline"
-                                            to={`/admin/groups/activity/${id}`}>
-                                            {grpData?.totalActivity}
-                                        </Link>
+                                        {
+                                            activityPermission?.canRead
+                                                ?
+
+                                                <Link
+                                                    className="text-primary text-decoration-underline"
+                                                    to={`/admin/groups/activity/${id}`}>
+                                                    {grpData?.totalActivity}
+                                                </Link>
+                                                :
+                                                <span
+                                                  >
+                                                    {grpData?.totalActivity}
+                                                </span>
+                                        }
                                     </td>
                                 </tr>
 

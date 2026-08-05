@@ -12,6 +12,7 @@ import SerachFilter from '../../../components/common/SerachFilter'
 import useGridPagination from '../../../hooks/useGridPagination'
 import { usePermission } from '../../../hooks/UsePermission'
 import { MENU } from '../../../data/Menu'
+import { ColumnMenu } from '../../../components/grid/ColumnMenu'
 const ActionCell = (props) => {
     const item = props.dataItem;
 
@@ -81,6 +82,7 @@ export default function Prohibited() {
     const [id, setid] = useState(null)
     const [searchText, setSearchText] = useState("")
     const [customSearch, setcustomSearch] = useState("")
+    const [filters, setFilters] = useState([])
     const {
         dataState,
         onDataStateChange,
@@ -96,7 +98,7 @@ export default function Prohibited() {
     const prohibitedPermission = permission.find((value, index) => value.menuId === MENU.PROHIBITED_WORD)
 
     const getProhibited = async () => {
-        const res = await apiRequest("POST", API_ROUTES.prohibited.getProhibited, { page, pageSize, customSearch, Sorts: sort }, null, {
+        const res = await apiRequest("POST", API_ROUTES.prohibited.getProhibited, { page, pageSize, customSearch, Sorts: sort, Filters: filters }, null, {
             showLoader: true
         })
         setprohibitedData(res.data.data)
@@ -104,22 +106,28 @@ export default function Prohibited() {
 
     const prohibitedColumns = [
         { field: "action", title: "Action", cell: ActionCell, width: "100px" },
-        { field: "words", title: "Prohibited Words" },
-        { field: "description", title: "Description" },
-        { field: "createdByUserName", title: "Created By" },
-        { field: "createdOn", title: "Created On", cell: DateCell },
-        { field: "updatedByUserName", title: "Modified By" },
-        { field: "status", title: "Status", cell: StatusCell, width: "100px" }
+        { field: "words", title: "Prohibited Words", filter: "text", columnMenu: ColumnMenu },
+        { field: "description", title: "Description", filter: "text", columnMenu: ColumnMenu },
+        { field: "createdByUserName", title: "Created By", filter: "text", columnMenu: ColumnMenu },
+        { field: "createdOn", title: "Created On", cell: DateCell, filter: "text", columnMenu: ColumnMenu },
+        { field: "updatedByUserName", title: "Modified By", filter: "text", columnMenu: ColumnMenu },
+        { field: "status", title: "Status", cell: StatusCell, width: "100px", filter: "boolean", columnMenu: ColumnMenu }
     ]
 
     const handleGridDataStateChange = (event) => {
         onDataStateChange(event)
         setKendoSort(event.dataState?.sort || [])
+        const nextFilter = event.dataState?.filter
+        if (nextFilter) {
+            setFilters(getBackendFilters(nextFilter))
+        } else {
+            setFilters([])
+        }
     }
 
     useEffect(() => {
         getProhibited()
-    }, [page, pageSize, customSearch, sort])
+    }, [page, pageSize, customSearch, sort, filters])
     return (
         <>
             <div className="container-fluid">

@@ -4,9 +4,12 @@ import { apiRequest } from '../../services/Api'
 import { API_ROUTES } from '../../routes/api.routes'
 import { Grid, GridColumn } from '@progress/kendo-react-grid';
 import BreadCumb from '../../components/common/breadCumb/BreadCumb';
+import { usePermission } from '../../hooks/UsePermission';
+import { MENU } from '../../data/Menu';
 const MemberCell = (props) => {
 
-
+    const permission = usePermission()
+    const endUserPermission = permission.find((value, index) => value.menuId === MENU.END_USER)
     return (
         <td {...props.tdProps}>
             <div className="d-flex gap-2 align-items-center">
@@ -19,12 +22,24 @@ const MemberCell = (props) => {
                         objectFit: "cover"
                     }}
                     src={props?.dataItem?.profileImagePath} alt="" />
-                <Link className='text-primary text-decoration-underline' to={`/admin/manage-end-user/view/${props.dataItem.userId}`}
+                {
+
+                }
+                {
+                    endUserPermission?.canRead
+                        ?
+
+                        <Link className='text-primary text-decoration-underline' to={`/admin/manage-end-user/view/${props.dataItem.userId}`}
 
 
-                >
-                    {props?.dataItem?.userName}
-                </Link>
+                        >
+                            {props?.dataItem?.userName}
+                        </Link>
+                        :
+                        <span className=''>
+                            {props?.dataItem?.userName}
+                        </span>
+                }
                 <i className='demo-icon icon-verified ng-star-inserted'></i>
 
             </div>

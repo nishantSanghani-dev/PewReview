@@ -35,6 +35,7 @@ import CategoryMaster from "../pages/masters/category/CategoryMaster";
 import LeaderBoard from "../pages/leaderboards/LeaderBoard";
 import AuthLayouts from "../layouts/authLayouts";
 import Profile from "../pages/profile/Profile";
+import ForgotPassword from "../pages/auth/forgot-password/ForgotPassword";
 
 export const routes = createBrowserRouter([
     {
@@ -45,6 +46,10 @@ export const routes = createBrowserRouter([
                 index: true,
                 element: <Login />,
             },
+            {
+                path: "forgot-password",
+                element: <ForgotPassword />
+            }
         ]
 
     },
@@ -214,7 +219,7 @@ export const routes = createBrowserRouter([
             },
             {
                 path: "profile",
-                element:<Profile/>
+                element: <Profile />
             }
         ],
     },

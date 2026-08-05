@@ -2,20 +2,29 @@ import React, { useEffect, useState } from 'react'
 import { apiRequest } from '../../services/Api'
 import { API_ROUTES } from '../../routes/api.routes'
 import { Grid, GridColumn } from '@progress/kendo-react-grid';
+import { filterIcon } from '@progress/kendo-svg-icons'
+import { ColumnMenu } from '../../components/grid/ColumnMenu'
+import { getBackendFilters } from '../../components/grid/GridFilter'
 import { Link } from 'react-router-dom';
 import SerachFilter from '../../components/common/SerachFilter';
 import useGridPagination from '../../hooks/useGridPagination'
 import { Tooltip } from '@progress/kendo-react-tooltip';
+import { usePermission } from '../../hooks/UsePermission';
+import { MENU } from '../../data/Menu';
 const ActionCell = (props) => {
     return (
         <td {...props.tdProps}>
             <div className="d-flex gap-2 align-items-center">
-                <Link to={`/admin/activity/view/${props.dataItem.postId}`}
+                {
+            
 
-                    className="small-square-btn edit-btn"
-                >
-                    <i className="demo-icon icon-eye-line"></i>
-                </Link>
+                    <Link to={`/admin/activity/view/${props.dataItem.postId}`}
+
+                        className="small-square-btn edit-btn"
+                    >
+                        <i className="demo-icon icon-eye-line"></i>
+                    </Link>
+                }
             </div>
         </td>
     );
@@ -89,7 +98,7 @@ const StatusCell = (props) => {
                     className="form-check-input"
                     type="checkbox"
                     checked={props.dataItem.isActive}
-                    readOnly
+                    disabled={!props.activityPersmission.canUpdate}
                 />
                 <label className="form-check-label"></label>
             </div>
@@ -105,12 +114,23 @@ export const DateCell = ({ tdProps, dataItem, field }) => {
         </td>
     )
 }
-const UserNameCell = ({ tdProps, dataItem, field }) => {
+const UserNameCell = ({ tdProps, dataItem, field, permission }) => {
+    const endUserPermission = permission.find((value, index) => value.menuId === MENU.END_USER)
+
     return (
         <td {...tdProps}>
-            <Link className='text-primary' to={`/admin/manage-end-user/view/${dataItem.userId}`}>
-                {dataItem.userName}
-            </Link>
+            {
+                endUserPermission?.canRead
+                    ?
+
+                    <Link className='text-primary' to={`/admin/manage-end-user/view/${dataItem.userId}`}>
+                        {dataItem.userName}
+                    </Link>
+                    :
+                    <span className=''>
+                        {dataItem.userName}
+                    </span>
+            }
         </td>
     )
 }
@@ -118,6 +138,8 @@ export default function Activity() {
     const [activityData, setactivityData] = useState([])
     const [totalRecords, settotalRecords] = useState(null)
     const [total, setTotal] = useState(0);
+    const [filters, setFilters] = useState([])
+
     const {
         dataState,
         onDataStateChange,
@@ -128,13 +150,17 @@ export default function Activity() {
         kendoSort,
         setKendoSort,
     } = useGridPagination(10)
-
+    const permission = usePermission()
+    const activityPersmission = permission.find((value, index) => value.menuId === MENU.ACTIVITY)
+    console.log(activityPersmission);
+    
     const getActivities = async () => {
         const payload = {
             page,
             pageSize,
             customSearch,
-            Sorts: sort
+            Sorts: sort,
+            Filters: filters
         };
         const res = await apiRequest("POST", API_ROUTES.activities.getActivities, payload, null, {
             showLoader: true
@@ -143,20 +169,25 @@ export default function Activity() {
         settotalRecords(res.data.totalRecord)
     }
     const venueActivityTabColumn = [
-        { field: "action", title: "Action", cell: ActionCell, width: "80px" },
-        { field: "userName", title: "Created By", width: "150px", cell: UserNameCell },
-        { field: "createdOn", title: "Created On", cell: DateCell, width: "150px" },
-        { field: "postTypeName", title: "Post Type", width: "150px" },
+        ...(activityPersmission?.canUpdate
+            ? [
+                { field: "action", title: "Action", cell: ActionCell, width: "80px" },
+            ]
+            : []),
+
+        { field: "userName", title: "Created By", width: "150px", cell: UserNameCell, filter: "text", columnMenu: ColumnMenu },
+        { field: "createdOn", title: "Created On", cell: DateCell, width: "150px", filter: "text", columnMenu: ColumnMenu },
+        { field: "postTypeName", title: "Post Type", width: "150px", filter: "text", columnMenu: ColumnMenu },
         { field: "attachmentList", title: "Images/Video", cell: ImagesVdeo, width: "180px" },
-        { field: "post", title: "Description", width: "150px" },
-        { field: "rate", title: "Rating", width: "100px" },
-        { field: "totalGun", title: "Gun", width: "100px" },
-        { field: "totalLike", title: "Likes", width: "100px" },
-        { field: "totalComment", title: "Comments", width: "120px" },
-        { field: "totalShare", title: "Share", width: "100px" },
-        { field: "totalHide", title: "Hide Count", width: "120px" },
-        { field: "totalReport", title: "Reported", width: "120px" },
-        { field: "isActive", title: "Status", width: "110px", cell: StatusCell }
+        { field: "post", title: "Description", width: "150px", filter: "text", columnMenu: ColumnMenu },
+        { field: "rate", title: "Rating", width: "100px", filter: "numeric", columnMenu: ColumnMenu },
+        { field: "totalGun", title: "Gun", width: "100px", filter: "numeric", columnMenu: ColumnMenu },
+        { field: "totalLike", title: "Likes", width: "100px", filter: "numeric", columnMenu: ColumnMenu },
+        { field: "totalComment", title: "Comments", width: "120px", filter: "numeric", columnMenu: ColumnMenu },
+        { field: "totalShare", title: "Share", width: "100px", filter: "numeric", columnMenu: ColumnMenu },
+        { field: "totalHide", title: "Hide Count", width: "120px", filter: "numeric", columnMenu: ColumnMenu },
+        { field: "totalReport", title: "Reported", width: "120px", filter: "numeric", columnMenu: ColumnMenu },
+        { field: "isActive", title: "Status", width: "110px", cell: StatusCell, filter: "boolean", columnMenu: ColumnMenu }
     ];
 
     const [searchText, setSearchText] = useState("")
@@ -165,6 +196,12 @@ export default function Activity() {
     const handleGridDataStateChange = (event) => {
         onDataStateChange(event)
         setKendoSort(event.dataState?.sort || [])
+        const nextFilter = event.dataState?.filter
+        if (nextFilter) {
+            setFilters(getBackendFilters(nextFilter))
+        } else {
+            setFilters([])
+        }
     }
 
     useEffect(() => {
@@ -204,6 +241,13 @@ export default function Activity() {
                                         data={activityData}
                                         skip={dataState.skip}
                                         take={dataState.take}
+                                        filter={dataState.filter}
+                                        filterOperators={{
+                                            text: [{ text: 'grid.filterContainsOperator', operator: 'contains' }],
+                                            numeric: [{ text: 'grid.filterEqOperator', operator: 'eq' }],
+                                            boolean: [{ text: 'grid.filterEqOperator', operator: 'eq' }]
+                                        }}
+                                        columnMenuIcon={filterIcon}
                                         sortable={{ allowUnsort: true, mode: 'single' }}
                                         sort={kendoSort}
                                         pageable={{
@@ -239,6 +283,8 @@ export default function Activity() {
                                                                 ? {
                                                                     data: (props) => (
                                                                         <col.cell
+                                                                            permission={permission}
+                                                                            activityPersmission={activityPersmission}
                                                                             {...props}
                                                                         />
                                                                     )

@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react'
 import { apiRequest } from '../../../services/Api'
 import { API_ROUTES } from '../../../routes/api.routes'
 import { Grid, GridColumn } from '@progress/kendo-react-grid'
+import { filterIcon } from '@progress/kendo-svg-icons'
+import { ColumnMenu } from '../../../components/grid/ColumnMenu'
+import { getBackendFilters } from '../../../components/grid/GridFilter'
 import { DateCell } from '../../activity/Activity';
 import { handleStatusChange } from '../../../utils/ChangeStatus';
 import { handleDelete } from '../../../utils/DeleteRecords';
@@ -9,6 +12,8 @@ import AccessoriesAdd from './AccessoriesAdd';
 import BreadCumb from '../../../components/common/breadCumb/BreadCumb';
 import SerachFilter from '../../../components/common/SerachFilter';
 import useGridPagination from '../../../hooks/useGridPagination'
+import { usePermission } from '../../../hooks/UsePermission'
+import { MENU } from '../../../data/Menu'
 const ActionCell = (props) => {
     const item = props.dataItem;
 
@@ -16,26 +21,34 @@ const ActionCell = (props) => {
     return (
         <td {...props.tdProps}>
             <span className="d-flex gap-2 align-items-center">
+                {
+                    props.accessoriesPermission.canUpdate
+                    &&
 
-                <button
-                    onClick={() => {
-                        props.setisAccessoriesOpen(true)
-                        props.setid(item.accessoryId || item.id)
-                    }}
+                    <button
+                        onClick={() => {
+                            props.setisAccessoriesOpen(true)
+                            props.setid(item.accessoryId || item.id)
+                        }}
 
-                    className="small-square-btn edit-btn"
+                        className="small-square-btn edit-btn"
 
-                >
-                    <i className="demo-icon icon-edit-1" />
-                </button>
+                    >
+                        <i className="demo-icon icon-edit-1" />
+                    </button>
+                }
+                {
+                    props.accessoriesPermission.canDelete
+                    &&
 
-                <button
-                    onClick={() => handleDelete(item.accessoryId, "accessories", "accessoroesDelete", props.getAccessories)}
-                    type="button"
-                    className="small-square-btn danger-btn"
-                >
-                    <i className="demo-icon icon-delete-1" />
-                </button>
+                    <button
+                        onClick={() => handleDelete(item.accessoryId, "accessories", "accessoroesDelete", props.getAccessories)}
+                        type="button"
+                        className="small-square-btn danger-btn"
+                    >
+                        <i className="demo-icon icon-delete-1" />
+                    </button>
+                }
 
 
             </span>
@@ -49,6 +62,7 @@ const StatusCell = (props) => {
                 <input
                     className="form-check-input"
                     type="checkbox"
+                    disabled={![props.accessoriesPermission.canUpdate]}
                     checked={props.dataItem.isActive}
                     readOnly
                     onChange={(e) => handleStatusChange(props.dataItem.accessoryId, e.target.checked, "accessories", "accessoriesStatusUpdate", props.getAccessories)}
@@ -70,6 +84,7 @@ export default function Accessories() {
     const [id, setid] = useState(null)
     const [searchText, setSearchText] = useState("")
     const [customSearch, setcustomSearch] = useState("")
+    const [filters, setFilters] = useState([])
     const {
         dataState,
         onDataStateChange,
@@ -80,8 +95,11 @@ export default function Accessories() {
         kendoSort,
         setKendoSort,
     } = useGridPagination(10)
+
+    const permission = usePermission()
+    const accessoriesPermission = permission.find((value, index) => value.menuId === MENU.ACCESSORY)
     const getAccessories = async () => {
-        const res = await apiRequest("POST", API_ROUTES.accessories.getaccessories, { page, pageSize, customSearch, Sorts: sort }, null, {
+        const res = await apiRequest("POST", API_ROUTES.accessories.getaccessories, { page, pageSize, customSearch, Sorts: sort, Filters: filters }, null, {
             showLoader: true
         })
         setaccessoriesData(res.data.data)
@@ -89,24 +107,35 @@ export default function Accessories() {
     }
 
     const accessoriesColumn = [
-        { field: "action", title: "Action", cell: ActionCell, width: "100px" },
-        { field: "accessoryName", title: "Name", width: "180px" },
-        { field: "accessoryCategory", title: "Category" },
-        { field: "gunNames", title: "Gun" },
-        { field: "description", title: "Description", width: "180px" },
-        { field: "createdByUserName", title: "CreatedBy" },
-        { field: "createdAt", title: "CreatedAt", cell: DateCell },
-        { field: "modifiedBy", title: "Modified By", width: "120px" },
-        { field: "isActive", title: "status", cell: StatusCell, width: "80px" }
+
+        ...(accessoriesPermission?.canUpdate || accessoriesPermission?.canDelete
+            ? [
+                { field: "action", title: "Action", cell: ActionCell, width: "100px" },
+            ]
+            : []),
+        { field: "accessoryName", title: "Name", width: "180px", filter: "text", columnMenu: ColumnMenu },
+        { field: "accessoryCategory", title: "Category", filter: "text", columnMenu: ColumnMenu },
+        { field: "gunNames", title: "Gun", filter: "text", columnMenu: ColumnMenu },
+        { field: "description", title: "Description", width: "180px", filter: "text", columnMenu: ColumnMenu },
+        { field: "createdByUserName", title: "CreatedBy", filter: "text", columnMenu: ColumnMenu },
+        { field: "createdAt", title: "CreatedAt", cell: DateCell, filter: "text", columnMenu: ColumnMenu },
+        { field: "modifiedBy", title: "Modified By", width: "120px", filter: "text", columnMenu: ColumnMenu },
+        { field: "isActive", title: "status", cell: StatusCell, width: "80px", filter: "boolean", columnMenu: ColumnMenu }
     ]
     const handleGridDataStateChange = (event) => {
         onDataStateChange(event)
         setKendoSort(event.dataState?.sort || [])
+        const nextFilter = event.dataState?.filter
+        if (nextFilter) {
+            setFilters(getBackendFilters(nextFilter))
+        } else {
+            setFilters([])
+        }
     }
 
     useEffect(() => {
         getAccessories()
-    }, [page, pageSize, customSearch, sort])
+    }, [page, pageSize, customSearch, sort, filters])
     return (
         <>
 
@@ -125,24 +154,30 @@ export default function Accessories() {
                                 onSubmit={(value) => setcustomSearch(value)}
                             />
                         </div>
-                        <div className="col-12 col-lg">
-                            <div className="btn-list d-flex justify-content-lg-end flex-wrap gap-2 gap-md-3 text-end">
 
-                                <button
-                                    onClick={() => {
-                                        setid(null);
-                                        setisAccessoriesOpen(true);
-                                    }}
-                                    className="btn main-btn border-btn blue-btn"
-                                    style={{
-                                        background: "linear-gradient(90deg, rgb(193, 39, 45) 0%, rgb(0 0 0 / 92%) 100%)",
-                                        color: "white"
-                                    }}
-                                >
-                                    Add
-                                </button>
+                        {
+                            accessoriesPermission.canCreate
+                            &&
+
+                            <div className="col-12 col-lg">
+                                <div className="btn-list d-flex justify-content-lg-end flex-wrap gap-2 gap-md-3 text-end">
+
+                                    <button
+                                        onClick={() => {
+                                            setid(null);
+                                            setisAccessoriesOpen(true);
+                                        }}
+                                        className="btn main-btn border-btn blue-btn"
+                                        style={{
+                                            background: "linear-gradient(90deg, rgb(193, 39, 45) 0%, rgb(0 0 0 / 92%) 100%)",
+                                            color: "white"
+                                        }}
+                                    >
+                                        Add
+                                    </button>
+                                </div>
                             </div>
-                        </div>
+                        }
                     </div>
                     <div className="row">
                         <div className="col-12 mt-3 mt-xxl-4">
@@ -152,6 +187,14 @@ export default function Accessories() {
                                     data={accessoriesData}
                                     skip={dataState.skip}
                                     take={dataState.take}
+                                   
+                                    filter={dataState.filter}
+                                    filterOperators={{
+                                        text: [{ text: 'grid.filterContainsOperator', operator: 'contains' }],
+                                        numeric: [{ text: 'grid.filterEqOperator', operator: 'eq' }],
+                                        boolean: [{ text: 'grid.filterEqOperator', operator: 'eq' }]
+                                    }}
+                                    columnMenuIcon={filterIcon}
                                     sortable={{ allowUnsort: true, mode: 'single' }}
                                     sort={kendoSort}
                                     pageable={{
@@ -185,6 +228,7 @@ export default function Accessories() {
                                                                 data: (props) => (
                                                                     <col.cell
                                                                         {...props}
+                                                                        accessoriesPermission={accessoriesPermission}
                                                                         getAccessories={getAccessories}
                                                                         setisAccessoriesOpen={setisAccessoriesOpen}
                                                                         setid={setid}

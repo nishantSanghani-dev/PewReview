@@ -13,6 +13,9 @@ import { Tooltip } from '@progress/kendo-react-tooltip'
 import { useSelector } from 'react-redux'
 import { usePermission } from '../../../../hooks/UsePermission'
 import { MENU } from '../../../../data/Menu'
+import { filterIcon } from '@progress/kendo-svg-icons'
+import { ColumnMenu } from '../../../../components/grid/ColumnMenu'
+import { getBackendFilters } from '../../../../components/grid/GridFilter'
 
 const DetailCell = ({ tdProps, dataItem, field }) => {
     return (
@@ -136,6 +139,7 @@ export default function VenueList() {
     const [searchText, setSearchText] = useState("")
     const [customSearch, setcustomSearch] = useState("")
     const [totalRecords, settotalRecords] = useState(null)
+    const [filters, setFilters] = useState([])
     const {
         dataState,
         onDataStateChange,
@@ -153,7 +157,7 @@ export default function VenueList() {
     
 
     const getVenueList = async () => {
-        const res = await apiRequest("POST", API_ROUTES.venue.getVenueList, { page, pageSize, customSearch, Sorts: sort }, null, {
+        const res = await apiRequest("POST", API_ROUTES.venue.getVenueList, { page, pageSize, customSearch, Sorts: sort, Filters: filters }, null, {
             showLoader: true
         })
         setvenueListData(res.data.data)
@@ -289,30 +293,36 @@ export default function VenueList() {
     };
 
     const venueColumns = [
-        { field: "action", title: "Action", cell: ActionCell, width: "130px" },
-        { field: "venueOwnerUserName", title: "Owner Name", cell: UserNameCell },
-        { field: "venueName", title: "Venue Name", width: "200px" },
-        { field: "description", title: "Description", cell: DetailCell },
-        { field: "website", title: "Website", cell: WebsiteCell },
-        { field: "phone", title: "Phone" },
-        { field: "address", title: "Address", cell: AddressCell },
-        { field: "totalGun", title: "No. of Guns", cell: GunCell },
-        { field: "avgRate", title: "Avg. Venue Rating" },
-        { field: "noOfChackin", title: "No. of Check-Ins" },
-        { field: "noOfEvent", title: "No. of Event Created", width: "170px" },
-        { field: "userName", title: "Created By" },
-        { field: "createdOn", title: "Created On", cell: DateTimeCell },
-        { field: "approvalStatusName", title: "Approval Status", cell: ApprovalStatusCell },
-        { field: "isActive", title: "Status", cell: StatusCell }
+        { field: "action", title: "Action", cell: ActionCell, width: "130px", filterable: false },
+        { field: "venueOwnerUserName", title: "Owner Name", cell: UserNameCell, filter: "text", columnMenu: ColumnMenu },
+        { field: "venueName", title: "Venue Name", width: "200px", filter: "text", columnMenu: ColumnMenu },
+        { field: "description", title: "Description", cell: DetailCell, filter: "text", columnMenu: ColumnMenu },
+        { field: "website", title: "Website", cell: WebsiteCell, filter: "text", columnMenu: ColumnMenu },
+        { field: "phone", title: "Phone", filter: "text", columnMenu: ColumnMenu },
+        { field: "address", title: "Address", cell: AddressCell, filter: "text", columnMenu: ColumnMenu },
+        { field: "totalGun", title: "No. of Guns", cell: GunCell, filter: "numeric", columnMenu: ColumnMenu },
+        { field: "avgRate", title: "Avg. Venue Rating", filter: "numeric", columnMenu: ColumnMenu },
+        { field: "noOfChackin", title: "No. of Check-Ins", filter: "numeric", columnMenu: ColumnMenu },
+        { field: "noOfEvent", title: "No. of Event Created", width: "170px", filter: "numeric", columnMenu: ColumnMenu },
+        { field: "userName", title: "Created By", filter: "text", columnMenu: ColumnMenu },
+        { field: "createdOn", title: "Created On", cell: DateTimeCell, filterable: false },
+        { field: "approvalStatusName", title: "Approval Status", cell: ApprovalStatusCell, filter: "text", columnMenu: ColumnMenu },
+        { field: "isActive", title: "Status", cell: StatusCell, filter: "boolean" }
     ];
     const handleGridDataStateChange = (event) => {
         onDataStateChange(event)
         setKendoSort(event.dataState?.sort || [])
+        const nextFilter = event.dataState?.filter
+        if (nextFilter) {
+            setFilters(getBackendFilters(nextFilter))
+        } else {
+            setFilters([])
+        }
     }
 
     useEffect(() => {
         getVenueList()
-    }, [page, pageSize, customSearch, sort])
+    }, [page, pageSize, customSearch, sort,filters])
 
     return (
         <div className='container-fluid'>
@@ -382,11 +392,19 @@ export default function VenueList() {
                                     <Grid
                                         className="table-wrapper  text-center"
                                         data={venueListData}
+                                        total={totalRecords}
                                         skip={dataState.skip}
                                         take={dataState.take}
                                         sortable={{ allowUnsort: true, mode: 'single' }}
                                         sort={kendoSort}
-                                        total={totalRecords}
+                                    
+                                        filter={dataState.filter}
+                                        filterOperators={{
+                                            text: [{ text: 'grid.filterContainsOperator', operator: 'contains' }],
+                                            numeric: [{ text: 'grid.filterEqOperator', operator: 'eq' }],
+                                            boolean: [{ text: 'grid.filterEqOperator', operator: 'eq' }]
+                                        }}
+                                        columnMenuIcon={filterIcon}
                                         pageable={{
                                             buttonCount: 5,
                                             pageSizes: [10, 20, 50],
@@ -404,6 +422,9 @@ export default function VenueList() {
                                                 title={col.title}
                                                 sortable={col.field === 'action' ? false : true}
                                                 width={col.width || "150px"}
+                                                filterable={col.filter !== false}
+                                                filter={col.filter}
+                                                columnMenu={col.columnMenu}
                                                 cells={
                                                     col.cell
                                                         ? {

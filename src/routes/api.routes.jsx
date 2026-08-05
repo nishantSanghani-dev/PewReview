@@ -24,6 +24,7 @@ export const API_ROUTES = {
         getRolesForDropdown: "Role/GetRolesForDropdown",
         roleView: "Role/Get",
         roleAdd: "Role/Add",
+        roleEdit: (id) => `Role/Update/${id}`,
         roleDelete: (id) => `Role/Delete/${id}`,
         roleStatusEdit: (id) => `Role/UpdateStatus/${id}`
 
@@ -130,7 +131,7 @@ export const API_ROUTES = {
         categoryMasterUpdate: (id) => `GunCategoryMaster/UpdateStatus/${id}`,
         categoryMasterDelete: (id) => `GunCategoryMaster/Delete/${id}`,
         categoryDropdown: "GunCategoryMaster/CategoryDropdown",
-        categoryAdd:"GunCategoryMaster/Add"
+        categoryAdd: "GunCategoryMaster/Add"
     },
     report: {
         getReport: "Report/GetUserReportList"

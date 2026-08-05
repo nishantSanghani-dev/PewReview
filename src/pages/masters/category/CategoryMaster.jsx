@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react'
 import { apiRequest } from '../../../services/Api'
 import { API_ROUTES } from '../../../routes/api.routes'
 import { Grid, GridColumn } from '@progress/kendo-react-grid'
+import { filterIcon } from '@progress/kendo-svg-icons'
+import { ColumnMenu } from '../../../components/grid/ColumnMenu'
+import { getBackendFilters } from '../../../components/grid/GridFilter'
 import { DateCell } from '../../activity/Activity';
 import { handleStatusChange } from '../../../utils/ChangeStatus';
 import { handleDelete } from '../../../utils/DeleteRecords';
@@ -10,31 +13,32 @@ import SerachFilter from '../../../components/common/SerachFilter';
 import useGridPagination from '../../../hooks/useGridPagination'
 import CategoryModel from './CategoryModel';
 import ManufacturerAdd from '../manufacturer/ManufacturerAdd';
+import { usePermission } from '../../../hooks/UsePermission'
+import { MENU } from '../../../data/Menu'
 const ActionCell = (props) => {
     const item = props.dataItem;
     return (
         <td {...props.tdProps}>
             <span className="d-flex gap-2 align-items-center">
+                {
+                    props.categoryPermission.canUpdate
+                    &&
+                    <button className="small-square-btn edit-btn">
+                        <i className="demo-icon icon-edit-1" />
+                    </button>
+                }
+                {
+                    props.categoryPermission.canDelete
+                    &&
 
-                <button
-                    // onClick={() => {
-                    //     props.setismanufacturerOpen(true)
-                    //     props.setid(item.id)
-                    // }}
-
-                    className="small-square-btn edit-btn"
-
-                >
-                    <i className="demo-icon icon-edit-1" />
-                </button>
-
-                <button
-                    onClick={() => handleDelete(item.categoryId, "category", "categoryMasterDelete", props.getCategoryMaster)}
-                    type="button"
-                    className="small-square-btn danger-btn"
-                >
-                    <i className="demo-icon icon-delete-1" />
-                </button>
+                    <button
+                        onClick={() => handleDelete(item.categoryId, "category", "categoryMasterDelete", props.getCategoryMaster)}
+                        type="button"
+                        className="small-square-btn danger-btn"
+                    >
+                        <i className="demo-icon icon-delete-1" />
+                    </button>
+                }
 
 
             </span>
@@ -46,6 +50,7 @@ const StatusCell = (props) => {
         <td {...props.tdProps}>
             <div className="form-check form-switch mb-0">
                 <input
+                    disabled={!props.categoryPermission.canUpdate}
                     className="form-check-input"
                     type="checkbox"
                     checked={props.dataItem.isActive}
@@ -68,6 +73,7 @@ export default function CategoryMaster() {
     const [categoryMasterData, setcategoryMasterData] = useState([])
     const [searchText, setSearchText] = useState("")
     const [customSearch, setcustomSearch] = useState("")
+    const [filters, setFilters] = useState([])
     const {
         dataState,
         onDataStateChange,
@@ -79,31 +85,43 @@ export default function CategoryMaster() {
         setKendoSort,
     } = useGridPagination(10)
     const [isCategoryOpen, setisCategoryOpen] = useState(false)
+    const permission = usePermission()
+    const categoryPermission = permission.find((value, index) => value.menuId === MENU.GUN_CATEGORY_MASTER)
     const getCategoryMaster = async () => {
-        const res = await apiRequest("POST", API_ROUTES.category.getCategoryMaster, { page, pageSize, customSearch, Sorts: sort }, null, {
+        const res = await apiRequest("POST", API_ROUTES.category.getCategoryMaster, { page, pageSize, customSearch, Sorts: sort, Filters: filters }, null, {
             showLoader: true
         })
         setcategoryMasterData(res.data.data)
     }
     const categoryMasterColumns = [
-        { field: "action", title: "Action", cell: ActionCell, width: "100px" },
-        { field: "applicableForName", title: "Applicable For" },
-        { field: "categoryName", title: "Category Name", width: "180px" },
-        { field: "description", title: "Description", width: "180px" },
-        { field: "parentCategoryName", title: "Parent Category Name", width: "180px" },
-        { field: "createdByUserName", title: "Created By" },
-        { field: "createdOn", title: "Creadted On", cell: DateCell },
-        { field: "updatedByUserName", title: "Modified By" },
-        { field: "isActive", title: "Status", cell: StatusCell, width: "70px" }
+        ...(categoryPermission?.canUpdate || categoryPermission?.canDelete
+            ? [
+                { field: "action", title: "Action", cell: ActionCell, width: "100px" }
+            ]
+            : []),
+        { field: "applicableForName", title: "Applicable For", filter: "text", columnMenu: ColumnMenu },
+        { field: "categoryName", title: "Category Name", width: "180px", filter: "text", columnMenu: ColumnMenu },
+        { field: "description", title: "Description", width: "180px", filter: "text", columnMenu: ColumnMenu },
+        { field: "parentCategoryName", title: "Parent Category Name", width: "180px", filter: "text", columnMenu: ColumnMenu },
+        { field: "createdByUserName", title: "Created By", filter: "text", columnMenu: ColumnMenu },
+        { field: "createdOn", title: "Creadted On", cell: DateCell, filter: "text", columnMenu: ColumnMenu },
+        { field: "updatedByUserName", title: "Modified By", filter: "text", columnMenu: ColumnMenu },
+        { field: "isActive", title: "Status", cell: StatusCell, width: "70px", filter: "boolean", columnMenu: ColumnMenu }
     ]
     const handleGridDataStateChange = (event) => {
         onDataStateChange(event)
         setKendoSort(event.dataState?.sort || [])
+        const nextFilter = event.dataState?.filter
+        if (nextFilter) {
+            setFilters(getBackendFilters(nextFilter))
+        } else {
+            setFilters([])
+        }
     }
 
     useEffect(() => {
         getCategoryMaster()
-    }, [page, pageSize, customSearch, sort])
+    }, [page, pageSize, customSearch, sort, filters])
     return (
 
         <>
@@ -151,6 +169,14 @@ export default function CategoryMaster() {
                                     data={categoryMasterData}
                                     skip={dataState.skip}
                                     take={dataState.take}
+
+                                    filter={dataState.filter}
+                                    filterOperators={{
+                                        text: [{ text: 'grid.filterContainsOperator', operator: 'contains' }],
+                                        numeric: [{ text: 'grid.filterEqOperator', operator: 'eq' }],
+                                        boolean: [{ text: 'grid.filterEqOperator', operator: 'eq' }]
+                                    }}
+                                    columnMenuIcon={filterIcon}
                                     sortable={{ allowUnsort: true, mode: 'single' }}
                                     sort={kendoSort}
                                     pageable={{
@@ -184,6 +210,7 @@ export default function CategoryMaster() {
                                                                 data: (props) => (
                                                                     <col.cell
                                                                         {...props}
+                                                                        categoryPermission={categoryPermission}
                                                                         getCategoryMaster={getCategoryMaster}
                                                                     />
                                                                 )
@@ -211,7 +238,7 @@ export default function CategoryMaster() {
                 &&
 
                 <CategoryModel
-                getCategoryMaster={getCategoryMaster}
+                    getCategoryMaster={getCategoryMaster}
                     isCategoryOpen={isCategoryOpen}
                     setisCategoryOpen={setisCategoryOpen}
                 />

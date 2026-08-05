@@ -3,6 +3,9 @@ import { apiRequest } from '../../services/Api'
 import { API_ROUTES } from '../../routes/api.routes'
 import { Link, useLocation } from 'react-router-dom';
 import { Grid, GridColumn } from '@progress/kendo-react-grid';
+import { filterIcon } from '@progress/kendo-svg-icons'
+import { ColumnMenu } from '../../components/grid/ColumnMenu'
+import { getBackendFilters } from '../../components/grid/GridFilter'
 import "../supportTicket/supportTicket.css"
 import SupportTicketEdit from './SupportTicketEdit';
 import SerachFilter from '../../components/common/SerachFilter';
@@ -156,6 +159,7 @@ export default function SupportTicket() {
     const [ticketId, setticketId] = useState(null)
     const [searchText, setSearchText] = useState("");
     const [customSearch, setcustomSearch] = useState("");
+    const [filters, setFilters] = useState([])
     const {
         dataState,
         onDataStateChange,
@@ -179,7 +183,7 @@ export default function SupportTicket() {
     }
 
     const getTickets = async () => {
-        const res = await apiRequest("POST", API_ROUTES.supportTicket.SupportTicketViewList, { page, pageSize, customSearch, Sorts: sort }, null, {
+        const res = await apiRequest("POST", API_ROUTES.supportTicket.SupportTicketViewList, { page, pageSize, customSearch, Sorts: sort, Filters: filters }, null, {
             showLoader: true
         })
         console.log(res.data);
@@ -189,22 +193,28 @@ export default function SupportTicket() {
     const handleGridDataStateChange = (event) => {
         onDataStateChange(event)
         setKendoSort(event.dataState?.sort || [])
+        const nextFilter = event.dataState?.filter
+        if (nextFilter) {
+            setFilters(getBackendFilters(nextFilter))
+        } else {
+            setFilters([])
+        }
     }
 
     useEffect(() => {
         getSuppportStatus()
         getTickets()
-    }, [page, pageSize, customSearch, sort])
+    }, [page, pageSize, customSearch, sort, filters])
 
 
     const supportTicketsColumns = [
         { field: "action", title: "Action", cell: ActionCell, width: "80px" },
-        { field: "userName", title: "userName", width: "130px" },
-        { field: "emailePhone", title: "Email/Phone", width: "160px", cell: DetailCell },
-        { field: "issueType", title: "Issue Type" },
-        { field: "description", title: "Description" },
-        { field: "adminDescription", title: "Admin Comments" },
-        { field: "status", title: "Ticket status", cell: (props) => <ApprovalStatusCell {...props} statusOptions={statusOptions} /> },
+        { field: "userName", title: "userName", width: "130px", filter: "text", columnMenu: ColumnMenu },
+        { field: "emailePhone", title: "Email/Phone", width: "160px", cell: DetailCell, filter: "text", columnMenu: ColumnMenu },
+        { field: "issueType", title: "Issue Type", filter: "text", columnMenu: ColumnMenu },
+        { field: "description", title: "Description", filter: "text", columnMenu: ColumnMenu },
+        { field: "adminDescription", title: "Admin Comments", filter: "text", columnMenu: ColumnMenu },
+        { field: "status", title: "Ticket status", cell: (props) => <ApprovalStatusCell {...props} statusOptions={statusOptions} />, filter: "text", columnMenu: ColumnMenu },
     ];
 
     return (
@@ -244,6 +254,14 @@ export default function SupportTicket() {
                                         take={dataState.take}
                                         sortable={{ allowUnsort: true, mode: 'single' }}
                                         sort={kendoSort}
+                                        filterable={true}
+                                        filter={dataState.filter}
+                                        filterOperators={{
+                                            text: [{ text: 'grid.filterContainsOperator', operator: 'contains' }],
+                                            numeric: [{ text: 'grid.filterEqOperator', operator: 'eq' }],
+                                            boolean: [{ text: 'grid.filterEqOperator', operator: 'eq' }]
+                                        }}
+                                        columnMenuIcon={filterIcon}
                                         pageable={{
                                             buttonCount: 5,
                                             pageSizes: [10, 20, 50],

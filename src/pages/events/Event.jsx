@@ -14,6 +14,7 @@ export default function Event() {
     const [eventsData, seteventsData] = useState([])
     const [searchText, setSearchText] = useState("")
     const [customSearch, setcustomSearch] = useState("")
+    const [filters, setFilters] = useState([])
     const {
         dataState,
         onDataStateChange,
@@ -32,7 +33,7 @@ export default function Event() {
 
 
     const getEevent = async () => {
-        const res = await apiRequest("POST", API_ROUTES.events.getAllEvent, { page, pageSize, customSearch, Sorts: sort }, params, {
+        const res = await apiRequest("POST", API_ROUTES.events.getAllEvent, { page, pageSize, customSearch, Sorts: sort, Filters: filters }, params, {
             showLoader: true
         })
         seteventsData(res.data.data)
@@ -40,6 +41,12 @@ export default function Event() {
     const handleGridDataStateChange = (event) => {
         onDataStateChange(event)
         setKendoSort(event.dataState?.sort || [])
+        const nextFilter = event.dataState?.filter
+        if (nextFilter) {
+            setFilters(getBackendFilters(nextFilter))
+        } else {
+            setFilters([])
+        }
     }
 
     useEffect(() => {

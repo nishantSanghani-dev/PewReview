@@ -76,116 +76,122 @@ export const AddressCell = (props) => {
 export default function Events({ data, isUpcomingEvent, setisUpcomingEvent }) {
     const [gridSort, setGridSort] = useState([])
     const sortedData = useMemo(() => process(data, { sort: gridSort }).data, [data, gridSort])
-    const { permissions } = useSelector((store) => store.permissions)
+    const { permissions } = useSelector((store) => store.user)
     console.log(permissions);
 
-    const eventPermission = permissions.find((value, index) => value.menuId === MENU.EVENT)
+    const eventPermission = permissions?.find((value, index) => value.menuId === MENU.EVENT)
     console.log(eventPermission);
     return (
         <>
-            <div className="event-tabs">
-                <button
-                    className={`event-tab-btn ${isUpcomingEvent === true ? "active" : ""}`}
-                    onClick={() => setisUpcomingEvent(true)}
-                >
-                    Upcoming Events
-                </button>
+            {
+                eventPermission?.canRead
+                &&
+                <div>
+                    < div className="event-tabs">
+                        <button
+                            className={`event-tab-btn ${isUpcomingEvent === true ? "active" : ""}`}
+                            onClick={() => setisUpcomingEvent(true)}
+                        >
+                            Upcoming Events
+                        </button>
 
-                <button
-                    className={`event-tab-btn ${isUpcomingEvent === false ? "active" : ""}`}
-                    onClick={() => setisUpcomingEvent(false)}
-                >
-                    Passed Events
-                </button>
+                        <button
+                            className={`event-tab-btn ${isUpcomingEvent === false ? "active" : ""}`}
+                            onClick={() => setisUpcomingEvent(false)}
+                        >
+                            Passed Events
+                        </button>
 
-                <button
-                    className={`event-tab-btn ${isUpcomingEvent === null ? "active" : ""}`}
-                    onClick={() => setisUpcomingEvent(null)}
-                >
-                    Event Requests
-                </button>
-            </div>
+                        <button
+                            className={`event-tab-btn ${isUpcomingEvent === null ? "active" : ""}`}
+                            onClick={() => setisUpcomingEvent(null)}
+                        >
+                            Event Requests
+                        </button>
+                    </div >
 
-            <div
-                id="collapseTwo"
-                className="accordion-collapse collapse show d-lg-block"
-                aria-labelledby="headingTwo"
-                data-bs-parent="#myTabContent"
-            >
-                <div className="accordion-body mt-3 mt-xxl-4">
-                    <div className="row">
-                        <div className="col-12">
-                            <div className="table-responsive">
+                    <div
+                        id="collapseTwo"
+                        className="accordion-collapse collapse show d-lg-block"
+                        aria-labelledby="headingTwo"
+                        data-bs-parent="#myTabContent"
+                    >
+                        <div className="accordion-body mt-3 mt-xxl-4">
+                            <div className="row">
+                                <div className="col-12">
+                                    <div className="table-responsive">
 
-                                {
-                                    eventPermission.canRead
-                                    &&
+                                        {
+                                            eventPermission.canRead
+                                            &&
 
-                                    <Grid
-                                        className="table-wrapper fw-bold text-center"
-                                        style={{
-                                            zIndex: "999"
-                                        }}
-                                        data={sortedData}
-                                        sortable={{ allowUnsort: true, mode: 'single' }}
-                                        sort={gridSort}
-                                        pageable={{
-                                            buttonCount: 5,
-                                            pageSizes: [10, 20, 50],
-                                            info: true,
-                                            previousNext: true,
-                                            type: "numeric"
-                                        }}
-                                        onDataStateChange={(event) => setGridSort(event.dataState?.sort || [])}
-                                    >
-                                        <GridColumn
-                                            title="Action"
-                                            width="120px"
-                                            cells={{ data: ActionCell }}
-                                        />
+                                            <Grid
+                                                className="table-wrapper fw-bold text-center"
+                                                style={{
+                                                    zIndex: "999"
+                                                }}
+                                                data={sortedData}
+                                                sortable={{ allowUnsort: true, mode: 'single' }}
+                                                sort={gridSort}
+                                                pageable={{
+                                                    buttonCount: 5,
+                                                    pageSizes: [10, 20, 50],
+                                                    info: true,
+                                                    previousNext: true,
+                                                    type: "numeric"
+                                                }}
+                                                onDataStateChange={(event) => setGridSort(event.dataState?.sort || [])}
+                                            >
+                                                <GridColumn
+                                                    title="Action"
+                                                    width="120px"
+                                                    cells={{ data: ActionCell }}
+                                                />
 
-                                        <GridColumn
-                                            title="Host Name"
-                                            width="200px"
-                                            cells={{ data: HostNameCell }}
-                                        />
+                                                <GridColumn
+                                                    title="Host Name"
+                                                    width="200px"
+                                                    cells={{ data: HostNameCell }}
+                                                />
 
-                                        <GridColumn
-                                            title="Event Name"
-                                            width="200px"
-                                            cells={{ data: EventNameCell }}
-                                        />
+                                                <GridColumn
+                                                    title="Event Name"
+                                                    width="200px"
+                                                    cells={{ data: EventNameCell }}
+                                                />
 
-                                        <GridColumn
-                                            title="Date & Time"
-                                            width="200px"
-                                            cells={{ data: DateTimeCell }}
-                                        />
+                                                <GridColumn
+                                                    title="Date & Time"
+                                                    width="200px"
+                                                    cells={{ data: DateTimeCell }}
+                                                />
 
-                                        <GridColumn
-                                            title="Address"
-                                            width="250px"
-                                            cells={{ data: AddressCell }}
-                                        />
-                                        <GridColumn
-                                            field='userName'
-                                            title="Created By"
-                                            width="150px"
+                                                <GridColumn
+                                                    title="Address"
+                                                    width="250px"
+                                                    cells={{ data: AddressCell }}
+                                                />
+                                                <GridColumn
+                                                    field='userName'
+                                                    title="Created By"
+                                                    width="150px"
 
-                                        />
-                                        <GridColumn
-                                            field='approvalStatusName'
-                                            title="status"
-                                            width="150px"
+                                                />
+                                                <GridColumn
+                                                    field='approvalStatusName'
+                                                    title="status"
+                                                    width="150px"
 
-                                        />
-                                    </Grid>
-                                }
+                                                />
+                                            </Grid>
+                                        }
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            }
         </>
     )
 }

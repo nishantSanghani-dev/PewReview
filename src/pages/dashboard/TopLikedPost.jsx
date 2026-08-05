@@ -10,6 +10,9 @@ const ActionCell = (props) => {
     return (
         <td {...props.tdProps}>
             <div className="d-flex gap-2 align-items-center">
+                {
+                    props.dashboardPermission.canRead
+                    &&
 
                 <Link
                     to={`/admin/activity/view/${props.dataItem.postId}`}
@@ -17,11 +20,13 @@ const ActionCell = (props) => {
                 >
                     <i className="demo-icon icon-eye-line"></i>
                 </Link>
+                }
 
                 <div className="form-check form-switch">
                     <input
                         className="form-check-input"
                         type="checkbox"
+                    
                         checked={props.dataItem.isActive}
                         readOnly
                         onChange={(e) =>
@@ -44,7 +49,7 @@ const TextCell = ({ tdProps, dataItem, field }) => (
         {dataItem[field] ?? "-"}
     </td>
 );
-export default function TopLikedPost({ topLikedPost }) {
+export default function TopLikedPost({ topLikedPost, dashboardPermission }) {
 
     const venueColumns = [
         { field: "action", title: "Action", cell: ActionCell, width: "80px" },
@@ -80,7 +85,7 @@ export default function TopLikedPost({ topLikedPost }) {
                                 data: (props) => (
                                     <col.cell
                                         {...props}
-
+                                        dashboardPermission={dashboardPermission}
                                     />
                                 )
                             }

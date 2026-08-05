@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react'
 import { apiRequest } from '../../services/Api'
 import { API_ROUTES } from '../../routes/api.routes'
 import { Grid, GridColumn } from '@progress/kendo-react-grid'
+import { filterIcon } from '@progress/kendo-svg-icons'
+import { ColumnMenu } from '../../components/grid/ColumnMenu'
+import { getBackendFilters } from '../../components/grid/GridFilter'
 import BreadCumb from '../../components/common/breadCumb/BreadCumb';
 import SerachFilter from '../../components/common/SerachFilter';
 import useGridPagination from '../../hooks/useGridPagination'
@@ -15,6 +18,7 @@ export default function ReportedUser() {
     const [reportUserData, setreportUserData] = useState([])
     const [searchText, setSearchText] = useState("")
     const [customSearch, setcustomSearch] = useState("")
+    const [filters, setFilters] = useState([])
     const {
         dataState,
         onDataStateChange,
@@ -26,7 +30,7 @@ export default function ReportedUser() {
         setKendoSort,
     } = useGridPagination(10)
     const getReportedUser = async () => {
-        const res = await apiRequest("POST", API_ROUTES.report.getReport, { page, pageSize, customSearch, Sorts: sort }, null, {
+        const res = await apiRequest("POST", API_ROUTES.report.getReport, { page, pageSize, customSearch, Sorts: sort, Filters: filters }, null, {
             showLoader: true
         })
         setreportUserData(res.data)
@@ -43,6 +47,12 @@ export default function ReportedUser() {
     const handleGridDataStateChange = (event) => {
         onDataStateChange(event)
         setKendoSort(event.dataState?.sort || [])
+        const nextFilter = event.dataState?.filter
+        if (nextFilter) {
+            setFilters(getBackendFilters(nextFilter))
+        } else {
+            setFilters([])
+        }
     }
 
     useEffect(() => {
@@ -75,6 +85,14 @@ export default function ReportedUser() {
                                 data={reportUserData}
                                 skip={dataState.skip}
                                 take={dataState.take}
+                                filterable={true}
+                                filter={dataState.filter}
+                                filterOperators={{
+                                    text: [{ text: 'grid.filterContainsOperator', operator: 'contains' }],
+                                    numeric: [{ text: 'grid.filterEqOperator', operator: 'eq' }],
+                                    boolean: [{ text: 'grid.filterEqOperator', operator: 'eq' }]
+                                }}
+                                columnMenuIcon={filterIcon}
                                 sortable={{ allowUnsort: true, mode: 'single' }}
                                 sort={kendoSort}
                                 pageable={{
@@ -94,6 +112,8 @@ export default function ReportedUser() {
                                                 field={col.field}
                                                 title={col.title}
                                                 width={col.width || "150px"}
+                                                filter={col.filter}
+                                                columnMenu={col.columnMenu}
                                                 sortable={false}
                                                 pageable={{
                                                     buttonCount: 4,

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Grid, GridColumn } from "@progress/kendo-react-grid"
+import { filterIcon } from '@progress/kendo-svg-icons'
 import { apiRequest } from '../../../services/Api'
 import { API_ROUTES } from '../../../routes/api.routes'
 import { Link } from 'react-router-dom'
@@ -8,6 +9,10 @@ import SerachFilter from '../../../components/common/SerachFilter'
 import useGridPagination from '../../../hooks/useGridPagination'
 import { usePermission } from '../../../hooks/UsePermission'
 import { MENU } from '../../../data/Menu'
+
+
+import { ColumnMenu } from '../../../components/grid/ColumnMenu'
+import { getBackendFilters } from '../../../components/grid/GridFilter'
 
 export default function EndUser() {
     const [manageUserData, setmanageUserData] = useState([])
@@ -24,6 +29,7 @@ export default function EndUser() {
     } = useGridPagination(10)
     const [searchText, setSearchText] = useState("");
     const [customSearch, setcustomSearch] = useState("");
+    const [filters, setFilters] = useState([])
     const permission = usePermission()
     const endUserPermission = permission.find((value, index) => value.menuId === MENU.END_USER)
     console.log(endUserPermission);
@@ -36,7 +42,8 @@ export default function EndUser() {
                 page,
                 pageSize,
                 customSearch,
-                Sorts: sort
+                Sorts: sort,
+                Filters: filters
             };
 
             const res = await apiRequest(
@@ -132,6 +139,7 @@ export default function EndUser() {
             <td {...props.tdProps}>
                 <div className="form-check form-switch">
                     <input
+                        disabled={!props.endUserPermission?.canUpdate}
                         className="form-check-input"
                         type="checkbox"
                         checked={item.isActive}
@@ -151,12 +159,18 @@ export default function EndUser() {
     const handleGridDataStateChange = (event) => {
         onDataStateChange(event)
         setKendoSort(event.dataState?.sort || [])
+        const nextFilter = event.dataState?.filter
+        if (nextFilter) {
+            setFilters(getBackendFilters(nextFilter))
+        } else {
+            setFilters([])
+        }
     }
 
-    // fetch on mount and whenever paging, sort, or search changes
+    // fetch on mount and whenever paging, sort, filter or search changes
     useEffect(() => {
         getManageEndUser()
-    }, [page, pageSize, customSearch, sort])
+    }, [page, pageSize, customSearch, sort, filters])
     return (
         <div className="container-fluid">
             <div className="col mb-3">
@@ -215,6 +229,14 @@ export default function EndUser() {
                                     type: "numeric"
                                 }}
 
+
+                                filter={dataState.filter}
+                                filterOperators={{
+                                    text: [{ text: 'grid.filterContainsOperator', operator: 'contains' }],
+                                    numeric: [{ text: 'grid.filterEqOperator', operator: 'eq' }],
+                                    boolean: [{ text: 'grid.filterEqOperator', operator: 'eq' }]
+                                }}
+                                columnMenuIcon={filterIcon}
                                 onDataStateChange={handleGridDataStateChange}
                             >
                                 {
@@ -249,27 +271,37 @@ export default function EndUser() {
                                 <GridColumn
                                     field="firstName"
                                     title="First Name"
+                                    filter="text"
+                                    columnMenu={ColumnMenu}
                                 />
 
                                 <GridColumn
                                     field="lastName"
                                     title="Last Name"
+                                    filter="text"
+                                    columnMenu={ColumnMenu}
                                 />
 
                                 <GridColumn
                                     field="userName"
                                     title="Username"
+                                    filter="text"
+                                    columnMenu={ColumnMenu}
                                 />
 
                                 <GridColumn
                                     field="contactNumber"
                                     title="Phone"
+                                    filter="text"
+                                    columnMenu={ColumnMenu}
                                     cells={{ data: ContactCell }}
                                 />
 
                                 <GridColumn
                                     field="email"
                                     title="Email"
+                                    filter="text"
+                                    columnMenu={ColumnMenu}
                                 />
 
                                 <GridColumn
@@ -277,6 +309,9 @@ export default function EndUser() {
                                     title="Status"
                                     width="120px"
                                     sortable={true}
+                                    endUserPermission={endUserPermission}
+                                    filter="boolean"
+                                    columnMenu={ColumnMenu}
                                     cells={{ data: StatusCell }}
                                 />
 

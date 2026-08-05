@@ -1,10 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { Storage } from "../utils/storage";
 
 export const userSlice = createSlice({
     name: "user",
     initialState: {
         token: localStorage.getItem("TOKEN") ?? null,
-        permissions: JSON.parse(localStorage.getItem("PERMISSIONS")) ?? [],
+        permissions: Storage.get("PERMISSIONS") ?? [],
         permissionMap: JSON.parse(localStorage.getItem("PERMISSION_MAP")) ?? {}
     },
     reducers: {
@@ -18,13 +19,13 @@ export const userSlice = createSlice({
                 return acc;
             }, {});
             localStorage.setItem("TOKEN", state.token)
-            localStorage.setItem("PERMISSIONS", JSON.stringify(state.permissions))
+            Storage.set("PERMISSIONS", state.permissions);
             localStorage.setItem("PERMISSION_MAP", JSON.stringify(state.permissionMap));
         },
         logOut: (state, action) => {
             state.token = null
             localStorage.removeItem("TOKEN")
-            localStorage.removeItem("PERMISSIONS")
+            Storage.remove("PERMISSIONS")
             localStorage.removeItem("PERMISSION_MAP");
         }
     }

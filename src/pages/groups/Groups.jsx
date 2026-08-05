@@ -10,6 +10,9 @@ import SerachFilter from '../../components/common/SerachFilter';
 import useGridPagination from '../../hooks/useGridPagination'
 import { useSelector } from 'react-redux';
 import { MENU } from '../../data/Menu';
+import { filterIcon } from '@progress/kendo-svg-icons'
+import { ColumnMenu } from '../../components/grid/ColumnMenu'
+import { getBackendFilters } from '../../components/grid/GridFilter'
 const ActionCell = (props) => {
 
     return (
@@ -107,24 +110,45 @@ const UserNameCell = ({ tdProps, dataItem, field }) => {
     )
 }
 
-const MemberCell = ({ tdProps, dataItem, field }) => {
+const MemberCell = ({ tdProps, dataItem, field, permissions }) => {
+
+    const endUserPermission = permissions.find((value, index) => value.menuId === MENU.END_USER)
     return (
         <td {...tdProps}>
-            <Link className='text-primary text-decoration-underline' to={`/admin/groups/view/${dataItem?.id}/members`} >
-                {dataItem?.totalMember}
-            </Link>
+            {
+                endUserPermission?.canRead
+                    ?
+                    <Link className='text-primary text-decoration-underline' to={`/admin/groups/view/${dataItem?.id}/members`} >
+                        {dataItem?.totalMember}
+                    </Link>
+                    :
+                    <spam  >
+                        {dataItem?.totalMember}
+                    </spam>
+            }
+
         </td>
     )
 }
 
-const AvtivityCell = ({ tdProps, dataItem, field }) => {
+const AvtivityCell = ({ tdProps, dataItem, field, permissions }) => {
+    const activityPermission = permissions.find((value, index) => value.menuId === MENU.ACTIVITY)
     return (
         <td {...tdProps}>
-            <Link
-                className="text-primary text-decoration-underline"
-                to={`/admin/groups/activity/${dataItem?.id}`}>
-                {dataItem?.totalActivity}
-            </Link>
+            {
+                activityPermission?.canRead
+                    ?
+                    <Link
+                        className="text-primary text-decoration-underline"
+                        to={`/admin/groups/activity/${dataItem?.id}`}>
+                        {dataItem?.totalActivity}
+                    </Link>
+                    :
+                    <p>
+                        {dataItem?.totalActivity}
+                    </p>
+            }
+
         </td>
     )
 }
@@ -133,7 +157,9 @@ export default function Groups() {
     const [groupData, setgroupData] = useState([])
     const [searchText, setSearchText] = useState("")
     const [customSearch, setcustomSearch] = useState("")
+    const [filter, setFilter] = useState(null)
     const [totalRecords, settotalRecords] = useState(null)
+    const [filters, setFilters] = useState([])
     const {
         dataState,
         onDataStateChange,
@@ -151,34 +177,41 @@ export default function Groups() {
     console.log(grpPermission);
 
     const getGroups = async () => {
-        const res = await apiRequest("POST", API_ROUTES.groups.getGroups, { page, pageSize, customSearch, Sorts: sort }, null, {
+        const res = await apiRequest("POST", API_ROUTES.groups.getGroups, { page, pageSize, customSearch, Sorts: sort, Filters: filters }, null, {
             showLoader: true
         })
         setgroupData(res.data.data)
         settotalRecords(res.data.totalRecord)
     }
     const groupColumns = [
-        { field: "action", title: "Action", cell: ActionCell, width: "130px" },
-        { field: "groupName", title: "Group Name" },
-        { field: "groupImageFullUrl", title: "Group Image", cell: ImageCell, width: "130px" },
-        { field: "about", title: "About Group" },
-        { field: "isPublic", title: "Group Types", cell: GroupTypeCell },
-        { field: "totalMember", title: "Members", cell: MemberCell },
-        { field: "totalActivity", title: "Activities", cell: AvtivityCell },
-        { field: "totalReport", title: "Reported" },
-        { field: "userName", title: "Created By", cell: UserNameCell },
-        { field: "createdOn", title: "createdOn", cell: DateCell }, ,
-        { field: "isActive", title: "Status", cell: StatusCell },
+        { field: "action", title: "Action", cell: ActionCell, width: "130px", filterable: false },
+        { field: "groupName", title: "Group Name", filter: "text", columnMenu: ColumnMenu },
+        { field: "groupImageFullUrl", title: "Group Image", cell: ImageCell, width: "130px", filterable: false },
+        { field: "about", title: "About Group", filter: "text", columnMenu: ColumnMenu },
+        { field: "isPublic", title: "Group Types", cell: GroupTypeCell, filter: "boolean" },
+        { field: "totalMember", title: "Members", cell: MemberCell, filter: "numeric", columnMenu: ColumnMenu },
+        { field: "totalActivity", title: "Activities", cell: AvtivityCell, filter: "numeric", columnMenu: ColumnMenu },
+        { field: "totalReport", title: "Reported", filter: "numeric", columnMenu: ColumnMenu },
+        { field: "userName", title: "Created By", cell: UserNameCell, filter: "text", columnMenu: ColumnMenu },
+        { field: "createdOn", title: "createdOn", cell: DateCell, filterable: false },
+        { field: "isActive", title: "Status", cell: StatusCell, filter: "boolean" },
     ]
 
     const handleGridDataStateChange = (event) => {
         onDataStateChange(event)
         setKendoSort(event.dataState?.sort || [])
+
+        const nextFilter = event.dataState?.filter
+        if (nextFilter) {
+            setFilters(getBackendFilters(nextFilter))
+        } else {
+            setFilters([])
+        }
     }
 
     useEffect(() => {
         getGroups()
-    }, [page, pageSize, customSearch, sort])
+    }, [page, pageSize, customSearch, sort, filters])
 
     return (
         <div className="container-fluid">
@@ -212,10 +245,19 @@ export default function Groups() {
                                 <Grid
                                     className="table-wrapper  text-center"
                                     data={groupData}
+                                    total={totalRecords}
                                     skip={dataState.skip}
                                     take={dataState.take}
                                     sortable={{ allowUnsort: true, mode: 'single' }}
                                     sort={kendoSort}
+
+                                    filter={dataState.filter}
+                                    filterOperators={{
+                                        text: [{ text: 'grid.filterContainsOperator', operator: 'contains' }],
+                                        numeric: [{ text: 'grid.filterEqOperator', operator: 'eq' }],
+                                        boolean: [{ text: 'grid.filterEqOperator', operator: 'eq' }]
+                                    }}
+                                    columnMenuIcon={filterIcon}
                                     pageable={{
                                         buttonCount: 5,
                                         pageSizes: [10, 20, 50],
@@ -234,6 +276,9 @@ export default function Groups() {
                                             title={col.title}
                                             width={col.width || "150px"}
                                             sortable={col.field === 'action' || col.field == 'groupImageFullUrl' ? false : true}
+                                            filterable={col.filter !== false}
+                                            filter={col.filter}
+                                            columnMenu={col.columnMenu ? ColumnMenu : undefined}
                                             cells={
                                                 col.cell
                                                     ? {
@@ -242,6 +287,7 @@ export default function Groups() {
                                                                 {...props}
                                                                 grpPermission={grpPermission}
                                                                 getGroups={getGroups}
+                                                                permissions={permissions}
                                                             />
                                                         )
                                                     }

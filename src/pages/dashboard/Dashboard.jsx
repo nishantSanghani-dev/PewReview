@@ -5,6 +5,8 @@ import TopLikedPost from './TopLikedPost'
 import TotalReportedPost from './TotalReportedPost'
 import { Link } from 'react-router-dom'
 import AleartDialog from '../../components/common/AleartDialog'
+import { usePermission } from '../../hooks/UsePermission'
+import { MENU } from '../../data/Menu'
 
 
 export default function Dashboard() {
@@ -18,6 +20,10 @@ export default function Dashboard() {
     const [topReportingUsers, settopReportingUsers] = useState([])
     const [topReportedPosts, settopReportedPosts] = useState([])
     const today = new Date().toISOString().split("T")[0];
+    const permission = usePermission()
+    const dashboardPermission = permission.find((value, index) => value.menuId === MENU.DASHBOARD)
+    console.log(dashboardPermission);
+    
     const formatDate = (value) => {
         if (!value) return "";
 
@@ -241,8 +247,8 @@ export default function Dashboard() {
                             <div className="row mt-3">
                                 <div className="col-12">
                                     <div className="table-responsive">
-                                      
-                                        <TopLikedPost topLikedPost={topLikedPost} />
+
+                                        <TopLikedPost dashboardPermission={dashboardPermission} topLikedPost={topLikedPost} />
                                     </div>
                                 </div>
                             </div>
@@ -326,7 +332,7 @@ export default function Dashboard() {
                             <div className="row mt-3">
                                 <div className="col-12">
                                     <div className="table-responsive">
-                                        <TotalReportedPost filter={filter} topReportedPosts={topReportedPosts} />
+                                        <TotalReportedPost dashboardPermission={dashboardPermission} filter={filter} topReportedPosts={topReportedPosts} />
                                         {/* <table className="table table-bordered mb-0">
                                         <thead className="table-light">
                                             <tr>

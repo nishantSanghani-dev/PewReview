@@ -88,7 +88,7 @@ const ReportedCell = ({ tdProps, dataItem, isOpenReportedPerson, setisOpenReport
 };
 
 
-export default function TotalReportedPost({ topReportedPosts, filter }) {
+export default function TotalReportedPost({ topReportedPosts, filter, dashboardPermission }) {
   // console.log(topReportedPosts);
   const [isOpenReportedPerson, setisOpenReportedPerson] = useState(false)
   const reportedColumns = [
@@ -130,6 +130,7 @@ export default function TotalReportedPost({ topReportedPosts, filter }) {
                   data: (props) => (
                     <col.cell
                       {...props}
+                      dashboardPermission={dashboardPermission}
                       isOpenReportedPerson={isOpenReportedPerson}
                       setisOpenReportedPerson={setisOpenReportedPerson}
                       filter={filter}

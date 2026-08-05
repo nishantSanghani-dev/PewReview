@@ -8,31 +8,40 @@ import { handleDelete } from '../../../utils/DeleteRecords';
 import BreadCumb from '../../../components/common/breadCumb/BreadCumb';
 import SerachFilter from '../../../components/common/SerachFilter';
 import useGridPagination from '../../../hooks/useGridPagination';
+import { ColumnMenu } from '../../../components/grid/ColumnMenu';
+import { filterIcon } from '@progress/kendo-svg-icons';
+import { usePermission } from '../../../hooks/UsePermission';
+import { MENU } from '../../../data/Menu';
 const ActionCell = (props) => {
     const item = props.dataItem;
     return (
         <td {...props.tdProps}>
             <span className="d-flex gap-2 align-items-center">
+                {
+                    props.gunMasterPermission.canUpdate
+                    &&
 
-                <button
-                    // onClick={() => {
-                    //     props.setismanufacturerOpen(true)
-                    //     props.setid(item.id)
-                    // }}
+                    <button
 
-                    className="small-square-btn edit-btn"
 
-                >
-                    <i className="demo-icon icon-edit-1" />
-                </button>
+                        className="small-square-btn edit-btn"
 
-                <button
-                    onClick={() => handleDelete(item.gunId, "gun", "gunDelete", props.getGun)}
-                    type="button"
-                    className="small-square-btn danger-btn"
-                >
-                    <i className="demo-icon icon-delete-1" />
-                </button>
+                    >
+                        <i className="demo-icon icon-edit-1" />
+                    </button>
+                }
+                {
+                    props.gunMasterPermission.canDelete
+                    &&
+
+                    <button
+                        onClick={() => handleDelete(item.gunId, "gun", "gunDelete", props.getGun)}
+                        type="button"
+                        className="small-square-btn danger-btn"
+                    >
+                        <i className="demo-icon icon-delete-1" />
+                    </button>
+                }
 
 
             </span>
@@ -44,6 +53,7 @@ const StatusCell = (props) => {
         <td {...props.tdProps}>
             <div className="form-check form-switch mb-0">
                 <input
+                    disabled={!props.gunMasterPermission.canUpdate}
                     className="form-check-input"
                     type="checkbox"
                     checked={props.dataItem.isActive}
@@ -83,14 +93,14 @@ const DetailCell = ({ tdProps, dataItem, field }) => {
         </td>
     )
 }
-const ApprovalStatusCell = ({ tdProps, dataItem, statusOptions }) => {
+const ApprovalStatusCell = ({ tdProps, dataItem, statusOptions, gunMasterPermission }) => {
 
 
     return (
         <td {...tdProps}>
             <div className="approval-status-wrapper">
 
-                <select className="approval-status-select" defaultValue={dataItem.status}>
+                <select disabled={!gunMasterPermission.canUpdate} className="approval-status-select" defaultValue={dataItem.status}>
                     <option value="">{dataItem.approvalStatusName}</option>
                     {statusOptions && statusOptions.map((status, index) => (
                         <option disabled={dataItem.status === status.description} key={index} value={status}>
@@ -107,6 +117,7 @@ export default function GunMaster() {
     const [statusOptions, setstatusOptions] = useState([])
     const [searchText, setSearchText] = useState("")
     const [customSearch, setcustomSearch] = useState("")
+    const [filters, setFilters] = useState([])
     const {
         dataState,
         onDataStateChange,
@@ -117,25 +128,38 @@ export default function GunMaster() {
         kendoSort,
         setKendoSort,
     } = useGridPagination(10)
+
+    const persmission = usePermission()
+    const gunMasterPermission = persmission.find((value, index) => value.menuId === MENU.GUN_MASTER)
     const getGun = async () => {
-        const res = await apiRequest("POST", API_ROUTES.gun.getGun, { page, pageSize, customSearch, Sorts: sort }, null, {
+        const res = await apiRequest("POST", API_ROUTES.gun.getGun, { page, pageSize, customSearch, Sorts: sort, Filters: filters }, null, {
             showLoader: true
         })
         setgunData(res.data.data)
     }
     const gunCoulmn = [
-        { field: "action", title: "Action", cell: ActionCell, width: "100px" },
-        { field: "gunName", title: "Gun Name" },
-        { field: "categoryNames", title: "Category Names" },
-        { field: "manufacturerNames", title: "Manufacturer Names", width: "220px" },
-        { field: "details", title: "Details", cell: DetailCell },
+        ...(gunMasterPermission?.canUpdate || gunMasterPermission?.canDelete
+            ? [
+                {
+                    field: "action",
+                    title: "Action",
+                    cell: ActionCell,
+                    width: "100px",
+                },
+            ]
+            : []),
+
+        { field: "gunName", title: "Gun Name", filter: "text", columnMenu: ColumnMenu },
+        { field: "categoryNames", title: "Category Names", filter: "text", columnMenu: ColumnMenu },
+        { field: "manufacturerNames", title: "Manufacturer Names", width: "220px", filter: "text", columnMenu: ColumnMenu },
+        { field: "details", title: "Details", cell: DetailCell, filter: "text", columnMenu: ColumnMenu },
         { field: "attachmentFullPath", title: "Images", cell: ImageCell },
-        { field: "createdByUserName", title: "Creadted By" },
-        { field: "Created On", title: "updatedOn", cell: DateCell },
-        { field: "updatedByUserName", title: "Modified By" },
-        { field: "approvalStatusName", title: "Approval Status", cell: ApprovalStatusCell },
-        { field: "isActive", title: "Status", cell: StatusCell }
-    ]
+        { field: "createdByUserName", title: "Created By", filter: "text", columnMenu: ColumnMenu },
+        { field: "Created On", title: "Updated On", cell: DateCell, filter: "text", columnMenu: ColumnMenu },
+        { field: "updatedByUserName", title: "Modified By", filter: "text", columnMenu: ColumnMenu },
+        { field: "approvalStatusName", title: "Approval Status", cell: ApprovalStatusCell, filter: "text", columnMenu: ColumnMenu },
+        { field: "isActive", title: "Status", cell: StatusCell, filter: "boolean", columnMenu: ColumnMenu }
+    ];
     const getSuppportStatus = async () => {
         const res = await apiRequest("GET", API_ROUTES.common.getSupportStatus, null, null, {
             showLoader: true
@@ -147,12 +171,18 @@ export default function GunMaster() {
     const handleGridDataStateChange = (event) => {
         onDataStateChange(event)
         setKendoSort(event.dataState?.sort || [])
+        const nextFilter = event.dataState?.filter
+        if (nextFilter) {
+            setFilters(getBackendFilters(nextFilter))
+        } else {
+            setFilters([])
+        }
     }
 
     useEffect(() => {
         getGun()
         getSuppportStatus()
-    }, [page, pageSize, customSearch, sort])
+    }, [page, pageSize, customSearch, sort, filters])
     return (
         <div className="container-fluid">
             <div className="mb-3 activity-breadcrumb">
@@ -196,6 +226,13 @@ export default function GunMaster() {
                                 data={gunData}
                                 skip={dataState.skip}
                                 take={dataState.take}
+                                filter={dataState.filter}
+                                filterOperators={{
+                                    text: [{ text: 'grid.filterContainsOperator', operator: 'contains' }],
+                                    numeric: [{ text: 'grid.filterEqOperator', operator: 'eq' }],
+                                    boolean: [{ text: 'grid.filterEqOperator', operator: 'eq' }]
+                                }}
+                                columnMenuIcon={filterIcon}
                                 sortable={{ allowUnsort: true, mode: 'single' }}
                                 sort={kendoSort}
                                 pageable={{
@@ -215,7 +252,7 @@ export default function GunMaster() {
                                                 field={col.field}
                                                 title={col.title}
                                                 width={col.width || "150px"}
-                                                sortable={col.field === 'action' || col.field=='attachmentFullPath' ? false : true}
+                                                sortable={col.field === 'action' || col.field == 'attachmentFullPath' ? false : true}
                                                 pageable={{
                                                     buttonCount: 4,
                                                     pageSizes: [20, 50, 200],
@@ -228,6 +265,7 @@ export default function GunMaster() {
                                                         ? {
                                                             data: (props) => (
                                                                 <col.cell
+                                                                    gunMasterPermission={gunMasterPermission}
                                                                     {...props}
                                                                     statusOptions={statusOptions}
                                                                     getGun={getGun}

@@ -84,11 +84,20 @@ export default function RoleAndPermissionAdd() {
             permissions
         }
         console.log(payload);
+        let res
 
-        const res = await apiRequest("POST", API_ROUTES.role.roleAdd, payload, null, {
-            showLoader: true,
-            showToaster: true
-        })
+        if (id) {
+            res = await apiRequest("PUT", API_ROUTES.role.roleEdit(id), payload, null, {
+                showLoader: true,
+                showToaster: true
+            })
+        }
+        else {
+            res = await apiRequest("POST", API_ROUTES.role.roleAdd, payload, null, {
+                showLoader: true,
+                showToaster: true
+            })
+        }
         if (res.status) {
             navigate("/admin/role-and-permission/view")
         }

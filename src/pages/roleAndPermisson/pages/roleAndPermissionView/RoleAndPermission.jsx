@@ -9,6 +9,9 @@ import { handleStatusChange } from '../../../../utils/ChangeStatus'
 import SerachFilter from '../../../../components/common/SerachFilter'
 import { usePermission } from '../../../../hooks/UsePermission'
 import { MENU } from '../../../../data/Menu'
+import { filterIcon } from '@progress/kendo-svg-icons'
+import { ColumnMenu, ColumnMenuCheckboxFilter } from '../../../../components/grid/ColumnMenu'
+import { getBackendFilters } from '../../../../components/grid/GridFilter'
 const RoleActionCell = (props) => {
     const item = props.dataItem;
 
@@ -84,6 +87,7 @@ export default function RoleAndPermission() {
     const permission = usePermission()
     const rolePermission = permission.find((value, index) => value.menuId === MENU.ROLE)
     console.log(rolePermission);
+
 
     const getRole = async () => {
         const page = Math.floor(dataState.skip / dataState.take) + 1
@@ -189,9 +193,14 @@ export default function RoleAndPermission() {
                                 sortable={{ allowUnsort: true, mode: 'single' }}
 
                                 sort={kendoSort}
-                                filterable={true}
-                                filter={dataState.filter}
 
+                                autoProcessData={true}
+                                filter={dataState.filter}
+                                filterOperators={{
+                                    text: [{ text: 'grid.filterContainsOperator', operator: 'contains' }],
+                                    boolean: [{ text: 'grid.filterEqOperator', operator: 'eq' }]
+                                }}
+                                columnMenuIcon={filterIcon}
                                 pageable={{
                                     buttonCount: 5,
                                     pageSizes: [10, 1, 20, 50],
@@ -223,20 +232,10 @@ export default function RoleAndPermission() {
 
                                     const nextFilter = e.dataState.filter;
 
-                                    if (nextFilter && nextFilter.filters.length > 0) {
-
-                                        setFilters(
-                                            nextFilter.filters.map((item) => ({
-                                                Field: item.field,
-                                                Value: item.value,
-                                                OperatorType: 8
-                                            }))
-                                        );
-
+                                    if (nextFilter) {
+                                        setFilters(getBackendFilters(nextFilter));
                                     } else {
-
                                         setFilters([]);
-
                                     }
                                 }}
                             >
@@ -247,9 +246,11 @@ export default function RoleAndPermission() {
                                     &&
 
                                     <GridColumn
+
                                         title="Action"
                                         width="120px"
                                         sortable={false}
+                                        filterable={false}
                                         cells={{
                                             data: (props) => (
                                                 <RoleActionCell
@@ -263,27 +264,33 @@ export default function RoleAndPermission() {
                                 }
 
                                 <GridColumn
+                                    columnMenu={ColumnMenu}
                                     field="role"
                                     title="Role Name"
                                     width={"320px"}
+                                    filter="text"
                                 />
 
                                 <GridColumn
+                                    columnMenu={ColumnMenu}
                                     field="description"
                                     title="Description"
                                     width="500px"
                                 />
 
                                 <GridColumn
+                                
                                     field="noOfUser"
                                     title="No. of Users"
                                     width="190px"
                                 />
 
                                 <GridColumn
+                                    columnMenu={ColumnMenu}
                                     field='isActive'
                                     title="Status"
                                     width="107px"
+                                    filter="boolean"
                                     cells={{
                                         data: (props) => (
                                             <RoleStatusCell

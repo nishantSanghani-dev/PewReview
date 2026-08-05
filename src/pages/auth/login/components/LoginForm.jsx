@@ -6,7 +6,7 @@ import { loginService } from '../../../../services/login.service';
 import { toast } from 'react-toastify';
 import { apiRequest } from '../../../../services/Api';
 import { API_ROUTES } from '../../../../routes/api.routes';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logIn } from '../../../../slice/user.slice';
 export default function LoginForm() {
@@ -31,8 +31,10 @@ export default function LoginForm() {
         })
         console.log(res);
         if (res.status) {
-            dispatch(logIn({ token: res.data.token ,permission:res.data.userDetails
-.menuPermissions}))
+            dispatch(logIn({
+                token: res.data.token, permission: res.data.userDetails
+                    .menuPermissions
+            }))
             navigate("/admin/dashboard")
         }
 
@@ -78,9 +80,9 @@ export default function LoginForm() {
                 </div>
                 <div className="col-12 form-group">
                     <p className="m-0 d-flex flex-wrap justify-content-center gap-1">
-                        <a href="#" className="basic-links dark-links fw-bold">
+                        <Link to={'/forgot-password'} className="basic-links dark-links fw-bold">
                             Forgot Password?
-                        </a>
+                        </Link>
                         <span className="fw-medium">
                             Click here to recover password
                         </span>
