@@ -7,6 +7,7 @@ import GunDetails from '../../../../components/common/gunDetails/GunDetails';
 import { apiRequest } from '../../../../services/Api';
 import { API_ROUTES } from '../../../../routes/api.routes';
 import { useSelector } from 'react-redux';
+import useUserPermission from '../../../../utils/UserPermission';
 
 
 const ActionCell = (props) => {
@@ -15,13 +16,18 @@ const ActionCell = (props) => {
     return (
         <td {...props.tdProps}>
             <div className="d-flex gap-2 align-items-center">
+                {
+                    props.venuePermission?.canRead
+                    &&
 
-                <Link to={`/admin/venues/view/${props.dataItem.venueId}`}
+                    <Link to={`/admin/venues/view/${props.dataItem.venueId}`}
 
-                    className="small-square-btn edit-btn"
-                >
-                    <i className="demo-icon icon-eye-line"></i>
-                </Link>
+                        className="small-square-btn edit-btn"
+                    >
+                        <i className="demo-icon icon-eye-line"></i>
+                    </Link>
+                }
+                
                 <a
                     href="javascript:void(0)"
                     className="small-square-btn edit-btn"
@@ -75,8 +81,8 @@ const WebsiteCell = ({ tdProps, dataItem, field }) => (
 export default function Venues({ data }) {
     const [showGunDetails, setShowGunDetails] = useState(false);
     const [gunDetailsData, setgunDetailsData] = useState([])
-    
-    
+
+    const { venuePermission } = useUserPermission()
     const getVenueGunDetails = async (venueId) => {
         const res = await apiRequest("GET", API_ROUTES.venue.getVenueGunDetails, null, {
             venueId
@@ -88,7 +94,7 @@ export default function Venues({ data }) {
     }
     const GunCell = ({ tdProps, dataItem, setShowGunDetails }) => {
         console.log(dataItem.venueId);
-
+        const { gunMasterPermission } = useUserPermission()
         useEffect(() => {
             console.log(showGunDetails);
 
@@ -97,16 +103,23 @@ export default function Venues({ data }) {
             <>
                 <td {...tdProps}>
                     <div>
-                        <Link
-                            onClick={() => {
-                                setShowGunDetails(true)
-                                getVenueGunDetails(dataItem.venueId)
-                            }}
-                            className="text-primary"
-                            style={{ cursor: "pointer" }}
-                        >
-                            {dataItem.totalGun || "-"}
-                        </Link>
+                        {
+                            gunMasterPermission?.canRead
+                                ?
+
+                                <Link
+                                    onClick={() => {
+                                        setShowGunDetails(true)
+                                        getVenueGunDetails(dataItem.venueId)
+                                    }}
+                                    className="text-primary"
+                                    style={{ cursor: "pointer" }}
+                                >
+                                    {dataItem.totalGun || "-"}
+                                </Link>
+                                :
+                                <span>  {dataItem.totalGun || "-"}</span>
+                        }
                     </div>
                 </td>
 
@@ -173,6 +186,7 @@ export default function Venues({ data }) {
                                                     data: (props) => (
                                                         <col.cell
                                                             {...props}
+                                                            venuePermission={venuePermission}
                                                             setShowGunDetails={setShowGunDetails}
                                                         />
                                                     )

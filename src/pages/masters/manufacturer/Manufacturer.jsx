@@ -102,7 +102,13 @@ export default function Manufacturer() {
         setmanufacturerData(res.data.data)
     }
     const manufectureColumns = [
-        { field: "action", title: "Action", cell: ActionCell, width: "80px" },
+        ...(manufecturePermission?.canUpdate || manufecturePermission?.canDelete
+            ? [
+                 { field: "action", title: "Action", cell: ActionCell, width: "80px" },
+            ]
+            : []),
+
+       
         { field: "name", title: "Manufacturer Name", filter: "text", columnMenu: ColumnMenu },
         { field: "description", title: "Description", width: "250px", filter: "text", columnMenu: ColumnMenu },
         { field: "createdByUserName", title: "Created By", filter: "text", columnMenu: ColumnMenu },
@@ -174,7 +180,7 @@ export default function Manufacturer() {
                                     data={manufacturerData}
                                     skip={dataState.skip}
                                     take={dataState.take}
-                                
+
                                     filter={dataState.filter}
                                     filterOperators={{
                                         text: [{ text: 'grid.filterContainsOperator', operator: 'contains' }],

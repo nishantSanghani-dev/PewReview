@@ -5,8 +5,8 @@ export const userSlice = createSlice({
     name: "user",
     initialState: {
         token: localStorage.getItem("TOKEN") ?? null,
-        permissions: Storage.get("PERMISSIONS") ?? [],
-        permissionMap: JSON.parse(localStorage.getItem("PERMISSION_MAP")) ?? {}
+        permissions: Storage.get("PERMISSIONS") ?? []
+        // permissionMap: JSON.parse(localStorage.getItem("PERMISSION_MAP")) ?? {}
     },
     reducers: {
         logIn: (state, action) => {
@@ -14,19 +14,19 @@ export const userSlice = createSlice({
 
             state.token = action.payload.token
             state.permissions = action.payload.permission
-            state.permissionMap = action.payload.permission.reduce((acc, item) => {
-                acc[item.menuId] = item;
-                return acc;
-            }, {});
+            // state.permissionMap = action.payload.permission.reduce((acc, item) => {
+            //     acc[item.menuId] = item;
+            //     return acc;
+            // }, {});
             localStorage.setItem("TOKEN", state.token)
             Storage.set("PERMISSIONS", state.permissions);
-            localStorage.setItem("PERMISSION_MAP", JSON.stringify(state.permissionMap));
+            // localStorage.setItem("PERMISSION_MAP", JSON.stringify(state.permissionMap));
         },
         logOut: (state, action) => {
             state.token = null
             localStorage.removeItem("TOKEN")
             Storage.remove("PERMISSIONS")
-            localStorage.removeItem("PERMISSION_MAP");
+            // localStorage.removeItem("PERMISSION_MAP");
         }
     }
 

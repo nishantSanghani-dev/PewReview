@@ -15,20 +15,21 @@ import CategoryModel from './CategoryModel';
 import ManufacturerAdd from '../manufacturer/ManufacturerAdd';
 import { usePermission } from '../../../hooks/UsePermission'
 import { MENU } from '../../../data/Menu'
+import useUserPermission from '../../../utils/UserPermission'
 const ActionCell = (props) => {
     const item = props.dataItem;
     return (
         <td {...props.tdProps}>
             <span className="d-flex gap-2 align-items-center">
                 {
-                    props.categoryPermission.canUpdate
+                    props.gunCategoryMasterPermission.canUpdate
                     &&
                     <button className="small-square-btn edit-btn">
                         <i className="demo-icon icon-edit-1" />
                     </button>
                 }
                 {
-                    props.categoryPermission.canDelete
+                    props.gunCategoryMasterPermission.canDelete
                     &&
 
                     <button
@@ -50,7 +51,7 @@ const StatusCell = (props) => {
         <td {...props.tdProps}>
             <div className="form-check form-switch mb-0">
                 <input
-                    disabled={!props.categoryPermission.canUpdate}
+                    disabled={!props.gunCategoryMasterPermission.canUpdate}
                     className="form-check-input"
                     type="checkbox"
                     checked={props.dataItem.isActive}
@@ -85,8 +86,8 @@ export default function CategoryMaster() {
         setKendoSort,
     } = useGridPagination(10)
     const [isCategoryOpen, setisCategoryOpen] = useState(false)
-    const permission = usePermission()
-    const categoryPermission = permission.find((value, index) => value.menuId === MENU.GUN_CATEGORY_MASTER)
+
+    const { gunCategoryMasterPermission } = useUserPermission()
     const getCategoryMaster = async () => {
         const res = await apiRequest("POST", API_ROUTES.category.getCategoryMaster, { page, pageSize, customSearch, Sorts: sort, Filters: filters }, null, {
             showLoader: true
@@ -94,7 +95,7 @@ export default function CategoryMaster() {
         setcategoryMasterData(res.data.data)
     }
     const categoryMasterColumns = [
-        ...(categoryPermission?.canUpdate || categoryPermission?.canDelete
+        ...(gunCategoryMasterPermission?.canUpdate || gunCategoryMasterPermission?.canDelete
             ? [
                 { field: "action", title: "Action", cell: ActionCell, width: "100px" }
             ]
@@ -144,21 +145,26 @@ export default function CategoryMaster() {
                                 }}
                             />
                         </div>
-                        <div className="col-12 col-lg">
-                            <div className="btn-list d-flex justify-content-lg-end flex-wrap gap-2 gap-md-3 text-end">
+                        {
+                            gunCategoryMasterPermission?.canCreate
+                            &&
 
-                                <button
-                                    onClick={() => setisCategoryOpen(true)}
-                                    className="btn main-btn border-btn blue-btn"
-                                    style={{
-                                        background: "linear-gradient(90deg, rgb(193, 39, 45) 0%, rgb(0 0 0 / 92%) 100%)",
-                                        color: "white"
-                                    }}
-                                >
-                                    Add
-                                </button>
+                            <div className="col-12 col-lg">
+                                <div className="btn-list d-flex justify-content-lg-end flex-wrap gap-2 gap-md-3 text-end">
+
+                                    <button
+                                        onClick={() => setisCategoryOpen(true)}
+                                        className="btn main-btn border-btn blue-btn"
+                                        style={{
+                                            background: "linear-gradient(90deg, rgb(193, 39, 45) 0%, rgb(0 0 0 / 92%) 100%)",
+                                            color: "white"
+                                        }}
+                                    >
+                                        Add
+                                    </button>
+                                </div>
                             </div>
-                        </div>
+                        }
                     </div>
 
                     <div className="row">
@@ -210,7 +216,7 @@ export default function CategoryMaster() {
                                                                 data: (props) => (
                                                                     <col.cell
                                                                         {...props}
-                                                                        categoryPermission={categoryPermission}
+                                                                        gunCategoryMasterPermission={gunCategoryMasterPermission}
                                                                         getCategoryMaster={getCategoryMaster}
                                                                     />
                                                                 )

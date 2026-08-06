@@ -214,6 +214,7 @@ export default function ManageUser() {
                                                         <input
                                                             className="form-check-input"
                                                             type="checkbox"
+                                                            disabled={!manageUserPermission?.canUpdate}
                                                             checked={value.isActive}
                                                             onChange={(e) =>
                                                                 handleStatusChange(value.id, e.target.checked)

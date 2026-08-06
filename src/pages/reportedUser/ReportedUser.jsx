@@ -85,7 +85,7 @@ export default function ReportedUser() {
                                 data={reportUserData}
                                 skip={dataState.skip}
                                 take={dataState.take}
-                                filterable={true}
+                                
                                 filter={dataState.filter}
                                 filterOperators={{
                                     text: [{ text: 'grid.filterContainsOperator', operator: 'contains' }],

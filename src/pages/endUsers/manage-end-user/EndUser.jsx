@@ -139,7 +139,7 @@ export default function EndUser() {
             <td {...props.tdProps}>
                 <div className="form-check form-switch">
                     <input
-                        disabled={!props.endUserPermission?.canUpdate}
+                        disabled={!endUserPermission?.canUpdate}
                         className="form-check-input"
                         type="checkbox"
                         checked={item.isActive}

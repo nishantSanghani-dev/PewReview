@@ -67,6 +67,7 @@ const StatusCell = (props) => {
                 <input
                     className="form-check-input"
                     type="checkbox"
+                    disabled={!props.prohibitedPermission.canUpdate}
                     checked={props.dataItem.status}
                     readOnly
                     onChange={(e) => handleStatusChange(props.dataItem.id, e.target.checked, "prohibited", "prohibitedStatusChange", props.getProhibited)}
@@ -105,7 +106,12 @@ export default function Prohibited() {
     }
 
     const prohibitedColumns = [
-        { field: "action", title: "Action", cell: ActionCell, width: "100px" },
+        ...(prohibitedPermission?.canUpdate || prohibitedPermission?.canDelete
+            ? [
+                { field: "action", title: "Action", cell: ActionCell, width: "100px" },
+            ]
+            : []),
+
         { field: "words", title: "Prohibited Words", filter: "text", columnMenu: ColumnMenu },
         { field: "description", title: "Description", filter: "text", columnMenu: ColumnMenu },
         { field: "createdByUserName", title: "Created By", filter: "text", columnMenu: ColumnMenu },
@@ -215,6 +221,7 @@ export default function Prohibited() {
                                                                     data: (props) => (
                                                                         <col.cell
                                                                             {...props}
+                                                                            prohibitedPermission={prohibitedPermission}
                                                                             prohibitedPermission={prohibitedPermission}
                                                                             getProhibited={getProhibited}
                                                                             setisProhibitedOpen={setisProhibitedOpen}

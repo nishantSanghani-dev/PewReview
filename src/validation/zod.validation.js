@@ -19,6 +19,12 @@ export const loginSchema = z.object({
         ),
 })
 
+export const forgotPasswordSchema = z.object({
+    email: z
+        .string()
+        .email("Please enter a valid email address"),
+})
+
 export const roleSchema = z.object({
     roleName: z
         .string()

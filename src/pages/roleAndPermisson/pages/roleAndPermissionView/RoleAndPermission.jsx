@@ -79,7 +79,7 @@ export default function RoleAndPermission() {
     const [dataState, setDataState] = useState({ skip: 0, take: 10, filter: null })
     const [kendoSort, setKendoSort] = useState([])
     const [sort, setsort] = useState([])
-    const [filters, setFilters] = useState([]);
+    const [filters, setFilters] = useState(null);
     const sortPayload = useMemo(() => (kendoSort || []).map((item) => ({
         field: item.field,
         direction: item.dir === 'asc' ? 0 : 1,
@@ -92,8 +92,8 @@ export default function RoleAndPermission() {
     const getRole = async () => {
         const page = Math.floor(dataState.skip / dataState.take) + 1
         const payload = {
-            page,
-            pageSize: dataState.take,
+            Page: page,
+            PageSize: dataState.take,
             customSearch,
             Sorts: sortPayload,
             Filters: filters
@@ -235,32 +235,28 @@ export default function RoleAndPermission() {
                                     if (nextFilter) {
                                         setFilters(getBackendFilters(nextFilter));
                                     } else {
-                                        setFilters([]);
+                                        setFilters(null);
                                     }
                                 }}
                             >
                                 {
-                                    rolePermission.canDelete
-                                    &&
-                                    rolePermission.canUpdate
-                                    &&
-
-                                    <GridColumn
-
-                                        title="Action"
-                                        width="120px"
-                                        sortable={false}
-                                        filterable={false}
-                                        cells={{
-                                            data: (props) => (
-                                                <RoleActionCell
-                                                    {...props}
-                                                    onDelete={handleRoleDelete}
-                                                    rolePermission={rolePermission}
-                                                />
-                                            )
-                                        }}
-                                    />
+                                    (rolePermission?.canDelete || rolePermission?.canUpdate) && (
+                                        <GridColumn
+                                            title="Action"
+                                            width="120px"
+                                            sortable={false}
+                                            filterable={false}
+                                            cells={{
+                                                data: (props) => (
+                                                    <RoleActionCell
+                                                        {...props}
+                                                        onDelete={handleRoleDelete}
+                                                        rolePermission={rolePermission}
+                                                    />
+                                                ),
+                                            }}
+                                        />
+                                    )
                                 }
 
                                 <GridColumn
@@ -279,7 +275,7 @@ export default function RoleAndPermission() {
                                 />
 
                                 <GridColumn
-                                
+
                                     field="noOfUser"
                                     title="No. of Users"
                                     width="190px"

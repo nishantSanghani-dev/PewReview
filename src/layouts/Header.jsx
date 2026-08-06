@@ -15,7 +15,7 @@ export default function Header({ mobileSlideBar, setmobileSlideBar }) {
             useToken: true,
             showLoader: true,
         })
-        console.log(res);
+        // console.log(res);
         setuserData(res.data)
     }
     useEffect(() => {
@@ -23,10 +23,6 @@ export default function Header({ mobileSlideBar, setmobileSlideBar }) {
     }, [])
     return (
         <>
-            {
-                console.log(userData)
-
-            }
             <header>
                 <div className="container-fluid">
                     <div className="row justify-content-between align-items-center flex-row g-2 g-sm-3 g-xl-4">
@@ -98,8 +94,8 @@ export default function Header({ mobileSlideBar, setmobileSlideBar }) {
                                         className="dropdown-toggle"
                                         data-bs-toggle="dropdown"
                                     >
-                                        <img src={userData?.profileImageFullPath} alt="profile-avtar" />
-                                        <span>{userData?.firstName + userData?.lastName}</span>
+                                        <img src={userData?.profileImage ? userData?.profileImageFullPath : "https://pewdevadmin.alliancetek.net/assets/images/profile-img.png"} alt="profile-avtar" />
+                                        <span>{userData?.userName}</span>
                                     </a>
                                     <ul className="dropdown-menu">
                                         <li>

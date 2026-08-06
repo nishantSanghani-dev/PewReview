@@ -18,7 +18,7 @@ export const ActionCell = (props) => {
                     <i className="demo-icon icon-eye-line"></i>
                 </Link>
                 {
-                    props.eventPermission.canDelete
+                    props.eventPermission?.canDelete
                     &&
 
                     <button

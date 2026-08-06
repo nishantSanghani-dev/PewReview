@@ -12,6 +12,7 @@ import { ColumnMenu } from '../../../components/grid/ColumnMenu';
 import { filterIcon } from '@progress/kendo-svg-icons';
 import { usePermission } from '../../../hooks/UsePermission';
 import { MENU } from '../../../data/Menu';
+import useUserPermission from '../../../utils/UserPermission';
 const ActionCell = (props) => {
     const item = props.dataItem;
     return (
@@ -129,8 +130,9 @@ export default function GunMaster() {
         setKendoSort,
     } = useGridPagination(10)
 
-    const persmission = usePermission()
-    const gunMasterPermission = persmission.find((value, index) => value.menuId === MENU.GUN_MASTER)
+
+
+    const { gunMasterPermission } = useUserPermission()
     const getGun = async () => {
         const res = await apiRequest("POST", API_ROUTES.gun.getGun, { page, pageSize, customSearch, Sorts: sort, Filters: filters }, null, {
             showLoader: true
@@ -202,21 +204,26 @@ export default function GunMaster() {
                             }}
                         />
                     </div>
-                    <div className="col-12 col-lg">
-                        <div className="btn-list d-flex justify-content-lg-end flex-wrap gap-2 gap-md-3 text-end">
+                    {
+                        gunMasterPermission?.canCreate
+                        &&
 
-                            <button
-                                // onClick={() => setismanufacturerOpen(true)}
-                                className="btn main-btn border-btn blue-btn"
-                                style={{
-                                    background: "linear-gradient(90deg, rgb(193, 39, 45) 0%, rgb(0 0 0 / 92%) 100%)",
-                                    color: "white"
-                                }}
-                            >
-                                Add
-                            </button>
+                        <div className="col-12 col-lg">
+                            <div className="btn-list d-flex justify-content-lg-end flex-wrap gap-2 gap-md-3 text-end">
+
+                                <button
+                                    // onClick={() => setismanufacturerOpen(true)}
+                                    className="btn main-btn border-btn blue-btn"
+                                    style={{
+                                        background: "linear-gradient(90deg, rgb(193, 39, 45) 0%, rgb(0 0 0 / 92%) 100%)",
+                                        color: "white"
+                                    }}
+                                >
+                                    Add
+                                </button>
+                            </div>
                         </div>
-                    </div>
+                    }
                 </div>
                 <div className="row">
                     <div className="col-12 mt-3 mt-xxl-4">

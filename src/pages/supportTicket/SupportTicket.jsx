@@ -116,7 +116,7 @@ const DetailCell = ({ tdProps, dataItem, field }) => {
         </td>
     )
 }
-const ApprovalStatusCell = ({ tdProps, dataItem, statusOptions, getTickets }) => {
+const ApprovalStatusCell = ({ tdProps, dataItem, statusOptions, getTickets, supportTicketPermission }) => {
 
     const supportTicketAsyncEdit = async (id) => {
         const payload = {
@@ -139,7 +139,7 @@ const ApprovalStatusCell = ({ tdProps, dataItem, statusOptions, getTickets }) =>
         <td {...tdProps}>
             <div className="approval-status-wrapper">
 
-                <select onChange={(e) => supportTicketAsyncEdit(e.target.value)} className="approval-status-select" defaultValue={dataItem.status}>
+                <select disabled={!supportTicketPermission?.canUpdate} onChange={(e) => supportTicketAsyncEdit(e.target.value)} className="approval-status-select" defaultValue={dataItem.status}>
                     <option value="">{dataItem.status}</option>
                     {statusOptions && statusOptions.map((status, index) => (
                         <option disabled={dataItem.status === status.description} key={index} value={status.id}>
@@ -208,7 +208,16 @@ export default function SupportTicket() {
 
 
     const supportTicketsColumns = [
-        { field: "action", title: "Action", cell: ActionCell, width: "80px" },
+
+
+        ...(supportTicketPermission?.canUpdate || supportTicketPermission?.canDelete
+            ? [
+                { field: "action", title: "Action", cell: ActionCell, width: "80px" },
+            ]
+            : []),
+
+
+
         { field: "userName", title: "userName", width: "130px", filter: "text", columnMenu: ColumnMenu },
         { field: "emailePhone", title: "Email/Phone", width: "160px", cell: DetailCell, filter: "text", columnMenu: ColumnMenu },
         { field: "issueType", title: "Issue Type", filter: "text", columnMenu: ColumnMenu },
@@ -254,7 +263,7 @@ export default function SupportTicket() {
                                         take={dataState.take}
                                         sortable={{ allowUnsort: true, mode: 'single' }}
                                         sort={kendoSort}
-                                        filterable={true}
+
                                         filter={dataState.filter}
                                         filterOperators={{
                                             text: [{ text: 'grid.filterContainsOperator', operator: 'contains' }],

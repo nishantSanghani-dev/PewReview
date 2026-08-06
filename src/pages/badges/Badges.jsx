@@ -88,7 +88,11 @@ export default function Badges() {
     }
 
     const badgesColumns = [
-        { field: "action", title: "Action", cell: ActionCell, width: "70px" },
+        ...(badgePermission?.canUpdate || badgePermission?.canDelete
+            ? [
+                { field: "action", title: "Action", cell: ActionCell, width: "70px" },
+            ]
+            : []),
         { field: "imageName", title: "Images", cell: ImageCell, width: "80px" },
         { field: "name", title: "Name", width: "180px", filter: "text", columnMenu: ColumnMenu },
         { field: "applicableName", title: "Badge Applicable For", filter: "text", columnMenu: ColumnMenu },
@@ -175,7 +179,7 @@ export default function Badges() {
                                     data={badgesData}
                                     skip={dataState.skip}
                                     take={dataState.take}
-                              
+
                                     filter={dataState.filter}
                                     filterOperators={{
                                         text: [{ text: 'grid.filterContainsOperator', operator: 'contains' }],

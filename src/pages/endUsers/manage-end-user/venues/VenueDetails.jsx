@@ -7,12 +7,38 @@ import { API_ROUTES } from '../../../../routes/api.routes'
 import VenuesActivityTab from './VenuesActivityTab'
 import VenueEventsTab from './VenueEventsTab'
 import Events from '../Events'
+import useUserPermission from '../../../../utils/UserPermission'
+import { useSearchParams } from 'react-router-dom'
 export default function VenueDetails() {
-    const [isUpcomingEvent, setisUpcomingEvent] = useState(true)
+    const [searchParams, setSearchParams] = useSearchParams()
+    const queryTab = searchParams.get('tab')
+    const queryUpcoming = searchParams.get('upcoming')
     const { venueId } = useParams()
     const [venueDetailsData, setvenueDetailsData] = useState(null)
-    const [activeTab, setActiveTab] = useState("activities")
+    const [activeTabState, setActiveTabState] = useState("")
     const [activityTabData, setactivityTabData] = useState([])
+    const { activityPermission, eventPermission } = useUserPermission()
+    const allowedTabs = []
+    if (activityPermission?.canRead) allowedTabs.push("activities")
+    if (eventPermission?.canRead) allowedTabs.push("events")
+
+    const defaultTab = activityPermission?.canRead ? "activities" : eventPermission?.canRead ? "events" : ""
+
+    const activeTab = allowedTabs.includes(queryTab) ? queryTab : (activeTabState || defaultTab)
+
+    const isUpcomingEvent = queryUpcoming === 'false' ? false : queryUpcoming === 'null' ? null : true
+
+    const setTab = (tab) => {
+        const upcoming = String(isUpcomingEvent)
+        if (queryTab === tab && queryUpcoming === upcoming) return
+        setSearchParams({ tab, upcoming })
+    }
+
+    const updateUpcomingEvent = (value) => {
+        const upcoming = String(value)
+        if (queryTab === activeTab && queryUpcoming === upcoming) return
+        setSearchParams({ tab: activeTab, upcoming })
+    }
     const getVenueDetails = async () => {
         const res = await apiRequest("GET", API_ROUTES.venue.getVenueById(venueId), null, null, {
             showLoader: true
@@ -30,17 +56,28 @@ export default function VenueDetails() {
         })
         setactivityTabData(res.data.data)
     }
+
     useEffect(() => {
-        if (venueId) {
-            getVenueDetails()
-            if (activeTab == "activities") {
-                getVenueActivity()
-            }
-            else {
-                getEvents()
+        // Sync initial local active tab state when permissions load
+        if (!activeTabState && defaultTab) {
+            setActiveTabState(defaultTab)
+            if (!queryTab || !allowedTabs.includes(queryTab)) {
+                setSearchParams({ tab: defaultTab, upcoming: String(isUpcomingEvent) })
             }
         }
-    }, [venueId, activeTab, isUpcomingEvent])
+    }, [activityPermission, eventPermission, activeTabState, defaultTab, queryTab, allowedTabs, isUpcomingEvent, setSearchParams])
+
+    useEffect(() => {
+        if (!venueId) return
+
+        getVenueDetails()
+
+        if (activeTab === "activities" && activityPermission?.canRead) {
+            getVenueActivity()
+        } else if (activeTab === "events" && eventPermission?.canRead) {
+            getEvents()
+        }
+    }, [venueId, activeTab, isUpcomingEvent, activityPermission, eventPermission])
 
     return (
         <div className="container-fluid venue-page">
@@ -216,43 +253,52 @@ export default function VenueDetails() {
                     <div className="col-12">
 
                         <ul className="nav nav-tabs" id="myTab" role="tablist">
-                            <li className="nav-item" role="presentation">
-                                <button
-                                    onClick={() => setActiveTab("activities")}
-                                    className={`nav-link ${activeTab === "activities" ? "active" : ""}`}
-                                    id="nav-one-tab"
-                                    type="button"
-                                    role="tab"
-                                    aria-selected={activeTab === "activities"}
-                                >
-                                    Activities
-                                </button>
-                            </li>
+                            {
+                                activityPermission?.canRead
+                                &&
 
-                            <li className="nav-item" role="presentation">
-                                <button
-                                    onClick={() => setActiveTab("events")}
-                                    className={`nav-link ${activeTab === "events" ? "active" : ""}`}
-                                    id="nav-two-tab"
-                                    type="button"
-                                    role="tab"
-                                    aria-selected={activeTab === "events"}
-                                >
-                                    Events
-                                </button>
-                            </li>
+                                <li className="nav-item" role="presentation">
+                                    <button
+                                        onClick={() => setTab("activities")}
+                                        className={`nav-link ${activeTab === "activities" ? "active" : ""}`}
+                                        id="nav-one-tab"
+                                        type="button"
+                                        role="tab"
+                                        aria-selected={activeTab === "activities"}
+                                    >
+                                        Activities
+                                    </button>
+                                </li>
+                            }
+                            {
+                                eventPermission?.canRead
+                                &&
+
+                                <li className="nav-item" role="presentation">
+                                    <button
+                                        onClick={() => setTab("events")}
+                                        className={`nav-link ${activeTab === "events" ? "active" : ""}`}
+                                        id="nav-two-tab"
+                                        type="button"
+                                        role="tab"
+                                        aria-selected={activeTab === "events"}
+                                    >
+                                        Events
+                                    </button>
+                                </li>
+                            }
                         </ul>
                     </div>
                 </div>
             </div>
 
             <div className="tab-content accordion" id="myTabContent">
-                {activeTab === "activities" && (
+                {activeTab === "activities" && activityPermission?.canRead && (
                     <VenuesActivityTab activityTabData={activityTabData} />
                 )}
 
-                {activeTab === "events" && (
-                    <Events isUpcomingEvent={isUpcomingEvent} setisUpcomingEvent={setisUpcomingEvent} data={activityTabData} />
+                {activeTab === "events" && eventPermission?.canRead && (
+                    <Events isUpcomingEvent={isUpcomingEvent} setisUpcomingEvent={updateUpcomingEvent} data={activityTabData} />
                 )}
             </div>
 

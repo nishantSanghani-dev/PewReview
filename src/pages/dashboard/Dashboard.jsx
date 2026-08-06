@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom'
 import AleartDialog from '../../components/common/AleartDialog'
 import { usePermission } from '../../hooks/UsePermission'
 import { MENU } from '../../data/Menu'
+import useUserPermission from '../../utils/UserPermission'
 
 
 export default function Dashboard() {
@@ -20,10 +21,10 @@ export default function Dashboard() {
     const [topReportingUsers, settopReportingUsers] = useState([])
     const [topReportedPosts, settopReportedPosts] = useState([])
     const today = new Date().toISOString().split("T")[0];
-    const permission = usePermission()
-    const dashboardPermission = permission.find((value, index) => value.menuId === MENU.DASHBOARD)
-    console.log(dashboardPermission);
-    
+   
+    const { dashboardPermission, activityPermission, reportPermission } = useUserPermission()
+
+
     const formatDate = (value) => {
         if (!value) return "";
 
@@ -239,9 +240,14 @@ export default function Dashboard() {
                                     <h3 className="fw-bold theme-color">Most Liked Posts</h3>
                                 </div>
                                 <div className="col-auto">
-                                    <Link className="basic-links" to={'/admin/activity/view'}>
-                                        View All
-                                    </Link>
+                                    {
+                                        activityPermission?.canRead
+                                        &&
+
+                                        <Link className="basic-links" to={'/admin/activity/view'}>
+                                            View All
+                                        </Link>
+                                    }
                                 </div>
                             </div>
                             <div className="row mt-3">
@@ -259,9 +265,14 @@ export default function Dashboard() {
                                     <h3 className="fw-bold theme-color">Most Reported Users</h3>
                                 </div>
                                 <div className="col-auto">
-                                    <Link className="basic-links" to={'/admin/reported-user'}>
-                                        View All
-                                    </Link>
+                                    {
+                                        reportPermission?.canRead
+                                        &&
+
+                                        <Link className="basic-links" to={'/admin/reported-user'}>
+                                            View All
+                                        </Link>
+                                    }
                                 </div>
                             </div>
                             <div className="row mt-3">
@@ -324,9 +335,14 @@ export default function Dashboard() {
                                     </h3>
                                 </div>
                                 <div className="col-auto">
-                                    <Link className="basic-links" to={'/admin/activity/view'}>
-                                        View All
-                                    </Link>
+                                    {
+                                        activityPermission?.canRead
+                                        &&
+
+                                        <Link className="basic-links" to={'/admin/activity/view'}>
+                                            View All
+                                        </Link>
+                                    }
                                 </div>
                             </div>
                             <div className="row mt-3">

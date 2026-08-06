@@ -36,6 +36,8 @@ import LeaderBoard from "../pages/leaderboards/LeaderBoard";
 import AuthLayouts from "../layouts/authLayouts";
 import Profile from "../pages/profile/Profile";
 import ForgotPassword from "../pages/auth/forgot-password/ForgotPassword";
+import PermissionRoute from "./PermissionRoute";
+import { MENU } from "../data/Menu";
 
 export const routes = createBrowserRouter([
     {
@@ -63,22 +65,38 @@ export const routes = createBrowserRouter([
             },
             {
                 path: "dashboard",
-                element: <Dashboard />,
+                element: (
+                    <PermissionRoute menuId={MENU.DASHBOARD}>
+                        <Dashboard />
+                    </PermissionRoute>
+                ),
             },
             {
                 path: "user",
                 children: [
                     {
                         path: "manage-user",
-                        element: <ManageUser />,
+                        element: (
+                            <PermissionRoute menuId={MENU.USER}>
+                                <ManageUser />
+                            </PermissionRoute>
+                        ),
                     },
                     {
                         path: "add",
-                        element: <UserAdd />
+                        element: (
+                            <PermissionRoute menuId={MENU.USER}>
+                                <UserAdd />
+                            </PermissionRoute>
+                        )
                     },
                     {
                         path: "edit/:id",
-                        element: <UserAdd />
+                        element: (
+                            <PermissionRoute menuId={MENU.USER}>
+                                <UserAdd />
+                            </PermissionRoute>
+                        )
                     }
                 ]
             },
@@ -88,11 +106,19 @@ export const routes = createBrowserRouter([
                 children: [
                     {
                         path: "view",
-                        element: <Activity />
+                        element: (
+                            <PermissionRoute menuId={MENU.ACTIVITY}>
+                                <Activity />
+                            </PermissionRoute>
+                        )
                     },
                     {
                         path: "view/:id",
-                        element: <ActivityDetails />
+                        element: (
+                            <PermissionRoute menuId={MENU.ACTIVITY}>
+                                <ActivityDetails />
+                            </PermissionRoute>
+                        )
                     }
                 ]
             },
@@ -101,44 +127,83 @@ export const routes = createBrowserRouter([
                 children: [
                     {
                         path: "view",
-                        element: <Event />
+                        element: (
+                            <PermissionRoute menuId={MENU.EVENT}>
+                                <Event />
+                            </PermissionRoute>
+                        )
                     },
                     {
                         path: "view/:id",
-                        element: <EventDetails />
+                        element: (
+                            <PermissionRoute menuId={MENU.EVENT}>
+                                <EventDetails />
+                            </PermissionRoute>
+                        )
                     }
                 ]
             },
             {
                 path: "manage-end-user",
-                element: <EndUser />
+                element: (
+                    <PermissionRoute menuId={MENU.END_USER}>
+                        <EndUser />
+                    </PermissionRoute>
+                )
             },
             {
                 path: "manage-end-user/view/:id",
-                element: <EndUserView />
+                element: (
+                    <PermissionRoute menuId={MENU.END_USER}>
+                        <EndUserView />
+                    </PermissionRoute>
+                )
             },
             {
                 path: "messages",
-                element: <Messages />
+                element: (
+                    <PermissionRoute menuId={MENU.MESSAGE}>
+                        <Messages />
+                    </PermissionRoute>
+                )
             },
             {
                 path: "reported-user",
-                element: <ReportedUser />
+                element: (
+                    <PermissionRoute menuId={MENU.REPORT}>
+                        <ReportedUser />
+                    </PermissionRoute>
+                )
             },
             {
                 path: "role-and-permission",
                 children: [
                     {
                         path: "view",
-                        element: <RoleAndPermission />
+                        element: (
+                            <PermissionRoute menuId={MENU.ROLE}>
+                                <RoleAndPermission />
+                            </PermissionRoute>
+                        )
+
                     },
                     {
                         path: "add",
-                        element: <RoleAndPermissionAdd />
+                        element: (
+                            <PermissionRoute menuId={MENU.ROLE}>
+                                <RoleAndPermissionAdd />
+                            </PermissionRoute>
+                        )
+
                     },
                     {
                         path: "edit/:id",
-                        element: <RoleAndPermissionAdd />
+                        element: (
+                            <PermissionRoute menuId={MENU.ROLE}>
+                                <RoleAndPermissionAdd />
+                            </PermissionRoute>
+                        )
+
                     }
                 ]
             },
@@ -147,75 +212,135 @@ export const routes = createBrowserRouter([
                 children: [
                     {
                         path: "list",
-                        element: <VenueList />
+                        element: (
+                            <PermissionRoute menuId={MENU.VENUE}>
+                                <VenueList />
+                            </PermissionRoute>
+                        )
                     },
                     {
                         path: "view/:venueId",
-                        element: <VenueDetails />
+                        element: (
+                            <PermissionRoute menuId={MENU.VENUE}>
+                                <VenueDetails />
+                            </PermissionRoute>
+                        )
                     }
                 ]
             },
             {
                 path: "support-tickets",
-                element: <SupportTicket />
+                element: (
+                    <PermissionRoute menuId={MENU.SUPPORT}>
+                        <SupportTicket />
+                    </PermissionRoute>
+                )
             },
             {
                 path: "groups",
                 children: [
                     {
                         index: true,
-                        element: <Groups />
+                        element: (
+                            <PermissionRoute menuId={MENU.GROUP}>
+                                <Groups />
+                            </PermissionRoute>
+                        )
                     },
                     {
                         path: "view/:id",
-                        element: <GroupDetails />
+                        element: (
+                            <PermissionRoute menuId={MENU.GROUP}>
+                                <GroupDetails />
+                            </PermissionRoute>
+                        )
                     },
                     {
                         path: "view/:id/members",
-                        element: <GroupMember />
+                        element: (
+                            <PermissionRoute menuId={MENU.GROUP}>
+                                <GroupMember />
+                            </PermissionRoute>
+                        )
                     },
                     {
                         path: "activity/:id",
-                        element: <GroupActivities />
+                        element: (
+                            <PermissionRoute menuId={MENU.GROUP}>
+                                <GroupActivities />
+                            </PermissionRoute>
+                        )
                     }
                 ]
             },
             {
                 path: "manage-badges",
-                element: <Badges />
+                element: (
+                    <PermissionRoute menuId={MENU.BADGE}>
+                        <Badges />
+                    </PermissionRoute>
+                )
             },
             {
                 path: "masters",
                 children: [
                     {
                         path: "prohibited-words",
-                        element: <Prohibited />
+                        element: (
+                            <PermissionRoute menuId={MENU.PROHIBITED_WORD}>
+                                <Prohibited />
+                            </PermissionRoute>
+                        )
                     },
                     {
                         path: "manufacturer",
-                        element: <Manufacturer />
+                        element: (
+                            <PermissionRoute menuId={MENU.MANUFACTURER}>
+                                <Manufacturer />
+                            </PermissionRoute>
+                        )
                     },
                     {
                         path: "accessories",
-                        element: <Accessories />
+                        element: (
+                            <PermissionRoute menuId={MENU.ACCESSORY}>
+                                <Accessories />
+                            </PermissionRoute>
+                        )
                     },
                     {
                         path: "gun",
-                        element: <GunMaster />
+                        element: (
+                            <PermissionRoute menuId={MENU.GUN_MASTER}>
+                                <GunMaster />
+                            </PermissionRoute>
+                        )
                     },
                     {
                         path: "ammunition",
-                        element: <Ammunition />
+                        element: (
+                            <PermissionRoute menuId={MENU.AMMUNITION}>
+                                <Ammunition />
+                            </PermissionRoute>
+                        )
                     },
                     {
                         path: "category",
-                        element: <CategoryMaster />
+                        element: (
+                            <PermissionRoute menuId={MENU.GUN_CATEGORY_MASTER}>
+                                <CategoryMaster />
+                            </PermissionRoute>
+                        )
                     }
                 ]
             },
             {
                 path: "leaderboard",
-                element: <LeaderBoard />
+                element: (
+                    <PermissionRoute menuId={MENU.LEADERBOARD}>
+                        <LeaderBoard />
+                    </PermissionRoute>
+                )
             },
             {
                 path: "profile",

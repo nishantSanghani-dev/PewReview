@@ -16,6 +16,7 @@ import { MENU } from '../../../../data/Menu'
 import { filterIcon } from '@progress/kendo-svg-icons'
 import { ColumnMenu } from '../../../../components/grid/ColumnMenu'
 import { getBackendFilters } from '../../../../components/grid/GridFilter'
+import useUserPermission from '../../../../utils/UserPermission'
 
 const DetailCell = ({ tdProps, dataItem, field }) => {
     return (
@@ -118,15 +119,19 @@ const StatusCell = (props) => {
     );
 };
 
-export const UserNameCell = ({ tdProps, dataItem, field }) => {
+export const UserNameCell = ({ tdProps, dataItem, field, userPermission }) => {
     return (
         <td {...tdProps}>
             {
-                
+                userPermission?.canUpdate && userPermission?.canCreate && userPermission?.canDelete && userPermission?.canRead
+                    ?
+
+                    <Link className='text-primary' to={`/admin/user/edit/${dataItem.userId}`}>
+                        {dataItem.venueOwnerUserName || dataItem.userName}
+                    </Link>
+                    :
+                    <p>   {dataItem.venueOwnerUserName || dataItem.userName}</p>
             }
-            <Link className='text-primary' to={`/admin/user/edit/${dataItem.userId}`}>
-                {dataItem.venueOwnerUserName || dataItem.userName}
-            </Link>
         </td>
     )
 }
@@ -152,9 +157,11 @@ export default function VenueList() {
     } = useGridPagination(10)
 
     const permission = usePermission()
-    const venuePermission = permission.find((value, index) => value.menuId === MENU.VENUE)
-    console.log(venuePermission);
-    
+
+    const { userPermission, gunMasterPermission,venuePermission } = useUserPermission()
+    console.log(userPermission);
+
+
 
     const getVenueList = async () => {
         const res = await apiRequest("POST", API_ROUTES.venue.getVenueList, { page, pageSize, customSearch, Sorts: sort, Filters: filters }, null, {
@@ -187,17 +194,20 @@ export default function VenueList() {
                         {
                             dataItem.totalGun > 0
                                 ?
-
-                                <Link
-                                    onClick={() => {
-                                        setShowGunDetails(true)
-                                        getVenueGunDetails(dataItem.venueId)
-                                    }}
-                                    className="text-primary"
-                                    style={{ cursor: "pointer" }}
-                                >
-                                    {dataItem.totalGun}
-                                </Link>
+                                gunMasterPermission?.canRead
+                                    ?
+                                    <Link
+                                        onClick={() => {
+                                            setShowGunDetails(true)
+                                            getVenueGunDetails(dataItem.venueId)
+                                        }}
+                                        className="text-primary"
+                                        style={{ cursor: "pointer" }}
+                                    >
+                                        {dataItem.totalGun}
+                                    </Link>
+                                    :
+                                    <span>{dataItem.totalGun}</span>
                                 :
                                 0
                         }
@@ -282,7 +292,7 @@ export default function VenueList() {
         return (
             <td {...tdProps}>
                 <div className="approval-status-wrapper">
-                    <select className="approval-status-select">
+                    <select disabled={!venuePermission?.canUpdate} className="approval-status-select">
                         <option value={dataItem.approvalStatusName}>Approved</option>
                         <option value={dataItem.approvalStatusName}>Rejected</option>
                         <option value={dataItem.approvalStatusName}>Pending</option>
@@ -322,7 +332,7 @@ export default function VenueList() {
 
     useEffect(() => {
         getVenueList()
-    }, [page, pageSize, customSearch, sort,filters])
+    }, [page, pageSize, customSearch, sort, filters])
 
     return (
         <div className='container-fluid'>
@@ -358,7 +368,7 @@ export default function VenueList() {
 
                         </div>
                     </div>
-                }   
+                }
             </div>
             <div
 
@@ -397,7 +407,7 @@ export default function VenueList() {
                                         take={dataState.take}
                                         sortable={{ allowUnsort: true, mode: 'single' }}
                                         sort={kendoSort}
-                                    
+
                                         filter={dataState.filter}
                                         filterOperators={{
                                             text: [{ text: 'grid.filterContainsOperator', operator: 'contains' }],
@@ -434,6 +444,7 @@ export default function VenueList() {
                                                                     venuePermission={venuePermission}
                                                                     getVenueList={getVenueList}
                                                                     setShowGunDetails={setShowGunDetails}
+                                                                    userPermission={userPermission}
                                                                 />
                                                             )
                                                         }

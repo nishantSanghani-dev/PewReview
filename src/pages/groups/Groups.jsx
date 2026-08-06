@@ -100,12 +100,22 @@ const StatusCell = (props) => {
         </td>
     );
 };
-const UserNameCell = ({ tdProps, dataItem, field }) => {
+const UserNameCell = ({ tdProps, dataItem, field, permissions }) => {
+    const checkEndUperPermission = permissions.find((value, index) => value.menuId === MENU.END_USER)
     return (
         <td {...tdProps}>
-            <Link className='text-primary' to={`/admin/manage-end-user/view/${dataItem.createdBy}`}>
-                {dataItem.userName}
-            </Link>
+            {
+                checkEndUperPermission?.canRead
+                    ?
+                    <Link className='text-primary' to={`/admin/manage-end-user/view/${dataItem.createdBy}`}>
+                        {dataItem.userName}
+                    </Link>
+                    :
+                    <span>
+                        {dataItem.userName}
+                    </span>
+            }
+
         </td>
     )
 }

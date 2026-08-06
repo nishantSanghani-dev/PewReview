@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import BreadCumb from '../../../components/common/breadCumb/BreadCumb'
 import { apiRequest } from '../../../services/Api'
-import { useParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router-dom'
 import { API_ROUTES } from '../../../routes/api.routes'
 import { Grid, GridColumn } from '@progress/kendo-react-grid';
 import UploadGun from './UploadGun';
@@ -10,18 +10,75 @@ import Event from '../../events/Event';
 import Events from './Events';
 import { toast } from 'react-toastify';
 import ActivitiesEndUser from './ActivitiesEndUser';
+import { usePermission } from '../../../hooks/UsePermission'
+import { MENU } from '../../../data/Menu'
+import useUserPermission from '../../../utils/UserPermission'
+
 
 export default function EndUserView() {
     const { id } = useParams()
-    const [activeTab, setActiveTab] = useState("uploadGun");
+    const [searchParams, setSearchParams] = useSearchParams()
     const [data, setData] = useState([]);
     const [manageUserSingleData, setmanageUserSingleData] = useState(null)
-    const [isUpcomingEvent, setisUpcomingEvent] = useState(true)
     const [activitiesFilter, setactivitiesFilter] = useState([{
         Field: "userId",
         OperatorType: 2,
         value: id
     }])
+
+    const { activityPermission, eventPermission, venuePermission, gunMasterPermission,endUserPermission } = useUserPermission()
+
+    const defaultTab = React.useMemo(() => {
+        if (gunMasterPermission?.canRead) return "uploadGun"
+        if (venuePermission?.canRead) return "venues"
+        if (eventPermission?.canRead) return "events"
+        if (activityPermission?.canRead) return "activities"
+        return ""
+    }, [gunMasterPermission?.canRead, venuePermission?.canRead, eventPermission?.canRead, activityPermission?.canRead])
+
+    const allowedTabs = React.useMemo(() => {
+        const tabs = []
+        if (gunMasterPermission?.canRead) tabs.push("uploadGun")
+        if (venuePermission?.canRead) tabs.push("venues")
+        if (eventPermission?.canRead) tabs.push("events")
+        if (activityPermission?.canRead) tabs.push("activities")
+        return tabs
+    }, [gunMasterPermission?.canRead, venuePermission?.canRead, eventPermission?.canRead, activityPermission?.canRead])
+
+    const queryTab = searchParams.get('tab')
+    const queryUpcoming = searchParams.get('upcoming')
+
+    const activeTab = React.useMemo(
+        () => (allowedTabs.includes(queryTab) ? queryTab : defaultTab),
+        [allowedTabs, defaultTab, queryTab]
+    )
+
+    const isUpcomingEvent = queryUpcoming === 'false'
+        ? false
+        : queryUpcoming === 'null'
+            ? null
+            : true
+
+    const setTab = (tab) => {
+        const upcoming = String(isUpcomingEvent)
+        if (queryTab === tab && queryUpcoming === upcoming) return
+        setSearchParams({ tab, upcoming })
+    }
+
+    const updateUpcomingEvent = (value) => {
+        const upcoming = String(value)
+        if (queryTab === activeTab && queryUpcoming === upcoming) return
+        setSearchParams({ tab: activeTab, upcoming })
+    }
+
+    useEffect(() => {
+        if (!defaultTab) return
+        const upcoming = String(isUpcomingEvent)
+        if (!queryTab || !allowedTabs.includes(queryTab) || queryUpcoming !== upcoming) {
+            setSearchParams({ tab: defaultTab, upcoming })
+        }
+    }, [defaultTab, queryTab, allowedTabs, queryUpcoming, isUpcomingEvent, setSearchParams])
+
     const manageEndUserSingleView = async () => {
         const res = await apiRequest("GET", API_ROUTES.endUser.endUserSingleView(id), null, null, {
             showLoader: true
@@ -93,12 +150,7 @@ export default function EndUserView() {
 
         fetchData();
 
-    }, [activeTab, id]);
-    useEffect(() => {
-        if (activeTab === "events") {
-            getEvents();
-        }
-    }, [isUpcomingEvent])
+    }, [activeTab, id, isUpcomingEvent]);
     return (
         <>
 
@@ -395,66 +447,86 @@ export default function EndUserView() {
                             <div className="col-12">
 
                                 <ul className="nav nav-tabs" id="myTab" role="tablist">
-                                    <li className="nav-item" role="presentation">
-                                        <button
-                                            onClick={() => setActiveTab("uploadGun")}
-                                            className={`nav-link ${activeTab === "uploadGun" ? "active" : ""}`}
-                                            id="nav-one-tab"
-                                            data-bs-toggle="tab"
-                                            data-bs-target="#nav-one-tab-pane"
-                                            type="button"
-                                            role="tab"
-                                            aria-controls="nav-one-tab-pane"
-                                            aria-selected="true"
-                                        >
-                                            Upload Gun
-                                        </button>
-                                    </li>
-                                    <li className="nav-item" role="presentation">
-                                        <button
-                                            onClick={() => setActiveTab("venues")}
-                                            className={`nav-link ${activeTab === "venues" ? "active" : ""}`}
-                                            id="nav-two-tab"
-                                            data-bs-toggle="tab"
-                                            data-bs-target="#nav-two-tab-pane"
-                                            type="button"
-                                            role="tab"
-                                            aria-controls="nav-two-tab-pane"
-                                            aria-selected="false"
-                                        >
-                                            Venues
-                                        </button>
-                                    </li>
-                                    <li className="nav-item" role="presentation">
-                                        <button
-                                            onClick={() => setActiveTab("events")}
-                                            className="nav-link "
-                                            id="nav-three-tab"
-                                            data-bs-toggle="tab"
-                                            data-bs-target="#nav-three-tab-pane"
-                                            type="button"
-                                            role="tab"
-                                            aria-controls="nav-three-tab-pane"
-                                            aria-selected="true"
-                                        >
-                                            Events
-                                        </button>
-                                    </li>
-                                    <li className="nav-item" role="presentation">
-                                        <button
-                                            onClick={() => setActiveTab("activities")}
-                                            className="nav-link"
-                                            id="nav-four-tab"
-                                            data-bs-toggle="tab"
-                                            data-bs-target="#nav-four-tab-pane"
-                                            type="button"
-                                            role="tab"
-                                            aria-controls="nav-four-tab-pane"
-                                            aria-selected="false"
-                                        >
-                                            Activities
-                                        </button>
-                                    </li>
+                                    {
+                                        gunMasterPermission?.canRead
+                                        &&
+
+                                        <li className="nav-item" role="presentation">
+                                            <button
+                                                onClick={() => setTab("uploadGun")}
+                                                className={`nav-link ${activeTab === "uploadGun" ? "active" : ""}`}
+                                                id="nav-one-tab"
+                                                data-bs-toggle="tab"
+                                                data-bs-target="#nav-one-tab-pane"
+                                                type="button"
+                                                role="tab"
+                                                aria-controls="nav-one-tab-pane"
+                                                aria-selected={activeTab === "uploadGun"}
+                                            >
+                                                Upload Gun
+                                            </button>
+                                        </li>
+                                    }
+                                    {
+                                        venuePermission?.canRead
+                                        &&
+
+                                        <li className="nav-item" role="presentation">
+                                            <button
+                                                onClick={() => setTab("venues")}
+                                                className={`nav-link ${activeTab === "venues" ? "active" : ""}`}
+                                                id="nav-two-tab"
+                                                data-bs-toggle="tab"
+                                                data-bs-target="#nav-two-tab-pane"
+                                                type="button"
+                                                role="tab"
+                                                aria-controls="nav-two-tab-pane"
+                                                aria-selected={activeTab === "venues"}
+                                            >
+                                                Venues
+                                            </button>
+                                        </li>
+                                    }
+                                    {
+                                        eventPermission?.canRead
+                                        &&
+
+                                        <li className="nav-item" role="presentation">
+                                            <button
+                                                onClick={() => setTab("events")}
+                                                className={`nav-link ${activeTab === "events" ? "active" : ""}`}
+                                                id="nav-three-tab"
+                                                data-bs-toggle="tab"
+                                                data-bs-target="#nav-three-tab-pane"
+                                                type="button"
+                                                role="tab"
+                                                aria-controls="nav-three-tab-pane"
+                                                aria-selected={activeTab === "events"}
+                                            >
+                                                Events
+                                            </button>
+                                        </li>
+                                    }
+                                    {
+                                        activityPermission?.canRead
+                                        &&
+
+                                        <li className="nav-item" role="presentation">
+                                            <button
+                                                onClick={() => setTab("activities")}
+                                                className={`nav-link ${activeTab === "activities" ? "active" : ""}`}
+                                                id="nav-four-tab"
+                                                data-bs-toggle="tab"
+                                                data-bs-target="#nav-four-tab-pane"
+                                                type="button"
+                                                role="tab"
+                                                aria-controls="nav-four-tab-pane"
+                                                aria-selected={activeTab === "activities"}
+                                            >
+                                                Activities
+                                            </button>
+                                        </li>
+                                    }
                                 </ul>
                                 {/* Shared Content: Tab + Accordion */}
                                 <div className="tab-content accordion" id="myTabContent">
@@ -477,7 +549,7 @@ export default function EndUserView() {
                                                 Upload Gun
                                             </button>
                                         </h2>
-                                        {activeTab === "uploadGun" && <UploadGun data={data} />}
+                                        {activeTab === "uploadGun" && gunMasterPermission?.canRead && <UploadGun data={data} />}
                                     </div>
 
                                     <div
@@ -511,278 +583,13 @@ export default function EndUserView() {
                                     {
                                         activeTab === "events"
                                         &&
-                                        <Events isUpcomingEvent={isUpcomingEvent} setisUpcomingEvent={setisUpcomingEvent} data={data} />
+                                        <Events isUpcomingEvent={isUpcomingEvent} setisUpcomingEvent={updateUpcomingEvent} data={data} />
                                     }
                                     {
                                         activeTab === "activities"
                                         &&
                                         <ActivitiesEndUser data={data} />
-                                    }
-                                    {/* <div
-                                        className="tab-pane fade accordion-item"
-                                        id="nav-four-tab-pane"
-                                        role="tabpanel"
-                                        aria-labelledby="nav-four-tab"
-                                        tabIndex={0}
-                                    >
-                                        <h2 className="accordion-header d-lg-none" id="headingFour">
-                                            <button
-                                                className="accordion-button collapsed"
-                                                type="button"
-                                                data-bs-toggle="collapse"
-                                                data-bs-target="#collapseFour"
-                                                aria-expanded="false"
-                                                aria-controls="collapseThree"
-                                            >
-                                                Activities
-                                            </button>
-                                        </h2>
-                                        <div
-                                            id="collapseFour"
-                                            className="accordion-collapse collapse d-lg-block"
-                                            aria-labelledby="headingFour"
-                                            data-bs-parent="#myTabContent"
-                                        >
-                                            <div className="accordion-body mt-3 mt-xxl-4">
-                                                <div className="row">
-                                                    <div className="col-12">
-                                                        <div className="table-responsive">
-                                                            <table className="table">
-                                                                <thead className="table-dark">
-                                                                    <tr>
-                                                                        <th>Action</th>
-                                                                        <th>Host Name</th>
-                                                                        <th>Event Name</th>
-                                                                        <th>Date &amp; Time</th>
-                                                                        <th>Address</th>
-                                                                    </tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                    <tr>
-                                                                        <td>
-                                                                            <span className="d-flex gap-2 align-items-center">
-                                                                                <a
-                                                                                    className="small-square-btn edit-btn"
-                                                                                    href="javascript:void(0);"
-                                                                                >
-                                                                                    <i className="demo-icon icon-eye-line" />
-                                                                                </a>
-                                                                                <a
-                                                                                    className="small-square-btn danger-btn"
-                                                                                    href="javascript:void(0);"
-                                                                                >
-                                                                                    <i className="demo-icon icon-delete-1" />
-                                                                                </a>
-                                                                            </span>
-                                                                        </td>
-                                                                        <td>Andrew Abbott</td>
-                                                                        <td>Meet Ups</td>
-                                                                        <td>
-                                                                            <p className="mb-0">
-                                                                                Monday, 17 May 2024 3:30 am- 6:30 am
-                                                                            </p>
-                                                                        </td>
-                                                                        <td>
-                                                                            <p className="mb-0">
-                                                                                Gun Club Association Member Meeting, Buriel
-                                                                                club co. Ashville, NC
-                                                                            </p>
-                                                                        </td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td>
-                                                                            <span className="d-flex gap-2 align-items-center">
-                                                                                <a
-                                                                                    className="small-square-btn edit-btn"
-                                                                                    href="javascript:void(0);"
-                                                                                >
-                                                                                    <i className="demo-icon icon-eye-line" />
-                                                                                </a>
-                                                                                <a
-                                                                                    className="small-square-btn danger-btn"
-                                                                                    href="javascript:void(0);"
-                                                                                >
-                                                                                    <i className="demo-icon icon-delete-1" />
-                                                                                </a>
-                                                                            </span>
-                                                                        </td>
-                                                                        <td>Tom Curran</td>
-                                                                        <td>GO Up meeting</td>
-                                                                        <td>
-                                                                            <p className="mb-0">
-                                                                                Monday, 17 May 2024 3:30 am- 6:30 am
-                                                                            </p>
-                                                                        </td>
-                                                                        <td>
-                                                                            <p className="mb-0">
-                                                                                Gun Club Association Member Meeting, Buriel
-                                                                                club co. Ashville, NC
-                                                                            </p>
-                                                                        </td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td>
-                                                                            <span className="d-flex gap-2 align-items-center">
-                                                                                <a
-                                                                                    className="small-square-btn edit-btn"
-                                                                                    href="javascript:void(0);"
-                                                                                >
-                                                                                    <i className="demo-icon icon-eye-line" />
-                                                                                </a>
-                                                                                <a
-                                                                                    className="small-square-btn danger-btn"
-                                                                                    href="javascript:void(0);"
-                                                                                >
-                                                                                    <i className="demo-icon icon-delete-1" />
-                                                                                </a>
-                                                                            </span>
-                                                                        </td>
-                                                                        <td>Christopher Nolan</td>
-                                                                        <td>Gun Meet Ups</td>
-                                                                        <td>
-                                                                            <p className="mb-0">
-                                                                                Monday, 17 May 2024 3:30 am- 6:30 am
-                                                                            </p>
-                                                                        </td>
-                                                                        <td>
-                                                                            <p className="mb-0">
-                                                                                Gun Club Association Member Meeting, Buriel
-                                                                                club co. Ashville, NC
-                                                                            </p>
-                                                                        </td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td>
-                                                                            <span className="d-flex gap-2 align-items-center">
-                                                                                <a
-                                                                                    className="small-square-btn edit-btn"
-                                                                                    href="javascript:void(0);"
-                                                                                >
-                                                                                    <i className="demo-icon icon-eye-line" />
-                                                                                </a>
-                                                                                <a
-                                                                                    className="small-square-btn danger-btn"
-                                                                                    href="javascript:void(0);"
-                                                                                >
-                                                                                    <i className="demo-icon icon-delete-1" />
-                                                                                </a>
-                                                                            </span>
-                                                                        </td>
-                                                                        <td>Tom Curran</td>
-                                                                        <td>GO Up meeting</td>
-                                                                        <td>
-                                                                            <p className="mb-0">
-                                                                                Monday, 17 May 2024 3:30 am- 6:30 am
-                                                                            </p>
-                                                                        </td>
-                                                                        <td>
-                                                                            <p className="mb-0">
-                                                                                Gun Club Association Member Meeting, Buriel
-                                                                                club co. Ashville, NC
-                                                                            </p>
-                                                                        </td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td>
-                                                                            <span className="d-flex gap-2 align-items-center">
-                                                                                <a
-                                                                                    className="small-square-btn edit-btn"
-                                                                                    href="javascript:void(0);"
-                                                                                >
-                                                                                    <i className="demo-icon icon-eye-line" />
-                                                                                </a>
-                                                                                <a
-                                                                                    className="small-square-btn danger-btn"
-                                                                                    href="javascript:void(0);"
-                                                                                >
-                                                                                    <i className="demo-icon icon-delete-1" />
-                                                                                </a>
-                                                                            </span>
-                                                                        </td>
-                                                                        <td>Christopher Nolan</td>
-                                                                        <td>Gun Meet Ups</td>
-                                                                        <td>
-                                                                            <p className="mb-0">
-                                                                                Monday, 17 May 2024 3:30 am- 6:30 am
-                                                                            </p>
-                                                                        </td>
-                                                                        <td>
-                                                                            <p className="mb-0">
-                                                                                Gun Club Association Member Meeting, Buriel
-                                                                                club co. Ashville, NC
-                                                                            </p>
-                                                                        </td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td>
-                                                                            <span className="d-flex gap-2 align-items-center">
-                                                                                <a
-                                                                                    className="small-square-btn edit-btn"
-                                                                                    href="javascript:void(0);"
-                                                                                >
-                                                                                    <i className="demo-icon icon-eye-line" />
-                                                                                </a>
-                                                                                <a
-                                                                                    className="small-square-btn danger-btn"
-                                                                                    href="javascript:void(0);"
-                                                                                >
-                                                                                    <i className="demo-icon icon-delete-1" />
-                                                                                </a>
-                                                                            </span>
-                                                                        </td>
-                                                                        <td>Tom Curran</td>
-                                                                        <td>GO Up meeting</td>
-                                                                        <td>
-                                                                            <p className="mb-0">
-                                                                                Monday, 17 May 2024 3:30 am- 6:30 am
-                                                                            </p>
-                                                                        </td>
-                                                                        <td>
-                                                                            <p className="mb-0">
-                                                                                Gun Club Association Member Meeting, Buriel
-                                                                                club co. Ashville, NC
-                                                                            </p>
-                                                                        </td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td>
-                                                                            <span className="d-flex gap-2 align-items-center">
-                                                                                <a
-                                                                                    className="small-square-btn edit-btn"
-                                                                                    href="javascript:void(0);"
-                                                                                >
-                                                                                    <i className="demo-icon icon-eye-line" />
-                                                                                </a>
-                                                                                <a
-                                                                                    className="small-square-btn danger-btn"
-                                                                                    href="javascript:void(0);"
-                                                                                >
-                                                                                    <i className="demo-icon icon-delete-1" />
-                                                                                </a>
-                                                                            </span>
-                                                                        </td>
-                                                                        <td>Christopher Nolan</td>
-                                                                        <td>Gun Meet Ups</td>
-                                                                        <td>
-                                                                            <p className="mb-0">
-                                                                                Monday, 17 May 2024 3:30 am- 6:30 am
-                                                                            </p>
-                                                                        </td>
-                                                                        <td>
-                                                                            <p className="mb-0">
-                                                                                Gun Club Association Member Meeting, Buriel
-                                                                                club co. Ashville, NC
-                                                                            </p>
-                                                                        </td>
-                                                                    </tr>
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div> */}
+                                    }   
                                 </div>
                             </div>
                         </div>

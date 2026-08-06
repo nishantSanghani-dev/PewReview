@@ -11,7 +11,8 @@ export const API_ROUTES = {
         userDelete: `User`,
         userSingleView: (id) => `User/${id}`,
         userEdit: `User/update`,
-        userExport: "User/GetExportUsersToken"
+        userExport: "User/GetExportUsersToken",
+        forgotPassword: `User/ForgetPassword`
     },
     endUser: {
         endUserView: "EndUser/GetUsers",

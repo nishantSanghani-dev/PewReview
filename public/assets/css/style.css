@@ -1847,7 +1847,7 @@ button.navbar-toggler:focus-visible {
 .login-page form .form-group+.form-group,
 .login-page form .round-checkbox,
 .login-page form .round-checkbox+.form-group {
-  margin-top: 16px;
+  margin-top: 8px;
 }
 
 .login-page.v2 {
