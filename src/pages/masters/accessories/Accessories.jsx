@@ -14,6 +14,7 @@ import SerachFilter from '../../../components/common/SerachFilter';
 import useGridPagination from '../../../hooks/useGridPagination'
 import { usePermission } from '../../../hooks/UsePermission'
 import { MENU } from '../../../data/Menu'
+import useUserPermission from '../../../utils/UserPermission'
 const ActionCell = (props) => {
     const item = props.dataItem;
 
@@ -96,8 +97,10 @@ export default function Accessories() {
         setKendoSort,
     } = useGridPagination(10)
 
-    const permission = usePermission()
-    const accessoriesPermission = permission.find((value, index) => value.menuId === MENU.ACCESSORY)
+    // const permission = usePermission()
+    // const accessoriesPermission = permission.find((value, index) => value.menuId === MENU.ACCESSORY)
+
+    const { accessoryPermission: accessoriesPermission } = useUserPermission()
     const getAccessories = async () => {
         const res = await apiRequest("POST", API_ROUTES.accessories.getaccessories, { page, pageSize, customSearch, Sorts: sort, Filters: filters }, null, {
             showLoader: true
@@ -187,7 +190,7 @@ export default function Accessories() {
                                     data={accessoriesData}
                                     skip={dataState.skip}
                                     take={dataState.take}
-                                   
+
                                     filter={dataState.filter}
                                     filterOperators={{
                                         text: [{ text: 'grid.filterContainsOperator', operator: 'contains' }],

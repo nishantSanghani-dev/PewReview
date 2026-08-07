@@ -156,7 +156,7 @@ export default function VenueList() {
         setKendoSort,
     } = useGridPagination(10)
 
-    const permission = usePermission()
+    // const permission = usePermission()
 
     const { userPermission, gunMasterPermission,venuePermission } = useUserPermission()
     console.log(userPermission);

@@ -66,7 +66,7 @@ export const routes = createBrowserRouter([
             {
                 path: "dashboard",
                 element: (
-                    <PermissionRoute menuId={MENU.DASHBOARD}>
+                    <PermissionRoute typeId={MENU.DASHBOARD}>
                         <Dashboard />
                     </PermissionRoute>
                 ),
@@ -77,7 +77,7 @@ export const routes = createBrowserRouter([
                     {
                         path: "manage-user",
                         element: (
-                            <PermissionRoute menuId={MENU.USER}>
+                            <PermissionRoute typeId={MENU.USER}>
                                 <ManageUser />
                             </PermissionRoute>
                         ),
@@ -85,7 +85,7 @@ export const routes = createBrowserRouter([
                     {
                         path: "add",
                         element: (
-                            <PermissionRoute menuId={MENU.USER}>
+                            <PermissionRoute typeId={MENU.USER}>
                                 <UserAdd />
                             </PermissionRoute>
                         )
@@ -93,7 +93,7 @@ export const routes = createBrowserRouter([
                     {
                         path: "edit/:id",
                         element: (
-                            <PermissionRoute menuId={MENU.USER}>
+                            <PermissionRoute typeId={MENU.USER}>
                                 <UserAdd />
                             </PermissionRoute>
                         )
@@ -107,7 +107,7 @@ export const routes = createBrowserRouter([
                     {
                         path: "view",
                         element: (
-                            <PermissionRoute menuId={MENU.ACTIVITY}>
+                            <PermissionRoute typeId={MENU.ACTIVITY}>
                                 <Activity />
                             </PermissionRoute>
                         )
@@ -115,7 +115,7 @@ export const routes = createBrowserRouter([
                     {
                         path: "view/:id",
                         element: (
-                            <PermissionRoute menuId={MENU.ACTIVITY}>
+                            <PermissionRoute typeId={MENU.ACTIVITY}>
                                 <ActivityDetails />
                             </PermissionRoute>
                         )
@@ -128,7 +128,7 @@ export const routes = createBrowserRouter([
                     {
                         path: "view",
                         element: (
-                            <PermissionRoute menuId={MENU.EVENT}>
+                            <PermissionRoute typeId={MENU.EVENT}>
                                 <Event />
                             </PermissionRoute>
                         )
@@ -136,7 +136,7 @@ export const routes = createBrowserRouter([
                     {
                         path: "view/:id",
                         element: (
-                            <PermissionRoute menuId={MENU.EVENT}>
+                            <PermissionRoute typeId={MENU.EVENT}>
                                 <EventDetails />
                             </PermissionRoute>
                         )
@@ -146,7 +146,7 @@ export const routes = createBrowserRouter([
             {
                 path: "manage-end-user",
                 element: (
-                    <PermissionRoute menuId={MENU.END_USER}>
+                    <PermissionRoute typeId={MENU.END_USER}>
                         <EndUser />
                     </PermissionRoute>
                 )
@@ -154,7 +154,7 @@ export const routes = createBrowserRouter([
             {
                 path: "manage-end-user/view/:id",
                 element: (
-                    <PermissionRoute menuId={MENU.END_USER}>
+                    <PermissionRoute typeId={MENU.END_USER}>
                         <EndUserView />
                     </PermissionRoute>
                 )
@@ -162,7 +162,7 @@ export const routes = createBrowserRouter([
             {
                 path: "messages",
                 element: (
-                    <PermissionRoute menuId={MENU.MESSAGE}>
+                    <PermissionRoute typeId={MENU.MESSAGE}>
                         <Messages />
                     </PermissionRoute>
                 )
@@ -170,7 +170,7 @@ export const routes = createBrowserRouter([
             {
                 path: "reported-user",
                 element: (
-                    <PermissionRoute menuId={MENU.REPORT}>
+                    <PermissionRoute typeId={MENU.REPORT}>
                         <ReportedUser />
                     </PermissionRoute>
                 )
@@ -181,7 +181,7 @@ export const routes = createBrowserRouter([
                     {
                         path: "view",
                         element: (
-                            <PermissionRoute menuId={MENU.ROLE}>
+                            <PermissionRoute typeId={MENU.ROLE}>
                                 <RoleAndPermission />
                             </PermissionRoute>
                         )
@@ -190,7 +190,7 @@ export const routes = createBrowserRouter([
                     {
                         path: "add",
                         element: (
-                            <PermissionRoute menuId={MENU.ROLE}>
+                            <PermissionRoute typeId={MENU.ROLE}>
                                 <RoleAndPermissionAdd />
                             </PermissionRoute>
                         )
@@ -199,7 +199,7 @@ export const routes = createBrowserRouter([
                     {
                         path: "edit/:id",
                         element: (
-                            <PermissionRoute menuId={MENU.ROLE}>
+                            <PermissionRoute typeId={MENU.ROLE}>
                                 <RoleAndPermissionAdd />
                             </PermissionRoute>
                         )
@@ -213,7 +213,7 @@ export const routes = createBrowserRouter([
                     {
                         path: "list",
                         element: (
-                            <PermissionRoute menuId={MENU.VENUE}>
+                            <PermissionRoute typeId={MENU.VENUE}>
                                 <VenueList />
                             </PermissionRoute>
                         )
@@ -221,7 +221,7 @@ export const routes = createBrowserRouter([
                     {
                         path: "view/:venueId",
                         element: (
-                            <PermissionRoute menuId={MENU.VENUE}>
+                            <PermissionRoute typeId={MENU.VENUE}>
                                 <VenueDetails />
                             </PermissionRoute>
                         )
@@ -231,7 +231,7 @@ export const routes = createBrowserRouter([
             {
                 path: "support-tickets",
                 element: (
-                    <PermissionRoute menuId={MENU.SUPPORT}>
+                    <PermissionRoute typeId={MENU.SUPPORT}>
                         <SupportTicket />
                     </PermissionRoute>
                 )
@@ -242,7 +242,7 @@ export const routes = createBrowserRouter([
                     {
                         index: true,
                         element: (
-                            <PermissionRoute menuId={MENU.GROUP}>
+                            <PermissionRoute typeId={MENU.GROUP}>
                                 <Groups />
                             </PermissionRoute>
                         )
@@ -250,7 +250,7 @@ export const routes = createBrowserRouter([
                     {
                         path: "view/:id",
                         element: (
-                            <PermissionRoute menuId={MENU.GROUP}>
+                            <PermissionRoute typeId={MENU.GROUP}>
                                 <GroupDetails />
                             </PermissionRoute>
                         )
@@ -258,7 +258,7 @@ export const routes = createBrowserRouter([
                     {
                         path: "view/:id/members",
                         element: (
-                            <PermissionRoute menuId={MENU.GROUP}>
+                            <PermissionRoute typeId={MENU.GROUP}>
                                 <GroupMember />
                             </PermissionRoute>
                         )
@@ -266,7 +266,7 @@ export const routes = createBrowserRouter([
                     {
                         path: "activity/:id",
                         element: (
-                            <PermissionRoute menuId={MENU.GROUP}>
+                            <PermissionRoute typeId={MENU.GROUP}>
                                 <GroupActivities />
                             </PermissionRoute>
                         )
@@ -276,7 +276,7 @@ export const routes = createBrowserRouter([
             {
                 path: "manage-badges",
                 element: (
-                    <PermissionRoute menuId={MENU.BADGE}>
+                    <PermissionRoute typeId={MENU.BADGE}>
                         <Badges />
                     </PermissionRoute>
                 )
@@ -287,7 +287,7 @@ export const routes = createBrowserRouter([
                     {
                         path: "prohibited-words",
                         element: (
-                            <PermissionRoute menuId={MENU.PROHIBITED_WORD}>
+                            <PermissionRoute typeId={MENU.PROHIBITED_WORD}>
                                 <Prohibited />
                             </PermissionRoute>
                         )
@@ -295,7 +295,7 @@ export const routes = createBrowserRouter([
                     {
                         path: "manufacturer",
                         element: (
-                            <PermissionRoute menuId={MENU.MANUFACTURER}>
+                            <PermissionRoute typeId={MENU.MANUFACTURER}>
                                 <Manufacturer />
                             </PermissionRoute>
                         )
@@ -303,7 +303,7 @@ export const routes = createBrowserRouter([
                     {
                         path: "accessories",
                         element: (
-                            <PermissionRoute menuId={MENU.ACCESSORY}>
+                            <PermissionRoute typeId={MENU.ACCESSORY}>
                                 <Accessories />
                             </PermissionRoute>
                         )
@@ -311,7 +311,7 @@ export const routes = createBrowserRouter([
                     {
                         path: "gun",
                         element: (
-                            <PermissionRoute menuId={MENU.GUN_MASTER}>
+                            <PermissionRoute typeId={MENU.GUN_MASTER}>
                                 <GunMaster />
                             </PermissionRoute>
                         )
@@ -319,7 +319,7 @@ export const routes = createBrowserRouter([
                     {
                         path: "ammunition",
                         element: (
-                            <PermissionRoute menuId={MENU.AMMUNITION}>
+                            <PermissionRoute typeId={MENU.AMMUNITION}>
                                 <Ammunition />
                             </PermissionRoute>
                         )
@@ -327,7 +327,7 @@ export const routes = createBrowserRouter([
                     {
                         path: "category",
                         element: (
-                            <PermissionRoute menuId={MENU.GUN_CATEGORY_MASTER}>
+                            <PermissionRoute typeId={MENU.GUN_CATEGORY_MASTER}>
                                 <CategoryMaster />
                             </PermissionRoute>
                         )
@@ -337,7 +337,7 @@ export const routes = createBrowserRouter([
             {
                 path: "leaderboard",
                 element: (
-                    <PermissionRoute menuId={MENU.LEADERBOARD}>
+                    <PermissionRoute typeId={MENU.LEADERBOARD}>
                         <LeaderBoard />
                     </PermissionRoute>
                 )

@@ -11,6 +11,7 @@ import { handleDelete } from '../../utils/DeleteRecords'
 import useGridPagination from '../../hooks/useGridPagination'
 import { usePermission } from '../../hooks/UsePermission'
 import { MENU } from '../../data/Menu'
+import useUserPermission from '../../utils/UserPermission'
 const ActionCell = (props) => {
 
 
@@ -76,8 +77,9 @@ export default function Badges() {
     const [filters, setFilters] = useState([])
     const { dataState, onDataStateChange, page, pageSize } = useGridPagination(10)
     const permission = usePermission()
-    const badgePermission = permission.find((value, index) => value.menuId === MENU.BADGE)
-    console.log(badgePermission);
+    // const badgePermission = permission.find((value, index) => value.menuId === MENU.BADGE)
+    // console.log(badgePermission);
+    const { badgePermission } = useUserPermission()
     const getBadges = async () => {
         const res = await apiRequest("POST", API_ROUTES.badges.getBadges, { page, pageSize, Filters: filters }, null, {
             showLoader: true

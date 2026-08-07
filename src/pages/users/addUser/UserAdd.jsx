@@ -6,6 +6,7 @@ import UserForm from '../components/UserForm'
 import { apiRequest } from '../../../services/Api'
 import { API_ROUTES } from '../../../routes/api.routes'
 import { useParams } from 'react-router-dom'
+import useUserPermission from '../../../utils/UserPermission'
 
 export default function UserAdd() {
     const [userRoleData, setuserRoleData] = useState([])
@@ -14,6 +15,9 @@ export default function UserAdd() {
     const [countryData, setcountryData] = useState([])
     const [userSingleData, setuserSingleData] = useState(null)
     const { id } = useParams()
+    const { userPermission, rolePermission } = useUserPermission()
+    console.log(userPermission);
+
     const getUserRole = async () => {
         const res = await apiRequest("POST", API_ROUTES.role.roleList, { page: 1, pageSize: 10 }, null, {
             showLoader: true,
@@ -54,6 +58,10 @@ export default function UserAdd() {
 
     }
     useEffect(() => {
+        // if (userPermission?.canRead && rolePermission?.canRead) {
+
+        //     getUserRole()
+        // }
         getUserRole()
         getGender()
         getCommunication()
@@ -65,27 +73,34 @@ export default function UserAdd() {
         }
     }, [id])
     return (
-        <div className="container-fluid">
-            <div className="tabbar-section">
-                <div className="row">
-                    <div className="col-12">
-                            <BreadCumb items={[{ label: "Manage User", path: "/admin/user/manage-user" }, { label: id ? "Edit User" : "Add User" }]} />
+        <>
+            {
+                userPermission?.canCreate
+                &&
+                <div className="container-fluid">
+                    <div className="tabbar-section">
+                        <div className="row">
+                            <div className="col-12">
+                                <BreadCumb items={[{ label: "Manage User", path: "/admin/user/manage-user" }, { label: id ? "Edit User" : "Add User" }]} />
+                            </div>
+                        </div>
+                        <div className="row">
+                            <div className="col-12">
+                                <UserForm
+                                    id={id}
+                                    userSingleData={userSingleData}
+                                    genderData={genderData}
+                                    userRoleData={userRoleData}
+                                    communicationData={communicationData}
+                                    countryData={countryData}
+                                />
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div className="row">
-                    <div className="col-12">
-                        <UserForm
-                            id={id}
-                            userSingleData={userSingleData}
-                            genderData={genderData}
-                            userRoleData={userRoleData}
-                            communicationData={communicationData}
-                            countryData={countryData}
-                        />
-                    </div>
-                </div>
-            </div>
-        </div>
+            }
+        </>
+
 
     )
 }

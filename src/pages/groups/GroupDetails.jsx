@@ -5,13 +5,16 @@ import { Link, useParams } from "react-router-dom";
 import BreadCumb from "../../components/common/breadCumb/BreadCumb";
 import { usePermission } from "../../hooks/UsePermission";
 import { MENU } from "../../data/Menu";
+import useUserPermission from "../../utils/UserPermission";
 
 export default function GroupDetails() {
     const { id } = useParams()
     const [grpData, setgrpData] = useState(null)
-    const permission = usePermission()
-    const endUserPermission = permission.find((value, index) => value.menuId === MENU.END_USER)
-    const activityPermission = permission.find((value, index) => value.menuId === MENU.ACTIVITY)
+    // const permission = usePermission()
+    // const endUserPermission = permission.find((value, index) => value.menuId === MENU.END_USER)
+    // const activityPermission = permission.find((value, index) => value.menuId === MENU.ACTIVITY)
+
+    const { endUserPermission, activityPermission } = useUserPermission()
     const getGroupDetails = async () => {
         const res = await apiRequest("GET", API_ROUTES.groups.getByGroupId(id), null, null, {
             showLoader: true
@@ -156,7 +159,7 @@ export default function GroupDetails() {
                                                 </Link>
                                                 :
                                                 <span
-                                                  >
+                                                >
                                                     {grpData?.totalActivity}
                                                 </span>
                                         }

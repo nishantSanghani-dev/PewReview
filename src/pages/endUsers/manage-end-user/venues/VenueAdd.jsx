@@ -21,6 +21,7 @@ export default function VenueAdd({ setvenueAddBtn, editVenueId, setEditVenueId }
     const [longitude, setLongitude] = useState(-95.7129);
     const [imageFile, setImageFile] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
+    const [existingImageName, setExistingImageName] = useState("");
     const fileInputRef = useRef(null);
     const mapRef = useRef(null);
     const userDropdownRef = useRef(null);
@@ -82,6 +83,57 @@ export default function VenueAdd({ setvenueAddBtn, editVenueId, setEditVenueId }
         })
         setCountryData(res.data)
     }
+
+    const getImagePreviewUrl = (imageValue) => {
+        if (!imageValue) return null;
+        if (typeof imageValue === "string" && /^(https?:|data:image)/i.test(imageValue)) {
+            return imageValue;
+        }
+        if (typeof imageValue === "string") {
+            const baseUrl = import.meta.env.VITE_API_BASE_URL || "";
+            return `${baseUrl}/${imageValue.replace(/^\/+/, "")}`;
+        }
+        return null;
+    };
+
+    const normalizeId = (value) => {
+        return typeof value === "string" ? value.toLowerCase() : value;
+    };
+
+    const findMatchingUser = (data) => {
+        const candidateIds = [data?.userId, data?.createdBy, data?.ownerUserId, data?.createdById]
+            .filter(Boolean)
+            .map(normalizeId);
+
+        if (candidateIds.length === 0) return null;
+
+        return endUserData.find((user) => {
+            const userIds = [user?.userId, user?.id, user?.createdById, user?.ownerUserId]
+                .filter(Boolean)
+                .map(normalizeId);
+            return userIds.some((id) => candidateIds.includes(id));
+        }) || null;
+    };
+
+    const findMatchingCountry = (data) => {
+        const addressText = `${data?.address || ""} ${data?.countryCodeName || ""} ${data?.countryCode || ""}`.toLowerCase();
+
+        return countryData.find((country) => {
+            const countryName = (country?.countryName || "").toLowerCase();
+            const countryCode = (country?.countryCode || "").toLowerCase();
+            const phoneCode = (country?.phoneInternationalCode || "").toLowerCase();
+
+            return (
+                country.countryCode === data?.countryCodeName ||
+                country.countryCode === data?.countryCode ||
+                country.phoneInternationalCode === data?.countryCode ||
+                countryName === data?.countryCodeName?.toLowerCase() ||
+                addressText.includes(countryName) ||
+                addressText.includes(countryCode) ||
+                addressText.includes(phoneCode.replace(/\+/g, ""))
+            );
+        }) || null;
+    };
 
     const handleSelectGun = (item) => {
         const isSelected = selectedGuns.some(g => g.gunId === item.gunId);
@@ -198,7 +250,8 @@ export default function VenueAdd({ setvenueAddBtn, editVenueId, setEditVenueId }
         const selectedCountry = countryData.find(c => c.countryId == data.selectedCountryId);
         const countryCode = selectedCountry ? selectedCountry.phoneInternationalCode : "";
         const countryCodeName = selectedCountry ? selectedCountry.countryCode : "";
-        console.log(imageFile.name);
+        const imageNameValue = imageFile ? imageFile.name : existingImageName || "";
+        console.log(data);
 
         const payload = {
             address: data.address,
@@ -206,15 +259,16 @@ export default function VenueAdd({ setvenueAddBtn, editVenueId, setEditVenueId }
             countryCodeName: countryCodeName,
             description: data.description || "",
             gunIds: data.gunIds && Array.isArray(data.gunIds) ? data.gunIds : [],
-            imageName: imageFile.name,
+            imageName: imageNameValue,
             latitude: latitude,
             longitude: longitude,
             phone: data.phone,
-            userId: data.userId,
+            userId: selectedUser.key,
             venueName: data.venueName,
             venueType: Number(data.venueType),
             website: data.website || ""
         };
+        console.log(payload);
 
 
 
@@ -253,43 +307,68 @@ export default function VenueAdd({ setvenueAddBtn, editVenueId, setEditVenueId }
 
     useEffect(() => {
         const getSingleVenue = async () => {
-            if (editVenueId) {
-                const res = await apiRequest("GET", API_ROUTES.venue.getVenueById(editVenueId), null, null, {
-                    showLoader: true
-                });
-                if (res && res.data) {
-                    const data = res.data;
-                    console.log(data);
+            if (!editVenueId) return;
 
-                    setValue("userId", data.userId, { shouldValidate: true });
-                    setValue("venueName", data.venueName, { shouldValidate: true });
-                    setValue("description", data.description, { shouldValidate: true });
-                    setValue("website", data.website, { shouldValidate: true });
-                    setValue("phone", data.phone, { shouldValidate: true });
-                    setValue("address", data.address, { shouldValidate: true });
-                    setValue("venueType", data.venueType, { shouldValidate: true });
+            const res = await apiRequest("GET", API_ROUTES.venue.getVenueById(editVenueId), null, null, {
+                showLoader: true
+            });
 
-                    setLatitude(parseFloat(data.latitude) || 37.0902);
-                    setLongitude(parseFloat(data.longitude) || -95.7129);
+            if (res && res.data) {
+                const data = res.data;
 
-                    if (data.countryCodeName) {
-                        const country = countryData.find(c => c.countryCode === data.countryCodeName);
-                        if (country) {
-                            setValue("selectedCountryId", country.countryId, { shouldValidate: true });
-                        }
-                    }
+                setValue("userId", data.userId, { shouldValidate: true });
+                setValue("venueName", data.venueName, { shouldValidate: true });
+                setValue("description", data.description, { shouldValidate: true });
+                setValue("website", data.website, { shouldValidate: true });
+                setValue("phone", data.phone, { shouldValidate: true });
+                setValue("address", data.address, { shouldValidate: true });
+                setValue("venueType", data.venueType, { shouldValidate: true });
 
-                    if (data.guns && Array.isArray(data.guns)) {
-                        setSelectedGuns(data.guns);
-                        setValue("gunIds", data.guns.map(g => g.gunId), { shouldValidate: true });
-                    }
+                setLatitude(parseFloat(data.latitude) || 37.0902);
+                setLongitude(parseFloat(data.longitude) || -95.7129);
+
+                const matchingUser = findMatchingUser(data);
+                console.log(matchingUser);
+                
+                if (matchingUser) {
+                    setSelectedUser(matchingUser);
+                    setValue("userId", matchingUser.key ||  matchingUser.userId || matchingUser.id || data.userId, { shouldValidate: true });
+                }
+
+                const matchingCountry = findMatchingCountry(data);
+                if (matchingCountry) {
+                    setValue("selectedCountryId", matchingCountry.countryId, { shouldValidate: true });
+                }
+
+                const matchingVenueType = getVenueType.find((item) =>
+                    item.venueTypeId === data.venueType ||
+                    item.id === data.venueType ||
+                    item.description === data.venueTypeName
+                );
+                if (matchingVenueType) {
+                    setselectedVenue(matchingVenueType);
+                }
+
+                const previewUrl = getImagePreviewUrl(data.imagePath || data.imageUrl || data.imageName || data.imageFullPath || data.venueImagePath || data.venueImageUrl);
+                if (previewUrl) {
+                    setImagePreview(previewUrl);
+                }
+
+                const existingImageValue = data.imageName || data.imagePath || data.imageUrl || data.imageFullPath || data.venueImagePath || data.venueImageUrl || "";
+                setExistingImageName(existingImageValue);
+                setValue("imageName", existingImageValue, { shouldValidate: true });
+
+                if (data.guns && Array.isArray(data.guns)) {
+                    setSelectedGuns(data.guns);
+                    setValue("gunIds", data.guns.map(g => g.gunId), { shouldValidate: true });
                 }
             }
         };
-        if (countryData.length > 0) {
+
+        if (editVenueId && countryData.length > 0 && endUserData.length > 0 && getVenueType.length > 0) {
             getSingleVenue();
         }
-    }, [editVenueId, countryData, setValue]);
+    }, [editVenueId, countryData, endUserData, getVenueType, setValue]);
 
     useEffect(() => {
         getEndUuser()
@@ -392,19 +471,25 @@ export default function VenueAdd({ setvenueAddBtn, editVenueId, setEditVenueId }
                                         {/* Menu */}
                                         {isOpen && (
                                             <div className="custom-dropdown-menu">
-                                                {endUserData.map((item, index) => (
-                                                    <div
-                                                        key={index}
-                                                        className="custom-dropdown-item"
-                                                        onClick={() => {
-                                                            setSelectedUser(item);
-                                                            setValue("userId", item.userId || item.id || "", { shouldValidate: true });
-                                                            setIsOpen(false);
-                                                        }}
-                                                    >
-                                                        {item.userName}
-                                                    </div>
-                                                ))}
+                                                {endUserData.map((item, index) => {
+                                                    console.log(item);
+                                                    
+                                                    return (
+
+                                                        <div
+                                                            key={index}
+                                                            className="custom-dropdown-item"
+                                                            onClick={() => {
+                                                                setSelectedUser(item);
+                                                                setValue("userId", item.key || item.userId || item.id || "", { shouldValidate: true });
+                                                                setIsOpen(false);
+                                                            }}
+                                                        >
+                                                            {item.userName}
+                                                        </div>
+                                                    )
+                                                }
+                                                )}
                                             </div>
                                         )}
 

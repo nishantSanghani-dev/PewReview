@@ -574,6 +574,8 @@ export default function EndUserView() {
                                         {
                                             activeTab === "venues"
                                             &&
+                                            eventPermission?.canRead
+                                            &&
                                             <Venues data={data} />
                                         }
 
@@ -582,6 +584,8 @@ export default function EndUserView() {
 
                                     {
                                         activeTab === "events"
+                                        &&
+                                        eventPermission?.canRead 
                                         &&
                                         <Events isUpcomingEvent={isUpcomingEvent} setisUpcomingEvent={updateUpcomingEvent} data={data} />
                                     }

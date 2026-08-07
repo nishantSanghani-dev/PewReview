@@ -13,6 +13,7 @@ import { MENU } from '../../data/Menu';
 import { filterIcon } from '@progress/kendo-svg-icons'
 import { ColumnMenu } from '../../components/grid/ColumnMenu'
 import { getBackendFilters } from '../../components/grid/GridFilter'
+import useUserPermission from '../../utils/UserPermission';
 const ActionCell = (props) => {
 
     return (
@@ -100,12 +101,12 @@ const StatusCell = (props) => {
         </td>
     );
 };
-const UserNameCell = ({ tdProps, dataItem, field, permissions }) => {
-    const checkEndUperPermission = permissions.find((value, index) => value.menuId === MENU.END_USER)
+const UserNameCell = ({ tdProps, dataItem, field, endUserPermission }) => {
+    // const checkEndUperPermission = permissions.find((value, index) => value.menuId === MENU.END_USER)
     return (
         <td {...tdProps}>
             {
-                checkEndUperPermission?.canRead
+                endUserPermission?.canRead
                     ?
                     <Link className='text-primary' to={`/admin/manage-end-user/view/${dataItem.createdBy}`}>
                         {dataItem.userName}
@@ -120,9 +121,9 @@ const UserNameCell = ({ tdProps, dataItem, field, permissions }) => {
     )
 }
 
-const MemberCell = ({ tdProps, dataItem, field, permissions }) => {
+const MemberCell = ({ tdProps, dataItem, field, endUserPermission }) => {
 
-    const endUserPermission = permissions.find((value, index) => value.menuId === MENU.END_USER)
+    // const endUserPermission = permissions.find((value, index) => value.menuId === MENU.END_USER)
     return (
         <td {...tdProps}>
             {
@@ -141,8 +142,8 @@ const MemberCell = ({ tdProps, dataItem, field, permissions }) => {
     )
 }
 
-const AvtivityCell = ({ tdProps, dataItem, field, permissions }) => {
-    const activityPermission = permissions.find((value, index) => value.menuId === MENU.ACTIVITY)
+const AvtivityCell = ({ tdProps, dataItem, field, activityPermission }) => {
+    // const activityPermission = permissions.find((value, index) => value.menuId === MENU.ACTIVITY)
     return (
         <td {...tdProps}>
             {
@@ -183,9 +184,9 @@ export default function Groups() {
 
     const { permissions } = useSelector((store) => store.user)
     console.log(permissions);
-    const grpPermission = permissions.find((value, index) => value.menuId === MENU.GROUP)
-    console.log(grpPermission);
-
+    // const grpPermission = permissions.find((value, index) => value.menuId === MENU.GROUP)
+    // console.log(grpPermission);
+    const { groupPermission: grpPermission, endUserPermission,activityPermission } = useUserPermission()
     const getGroups = async () => {
         const res = await apiRequest("POST", API_ROUTES.groups.getGroups, { page, pageSize, customSearch, Sorts: sort, Filters: filters }, null, {
             showLoader: true
@@ -297,7 +298,8 @@ export default function Groups() {
                                                                 {...props}
                                                                 grpPermission={grpPermission}
                                                                 getGroups={getGroups}
-                                                                permissions={permissions}
+                                                                endUserPermission={endUserPermission}
+                                                                activityPermission={activityPermission}
                                                             />
                                                         )
                                                     }

@@ -14,6 +14,7 @@ import SerachFilter from '../../../components/common/SerachFilter';
 import useGridPagination from '../../../hooks/useGridPagination'
 import { usePermission } from '../../../hooks/UsePermission'
 import { MENU } from '../../../data/Menu'
+import useUserPermission from '../../../utils/UserPermission'
 const ActionCell = (props) => {
     const item = props.dataItem;
 
@@ -85,8 +86,9 @@ export default function Ammunition() {
     const [searchText, setSearchText] = useState("")
     const [customSearch, setcustomSearch] = useState("")
     const [filters, setFilters] = useState([])
-    const permission = usePermission()
-    const ammunitionPermission = permission.find((value, index) => value.menuId === MENU.AMMUNITION)
+    // const permission = usePermission()
+    // const ammunitionPermission = permission.find((value, index) => value.menuId === MENU.AMMUNITION)
+    const { ammunitionPermission } = useUserPermission()
     const {
         dataState,
         onDataStateChange,

@@ -13,6 +13,7 @@ import { MENU } from '../../../data/Menu'
 
 import { ColumnMenu } from '../../../components/grid/ColumnMenu'
 import { getBackendFilters } from '../../../components/grid/GridFilter'
+import useUserPermission from '../../../utils/UserPermission'
 
 export default function EndUser() {
     const [manageUserData, setmanageUserData] = useState([])
@@ -31,9 +32,9 @@ export default function EndUser() {
     const [customSearch, setcustomSearch] = useState("");
     const [filters, setFilters] = useState([])
     const permission = usePermission()
-    const endUserPermission = permission.find((value, index) => value.menuId === MENU.END_USER)
-    console.log(endUserPermission);
-
+    // const endUserPermission = permission.find((value, index) => value.menuId === MENU.END_USER)
+    // console.log(endUserPermission);
+    const { endUserPermission } = useUserPermission()
 
     const getManageEndUser = async () => {
         try {
@@ -205,8 +206,9 @@ export default function EndUser() {
                     <div className="col-12 mt-3 mt-xxl-4">
                         <div className="table-responsive">
                             <Grid
-                                className="table-wrapper"
+                                className="table-wrapper responsive-kendo-grid"
                                 tableProps={{ className: "table" }}
+                                style={{ width: "100%", minWidth: "860px" }}
 
                                 data={manageUserData}
                                 total={total}

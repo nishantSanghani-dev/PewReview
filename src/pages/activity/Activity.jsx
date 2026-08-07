@@ -11,12 +11,13 @@ import useGridPagination from '../../hooks/useGridPagination'
 import { Tooltip } from '@progress/kendo-react-tooltip';
 import { usePermission } from '../../hooks/UsePermission';
 import { MENU } from '../../data/Menu';
+import useUserPermission from '../../utils/UserPermission';
 const ActionCell = (props) => {
     return (
         <td {...props.tdProps}>
             <div className="d-flex gap-2 align-items-center">
                 {
-            
+
 
                     <Link to={`/admin/activity/view/${props.dataItem.postId}`}
 
@@ -114,8 +115,8 @@ export const DateCell = ({ tdProps, dataItem, field }) => {
         </td>
     )
 }
-const UserNameCell = ({ tdProps, dataItem, field, permission }) => {
-    const endUserPermission = permission.find((value, index) => value.menuId === MENU.END_USER)
+const UserNameCell = ({ tdProps, dataItem, field, endUserPermission }) => {
+    // const endUserPermission = permission.find((value, index) => value.menuId === MENU.END_USER)
 
     return (
         <td {...tdProps}>
@@ -150,10 +151,11 @@ export default function Activity() {
         kendoSort,
         setKendoSort,
     } = useGridPagination(10)
-    const permission = usePermission()
-    const activityPersmission = permission.find((value, index) => value.menuId === MENU.ACTIVITY)
-    console.log(activityPersmission);
-    
+    // const permission = usePermission()
+    // const activityPersmission = permission.find((value, index) => value.menuId === MENU.ACTIVITY)
+    // console.log(activityPersmission);
+    const { activityPermission: activityPersmission, endUserPermission } = useUserPermission()
+
     const getActivities = async () => {
         const payload = {
             page,
@@ -283,7 +285,7 @@ export default function Activity() {
                                                                 ? {
                                                                     data: (props) => (
                                                                         <col.cell
-                                                                            permission={permission}
+                                                                            endUserPermission={endUserPermission}
                                                                             activityPersmission={activityPersmission}
                                                                             {...props}
                                                                         />

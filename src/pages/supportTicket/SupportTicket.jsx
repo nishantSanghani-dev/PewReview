@@ -13,6 +13,7 @@ import useGridPagination from '../../hooks/useGridPagination'
 import { Tooltip } from "@progress/kendo-react-tooltip";
 import { usePermission } from '../../hooks/UsePermission';
 import { MENU } from '../../data/Menu';
+import useUserPermission from '../../utils/UserPermission';
 const ActionCell = (props) => {
 
 
@@ -170,9 +171,11 @@ export default function SupportTicket() {
         kendoSort,
         setKendoSort,
     } = useGridPagination(10)
-    const permission = usePermission()
-    const supportTicketPermission = permission.find((value, index) => value.menuId === MENU.SUPPORT)
-    console.log(supportTicketPermission);
+    // const permission = usePermission()
+    // const supportTicketPermission = permission.find((value, index) => value.menuId === MENU.SUPPORT)
+    // console.log(supportTicketPermission);
+
+    const { supportPermission: supportTicketPermission } = useUserPermission()
     const getSuppportStatus = async () => {
         const res = await apiRequest("GET", API_ROUTES.common.getSupportStatus, null, null, {
             showLoader: true

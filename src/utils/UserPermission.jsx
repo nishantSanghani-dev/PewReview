@@ -5,61 +5,61 @@ export default function useUserPermission() {
     const permissions = usePermission();
     return {
         dashboardPermission: permissions.find(
-            (item) => item.menuId === MENU.DASHBOARD
+            (item) => item.typeId === MENU.DASHBOARD
         ),
         activityPermission: permissions.find(
-            (item) => item.menuId === MENU.ACTIVITY
+            (item) => item.typeId === MENU.ACTIVITY
         ),
         groupPermission: permissions.find(
-            (item) => item.menuId === MENU.GROUP
+            (item) => item.typeId === MENU.GROUP
         ),
         eventPermission: permissions.find(
-            (item) => item.menuId === MENU.EVENT
+            (item) => item.typeId === MENU.EVENT
         ),
         venuePermission: permissions.find(
-            (item) => item.menuId === MENU.VENUE
+            (item) => item.typeId === MENU.VENUE
         ),
         rolePermission: permissions.find(
-            (item) => item.menuId === MENU.ROLE
+            (item) => item.typeId === MENU.ROLE
         ),
         userPermission: permissions.find(
-            (item) => item.menuId === MENU.USER
+            (item) => item.typeId === MENU.USER
         ),
         endUserPermission: permissions.find(
-            (item) => item.menuId === MENU.END_USER
+            (item) => item.typeId === MENU.END_USER
         ),
         supportPermission: permissions.find(
-            (item) => item.menuId === MENU.SUPPORT
+            (item) => item.typeId === MENU.SUPPORT
         ),
         messagePermission: permissions.find(
-            (item) => item.menuId === MENU.MESSAGE
+            (item) => item.typeId === MENU.MESSAGE
         ),
         reportPermission: permissions.find(
-            (item) => item.menuId === MENU.REPORT
+            (item) => item.typeId === MENU.REPORT
         ),
         leaderboardPermission: permissions.find(
-            (item) => item.menuId === MENU.LEADERBOARD
+            (item) => item.typeId === MENU.LEADERBOARD
         ),
         badgePermission: permissions.find(
-            (item) => item.menuId === MENU.BADGE
+            (item) => item.typeId === MENU.BADGE
         ),
         prohibitedWordPermission: permissions.find(
-            (item) => item.menuId === MENU.PROHIBITED_WORD
+            (item) => item.typeId === MENU.PROHIBITED_WORD
         ),
         gunMasterPermission: permissions.find(
-            (item) => item.menuId === MENU.GUN_MASTER
+            (item) => item.typeId === MENU.GUN_MASTER
         ),
         ammunitionPermission: permissions.find(
-            (item) => item.menuId === MENU.AMMUNITION
+            (item) => item.typeId === MENU.AMMUNITION
         ),
         accessoryPermission: permissions.find(
-            (item) => item.menuId === MENU.ACCESSORY
+            (item) => item.typeId === MENU.ACCESSORY
         ),
         gunCategoryMasterPermission: permissions.find(
-            (item) => item.menuId === MENU.GUN_CATEGORY_MASTER
+            (item) => item.typeId === MENU.GUN_CATEGORY_MASTER
         ),
         manufacturerPermission: permissions.find(
-            (item) => item.menuId === MENU.MANUFACTURER
+            (item) => item.typeId === MENU.MANUFACTURER
         ),
     };
 }

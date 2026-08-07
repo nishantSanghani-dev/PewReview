@@ -8,6 +8,7 @@ import useGridPagination from '../../hooks/useGridPagination'
 import { usePermission } from '../../hooks/UsePermission'
 import { MENU } from '../../data/Menu'
 import { useSearchParams } from 'react-router-dom'
+import useUserPermission from '../../utils/UserPermission'
 
 const getParamsForTab = (tab) => {
     switch (tab) {
@@ -25,7 +26,7 @@ const getParamsForTab = (tab) => {
 export default function Event() {
     const [searchParams, setSearchParams] = useSearchParams()
     console.log(searchParams.get('tab'));
-    
+
     const queryTab = searchParams.get('tab')
     const eventTabs = ['upcomingEvents', 'passedEvents', 'adminEvents'].includes(queryTab)
         ? queryTab
@@ -45,9 +46,10 @@ export default function Event() {
         kendoSort,
         setKendoSort,
     } = useGridPagination(10)
-    const permission = usePermission()
-    const eventPermission = permission.find((value, index) => value.menuId === MENU.EVENT)
-    console.log(eventPermission);
+    // const permission = usePermission()
+    // const eventPermission = permission.find((value, index) => value.menuId === MENU.EVENT)
+    // console.log(eventPermission);
+    const { eventPermission } = useUserPermission()
     const getEevent = async () => {
         const res = await apiRequest("POST", API_ROUTES.events.getAllEvent, { page, pageSize, customSearch, Sorts: sort, Filters: filters }, params, {
             showLoader: true

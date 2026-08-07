@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { handleDelete } from '../../../utils/DeleteRecords';
 import { useSelector } from 'react-redux';
 import { MENU } from '../../../data/Menu';
+import useUserPermission from '../../../utils/UserPermission';
 export const ActionCell = (props) => {
     console.log(props.dataItem.eventId);
 
@@ -79,8 +80,10 @@ export default function Events({ data, isUpcomingEvent, setisUpcomingEvent }) {
     const { permissions } = useSelector((store) => store.user)
     console.log(permissions);
 
-    const eventPermission = permissions?.find((value, index) => value.menuId === MENU.EVENT)
-    console.log(eventPermission);
+    // const eventPermission = permissions?.find((value, index) => value.menuId === MENU.EVENT)
+    // console.log(eventPermission);
+
+    const { eventPermission } = useUserPermission()
     return (
         <>
             {

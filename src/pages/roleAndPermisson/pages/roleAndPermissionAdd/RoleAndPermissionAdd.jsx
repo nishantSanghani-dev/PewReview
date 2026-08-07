@@ -130,11 +130,9 @@ export default function RoleAndPermissionAdd() {
         }
     }, [id])
     return (
-
         <>
             {
                 console.log(singlePermissionData)
-
             }
             <div className="container-fluid">
                 <div className="tabbar-section">

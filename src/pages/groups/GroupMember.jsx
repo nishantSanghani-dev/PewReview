@@ -6,10 +6,12 @@ import { Grid, GridColumn } from '@progress/kendo-react-grid';
 import BreadCumb from '../../components/common/breadCumb/BreadCumb';
 import { usePermission } from '../../hooks/UsePermission';
 import { MENU } from '../../data/Menu';
+import useUserPermission from '../../utils/UserPermission';
 const MemberCell = (props) => {
 
-    const permission = usePermission()
-    const endUserPermission = permission.find((value, index) => value.menuId === MENU.END_USER)
+    // const permission = usePermission()
+    // const endUserPermission = permission.find((value, index) => value.menuId === MENU.END_USER)
+    const { endUserPermission } = useUserPermission()
     return (
         <td {...props.tdProps}>
             <div className="d-flex gap-2 align-items-center">

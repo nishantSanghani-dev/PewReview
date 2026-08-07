@@ -74,6 +74,8 @@ export default function UserForm({ userRoleData, genderData, communicationData, 
     }
 
     useEffect(() => {
+        console.log(userSingleData);
+        
         if (userSingleData) {
             reset({
                 firstName: userSingleData.firstName,
@@ -333,7 +335,7 @@ export default function UserForm({ userRoleData, genderData, communicationData, 
                                             className="child-checkbox"
                                             onChange={handleCommunication}
                                             value={value.id}
-                                            defaultChecked=""
+                                            // checked={userSingleData?.commincateWith?.includes(value.id)}
                                         />
                                         <span className="checkmark" />
                                         {value.description}

@@ -6,6 +6,7 @@ import SerachFilter from '../../../components/common/SerachFilter'
 import useGridPagination from '../../../hooks/useGridPagination'
 import { usePermission } from '../../../hooks/UsePermission'
 import { MENU } from '../../../data/Menu'
+import useUserPermission from '../../../utils/UserPermission'
 
 export default function ManageUser() {
     const [manageUserData, setmanageUserData] = useState([])
@@ -13,11 +14,14 @@ export default function ManageUser() {
     const [searchText, setSearchText] = useState("")
     const [customSearch, setcustomSearch] = useState("")
     const { page, pageSize, resetPage } = useGridPagination(10)
-    const permission = usePermission()
+    // const permission = usePermission()
     // console.log(permission);
-    const manageUserPermission = permission.find((value, index) => value.menuId === MENU.USER)
-    console.log(manageUserPermission);
+    // const manageUserPermission = permission.find((value, index) => value.menuId === MENU.USER)
+    // console.log(manageUserPermission);
 
+    const { userPermission: manageUserPermission } = useUserPermission()
+    console.log(manageUserPermission);
+    
     const getManageUser = async () => {
         const res = await apiRequest("POST", API_ROUTES.user.userView, { page, pageSize, customSearch }, null, {
             showLoader: true
@@ -85,162 +89,163 @@ export default function ManageUser() {
     }
 
     return (
-        <div className="container-fluid">
-            <div className="tabbar-section">
-                <div className="row align-items-center gap-3">
-                    <div className="col-12 col-lg-auto">
-                        <SerachFilter
-                            value={searchText}
-                            onChange={(e) => setSearchText(e.target.value)}
-                            onSubmit={handleSearchSubmit}
-                        />
-                    </div>
-                    <div className="col-12 col-lg">
-                        <div className="btn-list d-flex justify-content-lg-end flex-wrap gap-2 gap-md-3 text-end">
-                            {
-                                manageUserPermission.canDelete
-                                &&
-                                ids.length >= 1
-                                &&
+        <>
+            {
+                manageUserPermission?.canRead
+                &&
+                <div className="container-fluid">
+                    <div className="tabbar-section">
+                        <div className="row align-items-center gap-3">
+                            <div className="col-12 col-lg-auto">
+                                <SerachFilter
+                                    value={searchText}
+                                    onChange={(e) => setSearchText(e.target.value)}
+                                    onSubmit={handleSearchSubmit}
+                                />
+                            </div>
+                            <div className="col-12 col-lg">
+                                <div className="btn-list d-flex justify-content-lg-end flex-wrap gap-2 gap-md-3 text-end">
+                                    {
+                                        manageUserPermission.canDelete
+                                        &&
+                                        ids.length >= 1
+                                        &&
 
-                                <Link
-                                    href="javascript:void(0);"
-                                    className="btn main-btn border-btn danger-btn"
-                                    onClick={handleDelete}
-                                >
-                                    Delete
-                                </Link>
-                            }
-                            <a
-                                href="javascript:void(0);"
-                                className="btn main-btn border-btn blue-btn"
-                            >
-                                Import
-                            </a>
-                            <button
-                                onClick={exportData}
-                                className="btn main-btn border-btn sky-btn"
-                            >
-                                Export
-                            </button>
-                            {
-                                manageUserPermission.canCreate
-                                &&
+                                        <Link
+                                            href="javascript:void(0);"
+                                            className="btn main-btn border-btn danger-btn"
+                                            onClick={handleDelete}
+                                        >
+                                            Delete
+                                        </Link>
+                                    }
 
-                                <Link
-                                    to={'/admin/user/add'}
-                                    className="btn main-btn border-btn blue-btn"
-                                >
-                                    Add Users
-                                </Link>
-                            }
+                                    <button
+                                        onClick={exportData}
+                                        className="btn main-btn border-btn sky-btn"
+                                    >
+                                        Export
+                                    </button>
+                                    {
+                                        manageUserPermission.canCreate
+                                        &&
+
+                                        <Link
+                                            to={'/admin/user/add'}
+                                            className="btn main-btn border-btn blue-btn"
+                                        >
+                                            Add Users
+                                        </Link>
+                                    }
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
-                <div className="row">
-                    <div className="col-12 mt-3 mt-xxl-4">
-                        <div className="table-responsive">
-                            <table className="table">
-                                <thead className="table-dark">
-                                    <tr>
-                                        {manageUserPermission?.canDelete && <th></th>}
-
-                                        {(manageUserPermission?.canUpdate ||
-                                            manageUserPermission?.canDelete) && (
-                                                <th>Action</th>
-                                            )}
-
-                                        <th>First Name</th>
-                                        <th>Last Name</th>
-                                        <th>Role</th>
-                                        <th>Phone</th>
-                                        <th>Email</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-
-                                <tbody>
-                                    {manageUserData?.length > 0 ? (
-                                        manageUserData.map((value) => (
-                                            <tr key={value.id}>
-                                                {manageUserPermission?.canDelete && (
-                                                    <td>
-                                                        <label className="custom-checkbox">
-                                                            <input
-                                                                type="checkbox"
-                                                                className="child-checkbox"
-                                                                value={value.id}
-                                                                onChange={handleChange}
-                                                            />
-                                                            <span className="checkmark"></span>
-                                                        </label>
-                                                    </td>
-                                                )}
+                        <div className="row">
+                            <div className="col-12 mt-3 mt-xxl-4">
+                                <div className="table-responsive">
+                                    <table className="table">
+                                        <thead className="table-dark">
+                                            <tr>
+                                                {manageUserPermission?.canDelete && <th></th>}
 
                                                 {(manageUserPermission?.canUpdate ||
                                                     manageUserPermission?.canDelete) && (
-                                                        <td>
-                                                            <span className="d-flex gap-2 align-items-center">
-                                                                {manageUserPermission?.canUpdate && (
-                                                                    <Link
-                                                                        to={`/admin/user/edit/${value.id}`}
-                                                                        className="small-square-btn edit-btn"
-                                                                    >
-                                                                        <i className="demo-icon icon-edit-1" />
-                                                                    </Link>
-                                                                )}
-
-                                                                {manageUserPermission?.canDelete && (
-                                                                    <button
-                                                                        type="button"
-                                                                        onClick={() => handleDelete(value.id)}
-                                                                        className="small-square-btn danger-btn"
-                                                                    >
-                                                                        <i className="demo-icon icon-delete-1" />
-                                                                    </button>
-                                                                )}
-                                                            </span>
-                                                        </td>
+                                                        <th>Action</th>
                                                     )}
 
-                                                <td>{value.firstName}</td>
-                                                <td>{value.lastName}</td>
-                                                <td>{value.roleName}</td>
-                                                <td>{value.contactNumber}</td>
-                                                <td>{value.email}</td>
-
-                                                <td>
-                                                    <div className="form-check form-switch">
-                                                        <input
-                                                            className="form-check-input"
-                                                            type="checkbox"
-                                                            disabled={!manageUserPermission?.canUpdate}
-                                                            checked={value.isActive}
-                                                            onChange={(e) =>
-                                                                handleStatusChange(value.id, e.target.checked)
-                                                            }
-                                                        />
-                                                    </div>
-                                                </td>
+                                                <th>First Name</th>
+                                                <th>Last Name</th>
+                                                <th>Role</th>
+                                                <th>Phone</th>
+                                                <th>Email</th>
+                                                <th>Status</th>
                                             </tr>
-                                        ))
-                                    ) : (
-                                        <tr>
-                                            <td
-                                                colSpan={manageUserPermission?.canDelete ? 8 : 7}
-                                                className="text-center"
-                                            >
-                                                No users found.
-                                            </td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </table>
+                                        </thead>
+
+                                        <tbody>
+                                            {manageUserData?.length > 0 ? (
+                                                manageUserData.map((value) => (
+                                                    <tr key={value.id}>
+                                                        {manageUserPermission?.canDelete && (
+                                                            <td>
+                                                                <label className="custom-checkbox">
+                                                                    <input
+                                                                        type="checkbox"
+                                                                        className="child-checkbox"
+                                                                        value={value.id}
+                                                                        onChange={handleChange}
+                                                                    />
+                                                                    <span className="checkmark"></span>
+                                                                </label>
+                                                            </td>
+                                                        )}
+
+                                                        {(manageUserPermission?.canUpdate ||
+                                                            manageUserPermission?.canDelete) && (
+                                                                <td>
+                                                                    <span className="d-flex gap-2 align-items-center">
+                                                                        {manageUserPermission?.canUpdate && (
+                                                                            <Link
+                                                                                to={`/admin/user/edit/${value.id}`}
+                                                                                className="small-square-btn edit-btn"
+                                                                            >
+                                                                                <i className="demo-icon icon-edit-1" />
+                                                                            </Link>
+                                                                        )}
+
+                                                                        {manageUserPermission?.canDelete && (
+                                                                            <button
+                                                                                type="button"
+                                                                                onClick={() => handleDelete(value.id)}
+                                                                                className="small-square-btn danger-btn"
+                                                                            >
+                                                                                <i className="demo-icon icon-delete-1" />
+                                                                            </button>
+                                                                        )}
+                                                                    </span>
+                                                                </td>
+                                                            )}
+
+                                                        <td>{value.firstName}</td>
+                                                        <td>{value.lastName}</td>
+                                                        <td>{value.roleName}</td>
+                                                        <td>{value.contactNumber}</td>
+                                                        <td>{value.email}</td>
+
+                                                        <td>
+                                                            <div className="form-check form-switch">
+                                                                <input
+                                                                    className="form-check-input"
+                                                                    type="checkbox"
+                                                                    disabled={!manageUserPermission?.canUpdate}
+                                                                    checked={value.isActive}
+                                                                    onChange={(e) =>
+                                                                        handleStatusChange(value.id, e.target.checked)
+                                                                    }
+                                                                />
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                ))
+                                            ) : (
+                                                <tr>
+                                                    <td
+                                                        colSpan={manageUserPermission?.canDelete ? 8 : 7}
+                                                        className="text-center"
+                                                    >
+                                                        No users found.
+                                                    </td>
+                                                </tr>
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
+            }
+        </>
 
     )
 }

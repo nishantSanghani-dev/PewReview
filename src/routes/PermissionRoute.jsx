@@ -4,37 +4,39 @@ import { usePermission } from '../hooks/UsePermission'
 import { MENU } from '../data/Menu'
 
 const routeFallbacks = [
-    { menuId: MENU.DASHBOARD, path: '/admin/dashboard' },
-    { menuId: MENU.ACTIVITY, path: '/admin/activity/view' },
-    { menuId: MENU.EVENT, path: '/admin/events/view' },
-    { menuId: MENU.END_USER, path: '/admin/manage-end-user' },
-    { menuId: MENU.MESSAGE, path: '/admin/messages' },
-    { menuId: MENU.REPORT, path: '/admin/reported-user' },
-    { menuId: MENU.ROLE, path: '/admin/role-and-permission/view' },
-    { menuId: MENU.VENUE, path: '/admin/venues/list' },
-    { menuId: MENU.SUPPORT, path: '/admin/support-tickets' },
-    { menuId: MENU.GROUP, path: '/admin/groups' },
-    { menuId: MENU.BADGE, path: '/admin/manage-badges' },
-    { menuId: MENU.PROHIBITED_WORD, path: '/admin/masters/prohibited-words' },
-    { menuId: MENU.MANUFACTURER, path: '/admin/masters/manufacturer' },
-    { menuId: MENU.ACCESSORY, path: '/admin/masters/accessories' },
-    { menuId: MENU.GUN_MASTER, path: '/admin/masters/gun' },
-    { menuId: MENU.AMMUNITION, path: '/admin/masters/ammunition' },
-    { menuId: MENU.GUN_CATEGORY_MASTER, path: '/admin/masters/category' },
-    { menuId: MENU.LEADERBOARD, path: '/admin/leaderboard' },
+    { typeId: MENU.DASHBOARD, path: '/admin/dashboard' },
+    { typeId: MENU.ACTIVITY, path: '/admin/activity/view' },
+    { typeId: MENU.EVENT, path: '/admin/events/view' },
+    { typeId: MENU.END_USER, path: '/admin/manage-end-user' },
+    { typeId: MENU.MESSAGE, path: '/admin/messages' },
+    { typeId: MENU.REPORT, path: '/admin/reported-user' },
+    { typeId: MENU.ROLE, path: '/admin/role-and-permission/view' },
+    { typeId: MENU.VENUE, path: '/admin/venues/list' },
+    { typeId: MENU.SUPPORT, path: '/admin/support-tickets' },
+    { typeId: MENU.GROUP, path: '/admin/groups' },
+    { typeId: MENU.BADGE, path: '/admin/manage-badges' },
+    { typeId: MENU.PROHIBITED_WORD, path: '/admin/masters/prohibited-words' },
+    { typeId: MENU.MANUFACTURER, path: '/admin/masters/manufacturer' },
+    { typeId: MENU.ACCESSORY, path: '/admin/masters/accessories' },
+    { typeId: MENU.GUN_MASTER, path: '/admin/masters/gun' },
+    { typeId: MENU.AMMUNITION, path: '/admin/masters/ammunition' },
+    { typeId: MENU.GUN_CATEGORY_MASTER, path: '/admin/masters/category' },
+    { typeId: MENU.LEADERBOARD, path: '/admin/leaderboard' },
 ]
 
-export default function PermissionRoute({ menuId, children }) {
+export default function PermissionRoute({ typeId, children }) {
+    console.log(typeId);
     
     const permissions = usePermission() || []
-    const hasAccess = permissions.some((permission) => permission.menuId === menuId && permission.canRead)
-
+    const hasAccess = permissions.some((permission) => permission.typeId === typeId && permission.canRead)
+    console.log(hasAccess);
+    
     if (hasAccess) {
         return children
     }
 
     const fallback = routeFallbacks.find((route) =>
-        permissions.some((permission) => permission.menuId === route.menuId && permission.canRead)
+        permissions.some((permission) => permission.typeId === route.typeId && permission.canRead)
     )?.path
 
     return <Navigate to={fallback ?? '/'} replace />

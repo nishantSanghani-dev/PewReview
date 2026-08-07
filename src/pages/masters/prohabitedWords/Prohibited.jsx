@@ -13,6 +13,7 @@ import useGridPagination from '../../../hooks/useGridPagination'
 import { usePermission } from '../../../hooks/UsePermission'
 import { MENU } from '../../../data/Menu'
 import { ColumnMenu } from '../../../components/grid/ColumnMenu'
+import useUserPermission from '../../../utils/UserPermission'
 const ActionCell = (props) => {
     const item = props.dataItem;
 
@@ -95,9 +96,9 @@ export default function Prohibited() {
         setKendoSort,
     } = useGridPagination(10)
 
-    const permission = usePermission()
-    const prohibitedPermission = permission.find((value, index) => value.menuId === MENU.PROHIBITED_WORD)
-
+    // const permission = usePermission()
+    // const prohibitedPermission = permission.find((value, index) => value.menuId === MENU.PROHIBITED_WORD)
+    const { prohibitedWordPermission:prohibitedPermission } = useUserPermission()
     const getProhibited = async () => {
         const res = await apiRequest("POST", API_ROUTES.prohibited.getProhibited, { page, pageSize, customSearch, Sorts: sort, Filters: filters }, null, {
             showLoader: true
@@ -222,7 +223,7 @@ export default function Prohibited() {
                                                                         <col.cell
                                                                             {...props}
                                                                             prohibitedPermission={prohibitedPermission}
-                                                                            prohibitedPermission={prohibitedPermission}
+                                                                          
                                                                             getProhibited={getProhibited}
                                                                             setisProhibitedOpen={setisProhibitedOpen}
 

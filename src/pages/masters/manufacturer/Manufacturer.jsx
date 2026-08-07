@@ -14,6 +14,7 @@ import SerachFilter from '../../../components/common/SerachFilter';
 import useGridPagination from '../../../hooks/useGridPagination'
 import { usePermission } from '../../../hooks/UsePermission'
 import { MENU } from '../../../data/Menu'
+import useUserPermission from '../../../utils/UserPermission'
 const ActionCell = (props) => {
     const item = props.dataItem;
     return (
@@ -93,8 +94,9 @@ export default function Manufacturer() {
         kendoSort,
         setKendoSort,
     } = useGridPagination(10)
-    const permission = usePermission()
-    const manufecturePermission = permission.find((value, index) => value.menuId === MENU.MANUFACTURER)
+    // const permission = usePermission()
+    // const manufecturePermission = permission.find((value, index) => value.menuId === MENU.MANUFACTURER)
+    const { manufacturerPermission: manufecturePermission } = useUserPermission()
     const getManufacturer = async () => {
         const res = await apiRequest("POST", API_ROUTES.manufacturer.getManufacturer, { page, PageSize: pageSize, customSearch, Sorts: sort, Filters: filters }, null, {
             showLoader: true
@@ -104,11 +106,11 @@ export default function Manufacturer() {
     const manufectureColumns = [
         ...(manufecturePermission?.canUpdate || manufecturePermission?.canDelete
             ? [
-                 { field: "action", title: "Action", cell: ActionCell, width: "80px" },
+                { field: "action", title: "Action", cell: ActionCell, width: "80px" },
             ]
             : []),
 
-       
+
         { field: "name", title: "Manufacturer Name", filter: "text", columnMenu: ColumnMenu },
         { field: "description", title: "Description", width: "250px", filter: "text", columnMenu: ColumnMenu },
         { field: "createdByUserName", title: "Created By", filter: "text", columnMenu: ColumnMenu },

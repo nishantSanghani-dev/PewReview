@@ -12,6 +12,7 @@ import { MENU } from '../../../../data/Menu'
 import { filterIcon } from '@progress/kendo-svg-icons'
 import { ColumnMenu, ColumnMenuCheckboxFilter } from '../../../../components/grid/ColumnMenu'
 import { getBackendFilters } from '../../../../components/grid/GridFilter'
+import useUserPermission from '../../../../utils/UserPermission'
 const RoleActionCell = (props) => {
     const item = props.dataItem;
 
@@ -84,9 +85,11 @@ export default function RoleAndPermission() {
         field: item.field,
         direction: item.dir === 'asc' ? 0 : 1,
     })), [kendoSort])
-    const permission = usePermission()
-    const rolePermission = permission.find((value, index) => value.menuId === MENU.ROLE)
-    console.log(rolePermission);
+    // const permission = usePermission()
+    // const rolePermission = permission.find((value, index) => value.menuId === MENU.ROLE)
+    // console.log(rolePermission);
+
+    const { rolePermission } = useUserPermission()
 
 
     const getRole = async () => {

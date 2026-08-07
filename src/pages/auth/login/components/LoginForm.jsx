@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { loginSchema } from '../../../../validation/zod.validation';
@@ -9,11 +9,46 @@ import { API_ROUTES } from '../../../../routes/api.routes';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logIn } from '../../../../slice/user.slice';
+import { usePermission } from '../../../../hooks/UsePermission';
+import { MENU } from '../../../../data/Menu';
 export default function LoginForm() {
     const navigate = useNavigate()
     const { token } = useSelector((store) => store.user)
     const dispatch = useDispatch()
     // console.log(token);
+    const permission = usePermission()
+    const [shouldRedirect, setShouldRedirect] = useState(false)
+    console.log(permission);
+
+    useEffect(() => {
+        if (!shouldRedirect || !permission?.length) return
+
+        const firstPermission = permission[0]
+        const routeMap = {
+            [MENU.DASHBOARD]: '/admin/dashboard',
+            [MENU.ACTIVITY]: '/admin/activity/view',
+            [MENU.EVENT]: '/admin/events/view',
+            [MENU.END_USER]: '/admin/manage-end-user',
+            [MENU.MESSAGE]: '/admin/messages',
+            [MENU.REPORT]: '/admin/reported-user',
+            [MENU.ROLE]: '/admin/role-and-permission/view',
+            [MENU.VENUE]: '/admin/venues/list',
+            [MENU.SUPPORT]: '/admin/support-tickets',
+            [MENU.GROUP]: '/admin/groups',
+            [MENU.BADGE]: '/admin/manage-badges',
+            [MENU.PROHIBITED_WORD]: '/admin/masters/prohibited-words',
+            [MENU.MANUFACTURER]: '/admin/masters/manufacturer',
+            [MENU.ACCESSORY]: '/admin/masters/accessories',
+            [MENU.GUN_MASTER]: '/admin/masters/gun',
+            [MENU.AMMUNITION]: '/admin/masters/ammunition',
+            [MENU.GUN_CATEGORY_MASTER]: '/admin/masters/category',
+            [MENU.LEADERBOARD]: '/admin/leaderboard',
+            [MENU.USER]: '/admin/user/manage-user',
+        }
+
+        navigate(routeMap[firstPermission?.menuId] || '/admin/dashboard')
+        setShouldRedirect(false)
+    }, [permission, shouldRedirect, navigate])
 
     const {
         register,
@@ -32,10 +67,10 @@ export default function LoginForm() {
         console.log(res);
         if (res.status) {
             dispatch(logIn({
-                token: res.data.token, permission: res.data.userDetails
-                    .menuPermissions
+                token: res.data.token,
+                permission: res.data.userDetails.menuPermissions
             }))
-            navigate("/admin/dashboard")
+            setShouldRedirect(true)
         }
 
     }

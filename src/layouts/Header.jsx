@@ -44,7 +44,7 @@ export default function Header({ mobileSlideBar, setmobileSlideBar }) {
                      <input class="form-control" type="search" placeholder="Search" aria-label="Search">
                      <button class="btn btn-outline-primary" type="submit"><i class="demo-icon icon-search"></i></button>
                      </form> */}
-                            <button className="search-toggle d-block d-md-none" type="button">
+                            {/* <button className="search-toggle d-block d-md-none" type="button">
                                 <i className="demo-icon icon-search" />
                                 <i className="demo-icon icon-cross" />
                             </button>
@@ -58,7 +58,7 @@ export default function Header({ mobileSlideBar, setmobileSlideBar }) {
                                 <button className="btn btn-outline-primary" type="button">
                                     <i className="demo-icon icon-search" />
                                 </button>
-                            </form>
+                            </form> */}
                             <div className="head-icons">
                                 <ul className="d-flex align-items-center gap-1 gap-sm-3 gap-xl-4">
                                     <li className="dropdown no-arrow chat-notification">
@@ -70,10 +70,10 @@ export default function Header({ mobileSlideBar, setmobileSlideBar }) {
                                             <i className="demo-icon icon-message-2" />
                                             <span>5</span>
                                         </a>
-                                        <ul className="dropdown-menu">
+                                        {/* <ul className="dropdown-menu">
                                             <li><a className="dropdown-item" href="profile.html">List One</a></li>
                                             <li><a className="dropdown-item" href="#">List Two</a></li>
-                                        </ul>
+                                        </ul> */}
                                     </li>
                                     <li className="dropdown no-arrow notification">
                                         <a
