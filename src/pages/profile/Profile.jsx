@@ -3,12 +3,14 @@ import BreadCumb from '../../components/common/breadCumb/BreadCumb'
 import { apiRequest } from '../../services/Api'
 import { API_ROUTES } from '../../routes/api.routes'
 import ProfileForm from './ProfileForm'
+import ChangePassword from '../auth/login/pages/ChangePassword'
 
 export default function Profile() {
     const [userProfile, setUserProfile] = useState(null)
     const [genderData, setGenderData] = useState([])
     const [countryData, setCountryData] = useState([])
     const [communicationData, setCommunicationData] = useState([])
+    const [isOpenChangePassword, setisOpenChangePassword] = useState(false)
     const [roleData, setRoleData] = useState([])
 
     const fetchProfile = async () => {
@@ -61,6 +63,7 @@ export default function Profile() {
 
     return (
         <div className="container-fluid">
+
             <div className="tabbar-section">
                 <div className="row">
                     <div className="col-12">
@@ -70,6 +73,8 @@ export default function Profile() {
                 <div className="row">
                     <div className="col-12">
                         <ProfileForm
+                            isOpenChangePassword={isOpenChangePassword}
+                            setisOpenChangePassword={setisOpenChangePassword}
                             userProfile={userProfile}
                             genderData={genderData}
                             countryData={countryData}
@@ -80,6 +85,13 @@ export default function Profile() {
                     </div>
                 </div>
             </div>
+            {
+                isOpenChangePassword
+                &&
+                <ChangePassword
+                userProfile={userProfile}
+                setisOpenChangePassword={setisOpenChangePassword} />
+            }
         </div>
     )
 }

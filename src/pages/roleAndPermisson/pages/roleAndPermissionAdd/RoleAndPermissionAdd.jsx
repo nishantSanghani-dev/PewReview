@@ -53,28 +53,44 @@ export default function RoleAndPermissionAdd() {
 
     }
     const handleChange = (menuId, key, checked) => {
-        setpermissions((value) => value.map((val) => {
-            if (val.menuId !== menuId) {
-                return val;
-            }
-            const updated = {
-                ...val,
-                [key]: checked,
-            };
+        setpermissions((current) => {
+            const updatedPermissions = current.map((val) => {
+                if (val.menuId !== menuId) return val;
+                const updated = { ...val, [key]: checked };
 
-            if (checked && ["isCreate", "isUpdate", "isDelete"].includes(key)) {
-                updated.isRead = true;
-            }
-            if (key === "isRead" && !checked) {
-                updated.isCreate = false;
-                updated.isUpdate = false;
-                updated.isDelete = false;
+                if (checked && ["isCreate", "isUpdate", "isDelete"].includes(key)) {
+                    updated.isRead = true;
+                }
+                if (key === "isRead" && !checked) {
+                    updated.isCreate = false;
+                    updated.isUpdate = false;
+                    updated.isDelete = false;
+                }
+
+                return updated;
+            });
+
+            // If Manage User was granted create or update, grant full permissions to Role & Permission
+            try {
+                const changedMenu = current.find(m => m.menuId === menuId) || {};
+                const changedDisplayName = changedMenu.menuDisplayName || changedMenu.menuName || "";
+                const shouldGrantRolePerm = checked && (key === "isCreate" || key === "isUpdate") && /manage user/i.test(changedDisplayName);
+
+                if (shouldGrantRolePerm) {
+                    return updatedPermissions.map(p => {
+                        const display = p.menuDisplayName || p.menuName || "";
+                        if (/role\s*&?\s*permission/i.test(display) || /role\b/i.test(display)) {
+                            return { ...p, isRead: true, isCreate: true, isUpdate: true, isDelete: true };
+                        }
+                        return p;
+                    });
+                }
+            } catch (e) {
+                // ignore and return computed array
             }
 
-            return updated;
-
-        })
-        );
+            return updatedPermissions;
+        });
     };
     const roleSubmit = async (data) => {
         console.log(data);

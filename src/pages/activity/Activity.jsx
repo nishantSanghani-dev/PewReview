@@ -16,16 +16,17 @@ const ActionCell = (props) => {
     return (
         <td {...props.tdProps}>
             <div className="d-flex gap-2 align-items-center">
-                {
 
 
-                    <Link to={`/admin/activity/view/${props.dataItem.postId}`}
 
-                        className="small-square-btn edit-btn"
-                    >
-                        <i className="demo-icon icon-eye-line"></i>
-                    </Link>
-                }
+
+                <Link to={`/admin/activity/view/${props.dataItem.postId}`}
+
+                    className="small-square-btn edit-btn"
+                >
+                    <i className="demo-icon icon-eye-line"></i>
+                </Link>
+
             </div>
         </td>
     );
@@ -154,7 +155,9 @@ export default function Activity() {
     // const permission = usePermission()
     // const activityPersmission = permission.find((value, index) => value.menuId === MENU.ACTIVITY)
     // console.log(activityPersmission);
-    const { activityPermission: activityPersmission, endUserPermission } = useUserPermission()
+    const { activityPermission: activityPersmission, endUserPermission, venuePermission } = useUserPermission()
+    console.log(activityPersmission);
+
 
     const getActivities = async () => {
         const payload = {
@@ -171,9 +174,14 @@ export default function Activity() {
         settotalRecords(res.data.totalRecord)
     }
     const venueActivityTabColumn = [
-        ...(activityPersmission?.canUpdate
+        ...(activityPersmission?.canRead && venuePermission?.canRead
             ? [
-                { field: "action", title: "Action", cell: ActionCell, width: "80px" },
+                {
+                    field: "action",
+                    title: "Action",
+                    cell: ActionCell,
+                    width: "80px",
+                },
             ]
             : []),
 

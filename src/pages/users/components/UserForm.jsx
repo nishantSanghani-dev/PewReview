@@ -7,9 +7,12 @@ import { API_ROUTES } from '../../../routes/api.routes';
 import { useNavigate } from 'react-router-dom';
 
 export default function UserForm({ userRoleData, genderData, communicationData, countryData, userSingleData, id }) {
+    console.log(countryData);
+
     const [communicationUserData, setcommunicationUserData] = useState([])
     const [singleRoleData, setsingleRoleData] = useState([])
     const [isOpen, setIsOpen] = useState(false);
+    const [countryDetails, setcountryDetails] = useState({})
     const navigate = useNavigate()
     const {
         register,
@@ -20,23 +23,45 @@ export default function UserForm({ userRoleData, genderData, communicationData, 
         resolver: zodResolver(userSchema),
         mode: 'onBlur'
     })
-
-    const handleCommunication = (event) => {
+    const handleCountry = (event) => {
         console.log(event.target.value);
+        const countryFind = countryData.find((value, index) => {
+            console.log(value.countryId);
+            return value.countryId == event.target.value
+        })
+        setcountryDetails({
+            countryCode: countryFind.phoneInternationalCode,
+            countryCodeName: countryFind.countryCode
+        })
+
+    }
+    useEffect(() => {
+        console.log(countryDetails);
+
+    }, [countryDetails])
+    const handleCommunication = (event) => {
+        const val = String(event.target.value)
         if (event.target.checked) {
-            setcommunicationUserData([...communicationUserData, event.target.value])
-        }
-        else {
-            setcommunicationUserData(communicationUserData.filter((value, index) => value != event.target.value))
+            setcommunicationUserData(prev => [...prev, val])
+        } else {
+            setcommunicationUserData(prev => prev.filter(v => v !== val))
         }
     }
 
     const userAddForm = async (data) => {
         data.profileImage = data.profileImage?.[0]?.name || ''
         data.commincateWith = communicationUserData
-        const selectedCountry = countryData.find((value, index) => value.countryId == data.countryCode)
-        data.countryCode = selectedCountry.phoneInternationalCode
-        data.countryCodeName = selectedCountry.countryCode
+        const selectedCountry = countryData.find((value) => value.countryId == data.countryCode)
+        const selectedCountryDetails = selectedCountry
+            ? {
+                countryCode: selectedCountry.phoneInternationalCode,
+                countryCodeName: selectedCountry.countryCode
+            }
+            : countryDetails
+
+        data.countryCode = selectedCountryDetails?.countryCode || userSingleData?.countryCode || ''
+        data.countryCodeName = selectedCountryDetails?.countryCodeName || userSingleData?.countryCodeName || ''
+
         let res
         if (id) {
 
@@ -74,26 +99,36 @@ export default function UserForm({ userRoleData, genderData, communicationData, 
     }
 
     useEffect(() => {
-        console.log(userSingleData);
-        
         if (userSingleData) {
+            const matchedCountry = countryData.find(c => c.phoneInternationalCode === userSingleData.countryCode || c.countryCode === userSingleData.countryCodeName)
+            const countryIdForSelect = matchedCountry ? matchedCountry.countryId : ''
+            const countryDetailsFromMatch = matchedCountry
+                ? {
+                    countryCode: matchedCountry.phoneInternationalCode,
+                    countryCodeName: matchedCountry.countryCode
+                }
+                : {}
+
+            setcountryDetails(countryDetailsFromMatch)
             reset({
-                firstName: userSingleData.firstName,
-                lastName: userSingleData.lastName,
-                birthDay: userSingleData.birthDay,
-                gender: userSingleData.gender,
-                userName: userSingleData.userName,
-                address: userSingleData.address,
-                contactNumber: userSingleData.contactNumber,
-                countryCode: userSingleData.countryCode,
-                email: userSingleData.email,
-                role: userSingleData.roleId,
-                commincateWith: userSingleData.commincateWith,
-                profileImage: userSingleData.profileImageFullPath
+                firstName: userSingleData.firstName || '',
+                lastName: userSingleData.lastName || '',
+                birthDay: userSingleData.birthDay || '',
+                gender: String(userSingleData.gender || ''),
+                userName: userSingleData.userName || '',
+                address: userSingleData.address || '',
+                contactNumber: userSingleData.contactNumber || '',
+                countryCode: String(countryIdForSelect || ''),
+                email: userSingleData.email || '',
+                role: userSingleData.roleId || '',
+                commincateWith: userSingleData.commincateWith?.map(String) || [],
+                profileImage: userSingleData.profileImageFullPath || ''
             })
-            handleRoleData(userSingleData.roleId);
+
+            setcommunicationUserData(userSingleData.commincateWith?.map(String) || [])
+            if (userSingleData.roleId) handleRoleData(userSingleData.roleId);
         }
-    }, [userSingleData])
+    }, [userSingleData, countryData])
 
     return (
         <form onSubmit={handleSubmit(userAddForm)} className="mt-3 mt-xxl-4">
@@ -245,16 +280,17 @@ export default function UserForm({ userRoleData, genderData, communicationData, 
                         <div className="input-group" >
                             <select
                                 {...register('countryCode')}
+                                onChange={handleCountry}
                                 id="countryCode"
                                 className={`form-select ${errors.countryCode ? 'is-invalid' : ''}`}
                                 style={{ maxWidth: "100px", cursor: "pointer" }}
                             >
                                 <option value="">+1</option>
-                                {
-                                    countryData.map((value, index) => <option value={value.countryId} >({value.phoneInternationalCode})  {value.countryName}</option>)
-                                }
-
-                                <div className='w-full'></div>
+                                {countryData.map((value) => (
+                                    <option key={value.countryId} value={value.countryId}>
+                                        {value.phoneInternationalCode} {value.countryName}
+                                    </option>
+                                ))}
 
                             </select>
 
@@ -335,7 +371,7 @@ export default function UserForm({ userRoleData, genderData, communicationData, 
                                             className="child-checkbox"
                                             onChange={handleCommunication}
                                             value={value.id}
-                                            // checked={userSingleData?.commincateWith?.includes(value.id)}
+                                            checked={communicationUserData.includes(String(value.id))}
                                         />
                                         <span className="checkmark" />
                                         {value.description}

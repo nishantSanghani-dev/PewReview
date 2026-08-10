@@ -61,6 +61,8 @@ export default function AmmunitionAdd({ id, setid, isAmmunitionOpen, setisAmmuni
 
         if (res.status && res.data) {
             const fetchedCategoryIds = res.data.categoryIds || (res.data.categoryId ? [res.data.categoryId] : []);
+            console.log(fetchedCategoryIds);
+            
             reset({
                 name: res.data.name || "",
                 categoryIds: fetchedCategoryIds,
@@ -319,6 +321,7 @@ export default function AmmunitionAdd({ id, setid, isAmmunitionOpen, setisAmmuni
                                                                     lineHeight: '1'
                                                                 }}
                                                             >
+                                                                
                                                                 &#10006;
                                                             </span>
                                                         </div>

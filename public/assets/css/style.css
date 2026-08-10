@@ -4344,3 +4344,7 @@ textarea.form-control-custom {
   outline: 0;
   cursor: pointer; */
 }
+.k-grid-toolbar {
+    border-bottom: none !important;
+    background: transparent !important;
+}

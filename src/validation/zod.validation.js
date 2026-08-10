@@ -50,9 +50,6 @@ export const userSchema = z.object({
         .string()
         .optional()
         .refine(val => !val || !isNaN(Date.parse(val)), "Invalid date"),
-    gender: z
-        .string()
-        .optional(),
     userName: z
         .string()
         .trim()
@@ -67,6 +64,9 @@ export const userSchema = z.object({
         .min(1, "Contact number is required")
         .regex(/^\d+$/, "Contact number must contain only digits")
         .min(10, "Contact number must be at least 10 digits"),
+    gender: z
+        .string()
+        .min(1, "Gender is required"),
     countryCode: z
         .string()
         .min(1, "Country code is required"),
@@ -246,3 +246,48 @@ export const categorySchema = z.object({
         .string()
         .optional()
 });
+
+
+
+
+export const changePasswordSchema = z
+    .object({
+        currentPassword: z
+            .string()
+            .trim()
+            .min(1, "Current password is required"),
+
+        newPassword: z
+            .string()
+            .trim()
+            .min(8, "Password must be at least 8 characters")
+            .max(128, "Password must not exceed 128 characters")
+            .regex(
+                /[a-z]/,
+                "Password must contain at least one lowercase letter"
+            )
+            .regex(
+                /[A-Z]/,
+                "Password must contain at least one uppercase letter"
+            )
+            .regex(
+                /[0-9]/,
+                "Password must contain at least one number"
+            )
+            .regex(
+                /[!@#$%^&*(),.?":{}|<>_\-\\[\]/`~+=;']/,
+                "Password must contain at least one special character"
+            ),
+
+        confirmPassword: z
+            .string()
+            .trim()
+            .min(1, "Confirm password is required"),
+    })
+    .refine(
+        (data) => data.newPassword === data.confirmPassword,
+        {
+            message: "Passwords do not match",
+            path: ["confirmPassword"],
+        }
+    );

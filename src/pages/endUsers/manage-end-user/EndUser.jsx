@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Grid, GridColumn } from "@progress/kendo-react-grid"
+import { Grid, GridColumn, GridToolbar } from "@progress/kendo-react-grid"
 import { filterIcon } from '@progress/kendo-svg-icons'
 import { apiRequest } from '../../../services/Api'
 import { API_ROUTES } from '../../../routes/api.routes'
@@ -10,10 +10,11 @@ import useGridPagination from '../../../hooks/useGridPagination'
 import { usePermission } from '../../../hooks/UsePermission'
 import { MENU } from '../../../data/Menu'
 
-
+import { ExcelExport } from "@progress/kendo-react-excel-export";
 import { ColumnMenu } from '../../../components/grid/ColumnMenu'
 import { getBackendFilters } from '../../../components/grid/GridFilter'
 import useUserPermission from '../../../utils/UserPermission'
+import { Button } from 'bootstrap'
 
 export default function EndUser() {
     const [manageUserData, setmanageUserData] = useState([])
@@ -167,7 +168,12 @@ export default function EndUser() {
             setFilters([])
         }
     }
-
+    const _export = React.useRef(null);
+    const excelExport = () => {
+        if (_export.current !== null) {
+            _export.current.save();
+        }
+    };
     // fetch on mount and whenever paging, sort, filter or search changes
     useEffect(() => {
         getManageEndUser()
@@ -191,13 +197,16 @@ export default function EndUser() {
                     </div>
                     <div className="col-12 col-lg">
                         <div className="btn-list d-flex justify-content-lg-end flex-wrap gap-2 gap-md-3 text-end">
+                            <GridToolbar>
 
-                            <a
-                                href="javascript:void(0);"
-                                className="btn main-btn border-btn sky-btn"
-                            >
-                                Export
-                            </a>
+                                <button
+                                    onClick={excelExport}
+
+                                    className="btn main-btn border-btn sky-btn"
+                                >
+                                    Export
+                                </button>
+                            </GridToolbar>
 
                         </div>
                     </div>
@@ -205,120 +214,123 @@ export default function EndUser() {
                 <div className="row">
                     <div className="col-12 mt-3 mt-xxl-4">
                         <div className="table-responsive">
-                            <Grid
-                                className="table-wrapper responsive-kendo-grid"
-                                tableProps={{ className: "table" }}
-                                style={{ width: "100%", minWidth: "860px" }}
+                            <ExcelExport data={manageUserData} ref={_export}>
+                                <Grid
+                                    csv={true}
+                                    className="table-wrapper responsive-kendo-grid"
+                                    tableProps={{ className: "table" }}
+                                    style={{ width: "100%", minWidth: "860px" }}
 
-                                data={manageUserData}
-                                total={total}
+                                    data={manageUserData}
+                                    total={total}
 
-                                skip={dataState.skip}
-                                take={dataState.take}
+                                    skip={dataState.skip}
+                                    take={dataState.take}
 
-                                sortable={{
-                                    allowUnsort: true,
-                                    mode: "single"
-                                }}
-
-                                sort={kendoSort}
-
-                                pageable={{
-                                    buttonCount: 4,
-                                    pageSizes: [10, 20, 50],
-                                    previousNext: true,
-                                    info: true,
-                                    type: "numeric"
-                                }}
-
-
-                                filter={dataState.filter}
-                                filterOperators={{
-                                    text: [{ text: 'grid.filterContainsOperator', operator: 'contains' }],
-                                    numeric: [{ text: 'grid.filterEqOperator', operator: 'eq' }],
-                                    boolean: [{ text: 'grid.filterEqOperator', operator: 'eq' }]
-                                }}
-                                columnMenuIcon={filterIcon}
-                                onDataStateChange={handleGridDataStateChange}
-                            >
-                                {
-                                    endUserPermission.canDelete
-                                    &&
-
-                                    <GridColumn
-                                        title=""
-                                        sortable={false}
-                                        filterable={false}
-                                        width="70px"
-                                        cells={{ data: CheckboxCell }}
-                                    />
-                                }
-
-                                <GridColumn
-                                    title="Action"
-                                    sortable={false}
-                                    filterable={false}
-                                    width="180px"
-                                    cells={{
-                                        data: (props) => (
-                                            <ActionCell
-                                                {...props}
-                                                endUserPermission={endUserPermission}
-                                            />
-                                        ),
+                                    sortable={{
+                                        allowUnsort: true,
+                                        mode: "single"
                                     }}
 
-                                />
+                                    sort={kendoSort}
 
-                                <GridColumn
-                                    field="firstName"
-                                    title="First Name"
-                                    filter="text"
-                                    columnMenu={ColumnMenu}
-                                />
+                                    pageable={{
+                                        buttonCount: 4,
+                                        pageSizes: [10, 20, 50],
+                                        previousNext: true,
+                                        info: true,
+                                        type: "numeric"
+                                    }}
 
-                                <GridColumn
-                                    field="lastName"
-                                    title="Last Name"
-                                    filter="text"
-                                    columnMenu={ColumnMenu}
-                                />
 
-                                <GridColumn
-                                    field="userName"
-                                    title="Username"
-                                    filter="text"
-                                    columnMenu={ColumnMenu}
-                                />
+                                    filter={dataState.filter}
+                                    filterOperators={{
+                                        text: [{ text: 'grid.filterContainsOperator', operator: 'contains' }],
+                                        numeric: [{ text: 'grid.filterEqOperator', operator: 'eq' }],
+                                        boolean: [{ text: 'grid.filterEqOperator', operator: 'eq' }]
+                                    }}
+                                    columnMenuIcon={filterIcon}
+                                    onDataStateChange={handleGridDataStateChange}
+                                >
 
-                                <GridColumn
-                                    field="contactNumber"
-                                    title="Phone"
-                                    filter="text"
-                                    columnMenu={ColumnMenu}
-                                    cells={{ data: ContactCell }}
-                                />
+                                    {
+                                        endUserPermission.canDelete
+                                        &&
 
-                                <GridColumn
-                                    field="email"
-                                    title="Email"
-                                    filter="text"
-                                    columnMenu={ColumnMenu}
-                                />
+                                        <GridColumn
+                                            title=""
+                                            sortable={false}
+                                            filterable={false}
+                                            width="70px"
+                                            cells={{ data: CheckboxCell }}
+                                        />
+                                    }
 
-                                <GridColumn
-                                    field="isActive"
-                                    title="Status"
-                                    width="120px"
-                                    sortable={true}
-                                    endUserPermission={endUserPermission}
-                                    filter="boolean"
-                                    columnMenu={ColumnMenu}
-                                    cells={{ data: StatusCell }}
-                                />
+                                    <GridColumn
+                                        title="Action"
+                                        sortable={false}
+                                        filterable={false}
+                                        width="180px"
+                                        cells={{
+                                            data: (props) => (
+                                                <ActionCell
+                                                    {...props}
+                                                    endUserPermission={endUserPermission}
+                                                />
+                                            ),
+                                        }}
 
-                            </Grid>
+                                    />
 
+                                    <GridColumn
+                                        field="firstName"
+                                        title="First Name"
+                                        filter="text"
+                                        columnMenu={ColumnMenu}
+                                    />
+
+                                    <GridColumn
+                                        field="lastName"
+                                        title="Last Name"
+                                        filter="text"
+                                        columnMenu={ColumnMenu}
+                                    />
+
+                                    <GridColumn
+                                        field="userName"
+                                        title="Username"
+                                        filter="text"
+                                        columnMenu={ColumnMenu}
+                                    />
+
+                                    <GridColumn
+                                        field="contactNumber"
+                                        title="Phone"
+                                        filter="text"
+                                        columnMenu={ColumnMenu}
+                                        cells={{ data: ContactCell }}
+                                    />
+
+                                    <GridColumn
+                                        field="email"
+                                        title="Email"
+                                        filter="text"
+                                        columnMenu={ColumnMenu}
+                                    />
+
+                                    <GridColumn
+                                        field="isActive"
+                                        title="Status"
+                                        width="120px"
+                                        sortable={true}
+                                        endUserPermission={endUserPermission}
+                                        filter="boolean"
+                                        columnMenu={ColumnMenu}
+                                        cells={{ data: StatusCell }}
+                                    />
+
+                                </Grid>
+                            </ExcelExport>
                         </div>
                     </div>
                 </div>

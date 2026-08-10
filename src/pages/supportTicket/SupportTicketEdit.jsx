@@ -8,7 +8,7 @@ export default function SupportTicketEdit({ showModal, setShowModal, ticketId, s
     const navigation = useNavigate()
     const [ticketSingleData, setticketSingleData] = useState(null)
     const [editData, seteditData] = useState({
-        statusId: Number(null),
+        statusId: "",
         description: ""
     })
     const getTicketById = async () => {
@@ -16,16 +16,21 @@ export default function SupportTicketEdit({ showModal, setShowModal, ticketId, s
             showLoader: true
         })
 
-        setticketSingleData(res.data)
+        const ticket = res.data
+        setticketSingleData(ticket)
+        seteditData({
+            statusId: ticket?.statusId ?? "",
+            description: ticket?.adminDescription ?? ""
+        })
     }
 
 
 
     const handleTicketEdit = async (event) => {
         event.preventDefault()
-        editData.ticketId = ticketId
         const payload = {
-            ...editData,
+            ticketId,
+            statusId: Number(editData.statusId),
             description: editData.description?.trim() || "-",
         };
 
@@ -53,6 +58,10 @@ export default function SupportTicketEdit({ showModal, setShowModal, ticketId, s
     return (
         <>
             {/* Backdrop */}
+            {
+                console.log(ticketSingleData)
+                
+            }
             <div className='custom-backdrop'></div>
 
             {/* Modal */}
@@ -117,19 +126,21 @@ export default function SupportTicketEdit({ showModal, setShowModal, ticketId, s
                                 <label className="form-label">
                                     Ticket Status <span className="text-danger">*</span>
                                 </label>
-                                <select onChange={(e) => seteditData({
-                                    ...editData,
-                                    statusId: e.target.value
-                                })} name='statusId' defaultValue={ticketSingleData?.status} className="form-select custom-input">
-                                    <option value="">{ticketSingleData?.status}</option>
+                                <select
+                                    name='statusId'
+                                    value={editData.statusId}
+                                    onChange={(e) => seteditData({
+                                        ...editData,
+                                        statusId: e.target.value
+                                    })}
+                                    className="form-select custom-input"
+                                >
+                                    <option value="">Select Status</option>
                                     {statusOptions && statusOptions.map((status, index) => (
-                                        <option defaultValue={ticketSingleData?.status} key={index} value={status.id}>
+                                        <option key={index} value={status.id}>
                                             {status.description}
                                         </option>
                                     ))}
-
-
-
                                 </select>
                             </div>
 

@@ -106,14 +106,14 @@ export default function VenueAdd({ setvenueAddBtn, editVenueId, setEditVenueId }
     };
 
     const findMatchingUser = (data) => {
-        const candidateIds = [data?.userId, data?.createdBy, data?.ownerUserId, data?.createdById]
+        const candidateIds = [data?.userId, data?.createdBy, data?.ownerUserId, data?.createdById, data?.key, data?.value]
             .filter(Boolean)
             .map(normalizeId);
 
         if (candidateIds.length === 0) return null;
 
         return endUserData.find((user) => {
-            const userIds = [user?.userId, user?.id, user?.createdById, user?.ownerUserId]
+            const userIds = [user?.key, user?.value, user?.userId, user?.id, user?.createdById, user?.ownerUserId]
                 .filter(Boolean)
                 .map(normalizeId);
             return userIds.some((id) => candidateIds.includes(id));
@@ -251,17 +251,35 @@ export default function VenueAdd({ setvenueAddBtn, editVenueId, setEditVenueId }
         }
     };
 
+
+    const handleCountry = (event) => {
+        console.log(event.target.value);
+        console.log(countryData);
+
+        const contryFind = countryData.find((value, index) => value.countryId == event.target.value)
+        console.log(contryFind);
+        setcountryDetails({
+            countryCode: contryFind.phoneInternationalCode,
+            countryCodeName: contryFind.countryCode
+
+        })
+
+    }
     const handleSave = async (data) => {
+        console.log(data);
+
         const selectedCountry = countryData.find(c => String(c.countryId) === String(data.selectedCountryId));
         const countryCode = data.countryCode || (selectedCountry ? selectedCountry.phoneInternationalCode : "");
         const countryCodeName = data.countryCodeName || (selectedCountry ? selectedCountry.countryCode : "");
+        console.log(countryCodeName);
+
         const imageNameValue = imageFile ? imageFile.name : existingImageName || "";
         console.log(data);
 
         const payload = {
             address: data.address,
-            countryCode: countryCode,
-            countryCodeName: countryCodeName,
+            countryCode: countryDetails.countryCode,
+            countryCodeName: countryDetails.countryCodeName,
             description: data.description || "",
             gunIds: data.gunIds && Array.isArray(data.gunIds) ? data.gunIds : [],
             imageName: imageNameValue,
@@ -320,12 +338,12 @@ export default function VenueAdd({ setvenueAddBtn, editVenueId, setEditVenueId }
 
             if (res && res.data) {
                 const data = res.data;
-                console.log(data);
+               
 
-                console.log(data.userId);
+                console.log(data);
                 setcountryDetails({
-                    countryCode:data.countryCode,
-                    countryCodeName:data.countryCodeName
+                    countryCode: data.countryCode,
+                    countryCodeName: data.countryCodeName
 
                 })
                 setValue("userId", data.userId, { shouldValidate: true });
@@ -345,6 +363,15 @@ export default function VenueAdd({ setvenueAddBtn, editVenueId, setEditVenueId }
                 if (matchingUser) {
                     setSelectedUser(matchingUser);
                     setValue("userId", matchingUser.key || matchingUser.userId || matchingUser.id || data.userId, { shouldValidate: true });
+                } else {
+                    const fallbackUser = {
+                        key: data.userId,
+                        userId: data.userId,
+                        userName: data.userName || data.name || data.userName || data.userId || "Unknown User",
+                        name: data.name || data.userName || data.userId || "Unknown User"
+                    };
+                    setSelectedUser(fallbackUser);
+                    setValue("userId", data.userId, { shouldValidate: true });
                 }
 
                 const matchingCountry = findMatchingCountry(data);
@@ -500,8 +527,7 @@ export default function VenueAdd({ setvenueAddBtn, editVenueId, setEditVenueId }
                                             onClick={() => setIsOpen(!isOpen)}
                                         >
                                             <span>
-
-                                                {selectedUser ? selectedUser.userName : "sss Username"}
+                                                {selectedUser ? (selectedUser.userName || selectedUser.value || selectedUser.name || selectedUser.key || selectedUser.userId) : "Select Username"}
                                             </span>
 
                                             <i
@@ -708,17 +734,18 @@ export default function VenueAdd({ setvenueAddBtn, editVenueId, setEditVenueId }
                                             className={`form-select form-control-custom ${errors.selectedCountryId ? 'is-invalid' : ''}`}
                                             style={{ maxWidth: "140px" }}
                                             {...register('selectedCountryId')}
-                                            onChange={(e) => {
-                                                const countryId = e.target.value;
-                                                console.log(countryId);
+                                            // onChange={(e) => {
+                                            //     const countryId = e.target.value;
+                                            //     console.log(countryId);
 
-                                                const country = countryData.find((value) => String(value.countryId) === String(countryId));
-                                                console.log(country);
-                                                setcountryDetails(country)
-                                                setValue("selectedCountryId", countryId, { shouldValidate: true });
-                                                setValue("countryCode", country ? country.phoneInternationalCode : "", { shouldValidate: true });
-                                                setValue("countryCodeName", country ? country.countryCode : "", { shouldValidate: true });
-                                            }}
+                                            //     const country = countryData.find((value) => String(value.countryId) === String(countryId));
+                                            //     console.log(country);
+                                            //     setcountryDetails(country)
+                                            //     setValue("selectedCountryId", countryId, { shouldValidate: true });
+                                            //     setValue("countryCode", country ? country.phoneInternationalCode : "", { shouldValidate: true });
+                                            //     setValue("countryCodeName", country ? country.countryCode : "", { shouldValidate: true });
+                                            // }}
+                                            onChange={handleCountry}
                                         >
                                             <option value="">Select Code</option>
                                             {countryData.map((value, index) => {
