@@ -181,7 +181,7 @@ export default function VenueList() {
     }
 
     const GunCell = ({ tdProps, dataItem, setShowGunDetails }) => {
-        console.log(dataItem.venueId);
+        // console.log(dataItem.venueId);
 
         useEffect(() => {
             console.log(showGunDetails);
@@ -227,7 +227,7 @@ export default function VenueList() {
         );
     };
     const ActionCell = (props) => {
-        console.log(props.dataItem.venueId);
+        // console.log(props.dataItem.venueId);
 
         const deleteEvent = async () => {
             if (confirm("Are You Want To Delete Venue ? ")) {
