@@ -4,6 +4,7 @@ import { DateCell } from '../activity/Activity';
 import { Grid, GridColumn } from '@progress/kendo-react-grid';
 import ReportedUser from './ReportedUser';
 import { handleStatusChange } from '../../utils/ChangeStatus';
+import { Tooltip } from '@progress/kendo-react-tooltip';
 const ActionCell = (props) => {
   // console.log(props.dataItem.venueId);
 
@@ -38,12 +39,28 @@ const ActionCell = (props) => {
     </td>
   );
 };
-const TextCell = ({ tdProps, dataItem, field }) => (
-  <td {...tdProps}>
+const TextCell = ({ tdProps, dataItem, field }) => {
+    const value = dataItem[field];
 
-    {dataItem[field] ?? "-"}
-  </td>
-);
+    return (
+        <td {...tdProps}>
+            <Tooltip anchorElement="target" position="top">
+                <span
+                    title={value}
+                    style={{
+                        display: "inline-block",
+                        width: "100%",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                    }}
+                >
+                    {value ?? '-'}
+                </span>
+            </Tooltip>
+        </td>
+    );
+};
 
 const ReportedCell = ({ tdProps, dataItem, isOpenReportedPerson, setisOpenReportedPerson, filter }) => {
   // console.log(dataItem.venueId);
@@ -110,6 +127,7 @@ export default function TotalReportedPost({ topReportedPosts, filter, dashboardP
         data={topReportedPosts}
 
         pageable={{
+                                            responsive: false,
           buttonCount: 5,
           pageSizes: [10, 20, 50],
           info: true,

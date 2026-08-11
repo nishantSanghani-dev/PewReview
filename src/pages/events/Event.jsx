@@ -174,6 +174,7 @@ export default function Event() {
                                                         sortable={{ allowUnsort: true, mode: 'single' }}
                                                         sort={kendoSort}
                                                         pageable={{
+                                            responsive: false,
                                                             buttonCount: 5,
                                                             pageSizes: [10, 20, 50],
                                                             info: true,

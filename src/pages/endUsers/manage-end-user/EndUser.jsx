@@ -235,6 +235,7 @@ export default function EndUser() {
                                     sort={kendoSort}
 
                                     pageable={{
+                                            responsive: false,
                                         buttonCount: 4,
                                         pageSizes: [10, 20, 50],
                                         previousNext: true,

@@ -85,8 +85,9 @@ export const apiRequest = async (method, endPoint, body = null, params = null, a
     }
     return responseMessage
   } catch (error) {
-    console.log(error.response.status===401)
-    if(error.response.status===401){
+    console.log(error.response.status === 401)
+    if (error.response.status === 401) {
+      mergedApiOption.showToaster = false
       localStorage.removeItem("TOKEN")
     }
     console.log(error.response.data.strError);
@@ -95,7 +96,7 @@ export const apiRequest = async (method, endPoint, body = null, params = null, a
       return
     }
     toast.error(error?.response?.data?.message)
-    
+
     throw error
   } finally {
     if (mergedApiOption.showLoader) {

@@ -14,6 +14,7 @@ import { usePermission } from '../../../hooks/UsePermission'
 import { MENU } from '../../../data/Menu'
 import { ColumnMenu } from '../../../components/grid/ColumnMenu'
 import useUserPermission from '../../../utils/UserPermission'
+import { Tooltip } from '@progress/kendo-react-tooltip';
 const ActionCell = (props) => {
     const item = props.dataItem;
 
@@ -55,12 +56,28 @@ const ActionCell = (props) => {
         </td>
     );
 };
-const TextCell = ({ tdProps, dataItem, field }) => (
-    <td {...tdProps}>
+const TextCell = ({ tdProps, dataItem, field }) => {
+    const value = dataItem[field];
 
-        {dataItem[field] ?? "-"}
-    </td>
-);
+    return (
+        <td {...tdProps}>
+            <Tooltip anchorElement="target" position="top">
+                <span
+                    title={value}
+                    style={{
+                        display: "inline-block",
+                        width: "100%",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                    }}
+                >
+                    {value ?? '-'}
+                </span>
+            </Tooltip>
+        </td>
+    );
+};
 const StatusCell = (props) => {
     return (
         <td {...props.tdProps}>
@@ -179,7 +196,7 @@ export default function Prohibited() {
 
                     <div className="row">
                         <div className="col-12 mt-3 mt-xxl-4">
-                            <div className="table-responsive">
+                            <div className="">
                                 {
                                     prohibitedPermission.canRead
                                     &&
@@ -192,6 +209,7 @@ export default function Prohibited() {
                                         sortable={{ allowUnsort: true, mode: 'single' }}
                                         sort={kendoSort}
                                         pageable={{
+                                            responsive: false,
                                             buttonCount: 5,
                                             pageSizes: [10, 20, 50],
                                             previousNext: true,
@@ -210,6 +228,7 @@ export default function Prohibited() {
                                                         width={col.width}
                                                         sortable={col.field === 'action' ? false : true}
                                                         pageable={{
+                                            responsive: false,
                                                             buttonCount: 4,
                                                             pageSizes: [20, 50, 200],
                                                             previousNext: true,

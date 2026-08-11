@@ -1,12 +1,29 @@
 import React from "react";
 import "../gunDetails/gunDetails.css";
 import { Grid, GridColumn } from "@progress/kendo-react-grid";
-const TextCell = ({ tdProps, dataItem, field }) => (
-    <td {...tdProps}>
+import { Tooltip } from '@progress/kendo-react-tooltip';
+const TextCell = ({ tdProps, dataItem, field }) => {
+    const value = dataItem[field];
 
-        {dataItem[field] ?? "-"}
-    </td>
-);
+    return (
+        <td {...tdProps}>
+            <Tooltip anchorElement="target" position="top">
+                <span
+                    title={value}
+                    style={{
+                        display: "inline-block",
+                        width: "100%",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                    }}
+                >
+                    {value ?? '-'}
+                </span>
+            </Tooltip>
+        </td>
+    );
+};
 const GunImages = ({ tdProps, dataItem }) => {
     return (
         <td {...tdProps}>

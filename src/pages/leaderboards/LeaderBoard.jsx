@@ -3,6 +3,7 @@ import { Grid, GridColumn } from '@progress/kendo-react-grid';
 import { API_ROUTES } from '../../routes/api.routes';
 import { apiRequest } from '../../services/Api';
 import "../leaderboards/leaderboards.css"
+import { Tooltip } from '@progress/kendo-react-tooltip';
 export default function LeaderBoard() {
     const [duration, setDuration] = useState("Last 2 Weeks");
     const [isDurationOpen, setIsDurationOpen] = useState(false);
@@ -65,11 +66,28 @@ export default function LeaderBoard() {
         };
     }, []);
 
-    const TextCell = ({ tdProps, dataItem, field }) => (
+    const TextCell = ({ tdProps, dataItem, field }) => {
+    const value = dataItem[field];
+
+    return (
         <td {...tdProps}>
-            {dataItem[field] ?? "-"}
+            <Tooltip anchorElement="target" position="top">
+                <span
+                    title={value}
+                    style={{
+                        display: "inline-block",
+                        width: "100%",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                    }}
+                >
+                    {value ?? '-'}
+                </span>
+            </Tooltip>
         </td>
     );
+};
 
     return (
         <div className="container-fluid">

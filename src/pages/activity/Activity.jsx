@@ -31,25 +31,28 @@ const ActionCell = (props) => {
         </td>
     );
 };
-const TextCell = ({ tdProps, dataItem, field }) => (
-    <td {...tdProps}>
-        <Tooltip anchorElement="target" position="top">
-            <span
-                title={dataItem[field]}
-                style={{
-                    display: "inline-block",
-                    width: "100%",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                }}
-            >
-                {dataItem[field] ?? "-"}
-            </span>
-        </Tooltip>
-        {/* {dataItem[field] ?? "-"} */}
-    </td>
-);
+const TextCell = ({ tdProps, dataItem, field }) => {
+    const value = dataItem[field];
+
+    return (
+        <td {...tdProps}>
+            <Tooltip anchorElement="target" position="top">
+                <span
+                    title={value}
+                    style={{
+                        display: "inline-block",
+                        width: "100%",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                    }}
+                >
+                    {value ?? '-'}
+                </span>
+            </Tooltip>
+        </td>
+    );
+};
 const ImagesVdeo = ({ tdProps, dataItem }) => {
 
     const isVideo = (url) => {
@@ -244,7 +247,7 @@ export default function Activity() {
                     <div className="col-xl-12 mt-3 mt-xxl-4">
                         <div className="row">
                             <div className="col-12">
-                                <div className="table-responsive">
+                                <div className="">
                                     <Grid
                                         total={totalRecords}
                                         className="table-wrapper  text-center"
@@ -261,6 +264,7 @@ export default function Activity() {
                                         sortable={{ allowUnsort: true, mode: 'single' }}
                                         sort={kendoSort}
                                         pageable={{
+                                            responsive: false,
                                             buttonCount: 5,
                                             pageSizes: [20, 50, 150],
                                             info: true,
@@ -282,6 +286,7 @@ export default function Activity() {
                                                         width={col.width}
                                                         sortable={col.field === 'action' ? false : true}
                                                         pageable={{
+                                            responsive: false,
                                                             buttonCount: 4,
                                                             pageSizes: [20, 50, 200],
                                                             previousNext: true,

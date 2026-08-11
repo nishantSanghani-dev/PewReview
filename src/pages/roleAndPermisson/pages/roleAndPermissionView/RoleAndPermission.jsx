@@ -184,7 +184,7 @@ export default function RoleAndPermission() {
                 </div>
                 <div className="row">
                     <div className="col-12 mt-3 mt-xxl-4">
-                        <div className="table-responsive">
+                        <div className="">
                             <Grid
                                 className="table-wrapper"
                                 data={roleData}
@@ -205,6 +205,7 @@ export default function RoleAndPermission() {
                                 }}
                                 columnMenuIcon={filterIcon}
                                 pageable={{
+                                            responsive: false,
                                     buttonCount: 5,
                                     pageSizes: [10, 1, 20, 50],
                                     previousNext: true,

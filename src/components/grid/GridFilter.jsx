@@ -14,10 +14,10 @@ export const getBackendFilters = (filter) => {
 
         const isStatusField = descriptor.field === 'isActive'
         const normalizedValue = isStatusField
-            ? descriptor.value === true || descriptor.value === 'true' || descriptor.value === 1 || descriptor.value === '1'
+            ? (descriptor.value === true || descriptor.value === 'true' || descriptor.value === 1 || descriptor.value === '1'
                 ? '1'
-                : '0'
-            : descriptor.value
+                : '0')
+            : (descriptor.value !== null && descriptor.value !== undefined ? String(descriptor.value) : descriptor.value)
 
         return [
             {

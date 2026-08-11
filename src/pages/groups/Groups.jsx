@@ -14,6 +14,7 @@ import { filterIcon } from '@progress/kendo-svg-icons'
 import { ColumnMenu } from '../../components/grid/ColumnMenu'
 import { getBackendFilters } from '../../components/grid/GridFilter'
 import useUserPermission from '../../utils/UserPermission';
+import { Tooltip } from '@progress/kendo-react-tooltip';
 const ActionCell = (props) => {
 
     return (
@@ -41,12 +42,28 @@ const ActionCell = (props) => {
         </td>
     );
 };
-const TextCell = ({ tdProps, dataItem, field }) => (
-    <td {...tdProps}>
+const TextCell = ({ tdProps, dataItem, field }) => {
+    const value = dataItem[field];
 
-        {dataItem[field] ?? "-"}
-    </td>
-);
+    return (
+        <td {...tdProps}>
+            <Tooltip anchorElement="target" position="top">
+                <span
+                    title={value}
+                    style={{
+                        display: "inline-block",
+                        width: "100%",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                    }}
+                >
+                    {value ?? '-'}
+                </span>
+            </Tooltip>
+        </td>
+    );
+};
 const GroupTypeCell = ({ tdProps, dataItem, field }) => (
     <td {...tdProps}>
         {
@@ -248,7 +265,7 @@ export default function Groups() {
             <div className="accordion-body mt-3 mt-xxl-4">
                 <div className="row">
                     <div className="col-12">
-                        <div className="table-responsive">
+                        <div className="">
                             {
                                 grpPermission?.canRead
                                 &&
@@ -270,6 +287,7 @@ export default function Groups() {
                                     }}
                                     columnMenuIcon={filterIcon}
                                     pageable={{
+                                            responsive: false,
                                         buttonCount: 5,
                                         pageSizes: [10, 20, 50],
                                         info: true,

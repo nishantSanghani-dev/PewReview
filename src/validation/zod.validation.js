@@ -17,6 +17,7 @@ export const loginSchema = z.object({
             /[!@#$%^&*(),.?":{}|<>_\-\\[\]/`~+=;']/,
             "Password must contain at least one special character"
         ),
+    rememberMe: z.boolean().optional(),
 })
 
 export const forgotPasswordSchema = z.object({

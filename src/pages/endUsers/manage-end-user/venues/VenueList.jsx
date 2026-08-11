@@ -86,12 +86,28 @@ const AddressCell = (props) => {
         </td>
     );
 };
-const TextCell = ({ tdProps, dataItem, field }) => (
-    <td {...tdProps}>
+const TextCell = ({ tdProps, dataItem, field }) => {
+    const value = dataItem[field];
 
-        {dataItem[field] ?? "-"}
-    </td>
-);
+    return (
+        <td {...tdProps}>
+            <Tooltip anchorElement="target" position="top">
+                <span
+                    title={value}
+                    style={{
+                        display: "inline-block",
+                        width: "100%",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                    }}
+                >
+                    {value ?? '-'}
+                </span>
+            </Tooltip>
+        </td>
+    );
+};
 const StatusCell = (props) => {
     const item = props.dataItem;
 
@@ -145,6 +161,7 @@ export default function VenueList() {
     const [customSearch, setcustomSearch] = useState("")
     const [totalRecords, settotalRecords] = useState(null)
     const [filters, setFilters] = useState([])
+    const [scrollableMode, setScrollableMode] = useState("scrollable")
     const {
         dataState,
         onDataStateChange,
@@ -158,7 +175,7 @@ export default function VenueList() {
 
     // const permission = usePermission()
 
-    const { userPermission, gunMasterPermission,venuePermission } = useUserPermission()
+    const { userPermission, gunMasterPermission, venuePermission } = useUserPermission()
     console.log(userPermission);
 
 
@@ -334,6 +351,12 @@ export default function VenueList() {
         getVenueList()
     }, [page, pageSize, customSearch, sort, filters])
 
+    useEffect(() => {
+        // Keep Kendo Grid scrollable mode consistent with desktop on all viewports
+        // (prevent switching to `none` on tablet/mobile which hides header scroll).
+        setScrollableMode("scrollable")
+    }, [])
+
     return (
         <div className='container-fluid'>
 
@@ -400,6 +423,7 @@ export default function VenueList() {
                             <div className="col-12">
                                 <div className="table-responsive">
                                     <Grid
+                                        
                                         className="table-wrapper  text-center"
                                         data={venueListData}
                                         total={totalRecords}
@@ -407,6 +431,7 @@ export default function VenueList() {
                                         take={dataState.take}
                                         sortable={{ allowUnsort: true, mode: 'single' }}
                                         sort={kendoSort}
+                                        scrollable={scrollableMode}
 
                                         filter={dataState.filter}
                                         filterOperators={{
@@ -416,6 +441,7 @@ export default function VenueList() {
                                         }}
                                         columnMenuIcon={filterIcon}
                                         pageable={{
+                                            responsive: false,
                                             buttonCount: 5,
                                             pageSizes: [10, 20, 50],
                                             info: true,

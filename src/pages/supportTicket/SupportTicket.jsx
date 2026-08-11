@@ -254,7 +254,7 @@ export default function SupportTicket() {
                 <div className="accordion-body mt-3 mt-xxl-4">
                     <div className="row">
                         <div className="col-12">
-                            <div className="table-responsive">
+                            <div className="">
                                 {
                                     supportTicketPermission.canRead
                                     &&
@@ -275,6 +275,7 @@ export default function SupportTicket() {
                                         }}
                                         columnMenuIcon={filterIcon}
                                         pageable={{
+                                            responsive: false,
                                             buttonCount: 5,
                                             pageSizes: [10, 20, 50],
                                             info: true,

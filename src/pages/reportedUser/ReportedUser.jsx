@@ -8,12 +8,29 @@ import { getBackendFilters } from '../../components/grid/GridFilter'
 import BreadCumb from '../../components/common/breadCumb/BreadCumb';
 import SerachFilter from '../../components/common/SerachFilter';
 import useGridPagination from '../../hooks/useGridPagination'
-const TextCell = ({ tdProps, dataItem, field }) => (
-    <td {...tdProps}>
+import { Tooltip } from '@progress/kendo-react-tooltip';
+const TextCell = ({ tdProps, dataItem, field }) => {
+    const value = dataItem[field];
 
-        {dataItem[field] ?? "-"}
-    </td>
-);
+    return (
+        <td {...tdProps}>
+            <Tooltip anchorElement="target" position="top">
+                <span
+                    title={value}
+                    style={{
+                        display: "inline-block",
+                        width: "100%",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                    }}
+                >
+                    {value ?? '-'}
+                </span>
+            </Tooltip>
+        </td>
+    );
+};
 export default function ReportedUser() {
     const [reportUserData, setreportUserData] = useState([])
     const [searchText, setSearchText] = useState("")
@@ -79,7 +96,7 @@ export default function ReportedUser() {
                 </div>
                 <div className="row">
                     <div className="col-12 mt-3 mt-xxl-4">
-                        <div className="table-responsive">
+                        <div className="">
                             <Grid
                                 className="table-wrapper"
                                 data={reportUserData}
@@ -96,6 +113,7 @@ export default function ReportedUser() {
                                 sortable={{ allowUnsort: true, mode: 'single' }}
                                 sort={kendoSort}
                                 pageable={{
+                                            responsive: false,
                                     buttonCount: 5,
                                     pageSizes: [10, 20, 50],
                                     previousNext: true,
@@ -116,6 +134,7 @@ export default function ReportedUser() {
                                                 columnMenu={col.columnMenu}
                                                 sortable={false}
                                                 pageable={{
+                                            responsive: false,
                                                     buttonCount: 4,
                                                     pageSizes: [20, 50, 200],
                                                     previousNext: true,

@@ -1,21 +1,27 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { userSchema } from '../../../validation/zod.validation'
 import { apiRequest } from '../../../services/Api';
 import { API_ROUTES } from '../../../routes/api.routes';
 import { useNavigate } from 'react-router-dom';
+import { Calendar } from '@progress/kendo-react-dateinputs';
+import { Switch } from '@progress/kendo-react-inputs';
+import { Label } from '@progress/kendo-react-labels';
 
 export default function UserForm({ userRoleData, genderData, communicationData, countryData, userSingleData, id }) {
     console.log(countryData);
 
     const [communicationUserData, setcommunicationUserData] = useState([])
     const [singleRoleData, setsingleRoleData] = useState([])
-    const [isOpen, setIsOpen] = useState(false);
+    const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+    const [calendarWidth, setCalendarWidth] = useState('100%');
     const [countryDetails, setcountryDetails] = useState({})
+    const calendarWrapperRef = useRef(null)
     const navigate = useNavigate()
     const {
         register,
+        control,
         handleSubmit,
         reset,
         formState: { errors, touchedFields }
@@ -23,6 +29,24 @@ export default function UserForm({ userRoleData, genderData, communicationData, 
         resolver: zodResolver(userSchema),
         mode: 'onBlur'
     })
+
+    const formatDate = (value) => {
+        if (!value) return ''
+        const date = value instanceof Date ? value : new Date(value)
+        return isNaN(date.getTime()) ? '' : date.toISOString().slice(0, 10)
+    }
+
+    const handleCalendarToggle = () => {
+        setIsCalendarOpen(prev => !prev)
+        if (calendarWrapperRef.current) {
+            setCalendarWidth(`${calendarWrapperRef.current.offsetWidth}px`)
+        }
+    }
+
+    const handleCalendarClose = () => {
+        setIsCalendarOpen(false)
+    }
+
     const handleCountry = (event) => {
         console.log(event.target.value);
         const countryFind = countryData.find((value, index) => {
@@ -35,6 +59,17 @@ export default function UserForm({ userRoleData, genderData, communicationData, 
         })
 
     }
+
+    useEffect(() => {
+        const closeOnClickOutside = (event) => {
+            if (calendarWrapperRef.current && !calendarWrapperRef.current.contains(event.target)) {
+                setIsCalendarOpen(false)
+            }
+        }
+
+        document.addEventListener('mousedown', closeOnClickOutside)
+        return () => document.removeEventListener('mousedown', closeOnClickOutside)
+    }, [])
     useEffect(() => {
         console.log(countryDetails);
 
@@ -209,17 +244,85 @@ export default function UserForm({ userRoleData, genderData, communicationData, 
                     </div>
                 </div>
                 <div className="col-sm-6 col-xl-4 mt-3">
-                    <div className="form-group">
+                    <div className="form-group" ref={calendarWrapperRef} style={{ position: 'relative' }}>
                         <label htmlFor="birthDay" className="fw-semibold">
                             Birthday
                         </label>
-                        <input
-                            type="date"
-                            defaultValue={userSingleData?.birthDay}
-                            id="date"
-                            {...register('birthDay')}
-                            className="form-control"
+                        <Controller
+                            control={control}
+                            name="birthDay"
+                            defaultValue={formatDate(userSingleData?.birthDay)}
+                            render={({ field: { value, onChange } }) => (
+                                <>
+                                    <div className="position-relative">
+                                        <input
+                                            type="date"
+                                            id="date"
+                                            value={formatDate(value)}
+                                            onChange={(e) => onChange(e.target.value)}
+                                            className={`form-control ${errors.birthDay ? 'is-invalid' : ''}`}
+                                            placeholder="YYYY-MM-DD"
+                                            autoComplete="off"
+                                            max={formatDate(new Date())}
+                                            style={{ paddingRight: '44px' }}
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={handleCalendarToggle}
+                                            className="position-absolute"
+                                            style={{
+                                                right: '0.5rem',
+                                                top: '50%',
+                                                transform: 'translateY(-50%)',
+                                                height: 'calc(100% - 0.5rem)',
+                                                padding: '0 0.5rem',
+                                                border: 'none',
+                                                background: 'transparent',
+                                                cursor: 'pointer',
+                                                color: '#495057'
+                                            }}
+                                        >
+                                           
+                                        </button>
+                                    </div>
+                                    {isCalendarOpen && (
+                                        <div
+                                            className="calendar-popup"
+                                            style={{
+                                                position: 'absolute',
+                                                top: '100%',
+                                                left: 0,
+                                                zIndex: 1000,
+                                                width: calendarWidth,
+                                                maxWidth: '100%',
+                                                marginTop: '0.5rem',
+                                                boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+                                                background: '#fff',
+                                                border: '1px solid #ddd',
+                                                borderRadius: '8px',
+                                                padding: '0.5rem'
+                                            }}
+                                        >
+                                            <Calendar
+                                                value={value ? new Date(value) : null}
+                                                onChange={(e) => {
+                                                    const newValue = e.value ? formatDate(e.value) : ''
+                                                    onChange(newValue)
+                                                    handleCalendarClose()
+                                                }}
+                                                navigation={navigation}
+                                                max={new Date()}
+                                            />
+                                        </div>
+                                    )}
+                                </>
+                            )}
                         />
+                        {errors.birthDay && (
+                            <div className="invalid-feedback d-block">
+                                {errors.birthDay.message}
+                            </div>
+                        )}
                     </div>
                 </div>
                 <div className="col-sm-6 col-xl-4 mt-3">

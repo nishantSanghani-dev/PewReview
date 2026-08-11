@@ -8,6 +8,7 @@ import { apiRequest } from '../../../../services/Api';
 import { API_ROUTES } from '../../../../routes/api.routes';
 import { useSelector } from 'react-redux';
 import useUserPermission from '../../../../utils/UserPermission';
+import { Tooltip } from '@progress/kendo-react-tooltip';
 
 
 const ActionCell = (props) => {
@@ -56,12 +57,28 @@ const AddressCell = (props) => {
         </td>
     );
 };
-const TextCell = ({ tdProps, dataItem, field }) => (
-    <td {...tdProps}>
+const TextCell = ({ tdProps, dataItem, field }) => {
+    const value = dataItem[field];
 
-        {dataItem[field] ?? "-"}
-    </td>
-);
+    return (
+        <td {...tdProps}>
+            <Tooltip anchorElement="target" position="top">
+                <span
+                    title={value}
+                    style={{
+                        display: "inline-block",
+                        width: "100%",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                    }}
+                >
+                    {value ?? '-'}
+                </span>
+            </Tooltip>
+        </td>
+    );
+};
 const DetailCell = ({ tdProps, dataItem, field }) => {
     return (
         <td  {...tdProps}>
@@ -167,6 +184,7 @@ export default function Venues({ data }) {
                                 data={data}
                                 sortable
                                 pageable={{
+                                            responsive: false,
                                     buttonCount: 5,
                                     pageSizes: [10, 20, 50],
                                     info: true,

@@ -3,14 +3,31 @@ import React, { useEffect, useState } from 'react'
 import { apiRequest } from '../../services/Api';
 import { API_ROUTES } from '../../routes/api.routes';
 import { DateCell } from '../activity/Activity';
+import { Tooltip } from '@progress/kendo-react-tooltip';
 
 
-const TextCell = ({ tdProps, dataItem, field }) => (
-    <td {...tdProps}>
+const TextCell = ({ tdProps, dataItem, field }) => {
+    const value = dataItem[field];
 
-        {dataItem[field] ?? "-"}
-    </td>
-);
+    return (
+        <td {...tdProps}>
+            <Tooltip anchorElement="target" position="top">
+                <span
+                    title={value}
+                    style={{
+                        display: "inline-block",
+                        width: "100%",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                    }}
+                >
+                    {value ?? '-'}
+                </span>
+            </Tooltip>
+        </td>
+    );
+};
 
 export default function ReportedUser({ reportedId, setisOpenReportedPerson, filter }) {
     // console.log(reportedId);
@@ -71,6 +88,7 @@ export default function ReportedUser({ reportedId, setisOpenReportedPerson, filt
                                 data={reportedUserData}
                                 sortable
                                 pageable={{
+                                            responsive: false,
                                     buttonCount: 5,
                                     pageSizes: [10, 20, 50],
                                     info: true,

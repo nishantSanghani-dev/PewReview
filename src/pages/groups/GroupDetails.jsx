@@ -98,7 +98,7 @@ export default function GroupDetails() {
                         Details
                     </h3>
 
-                    <div className="table-responsive">
+                    <div className="">
 
                         <table className="table align-middle mb-0">
 

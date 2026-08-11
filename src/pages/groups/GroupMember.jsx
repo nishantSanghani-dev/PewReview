@@ -72,12 +72,13 @@ export default function GroupMember() {
             <div className="accordion-body mt-3 mt-xxl-4">
                 <div className="row">
                     <div className="col-12">
-                        <div className="table-responsive">
+                        <div className="">
                             <Grid
                                 className="table-wrapper  text-center"
                                 data={memberData}
 
                                 pageable={{
+                                            responsive: false,
                                     buttonCount: 5,
                                     pageSizes: [10, 20, 50],
                                     info: true,

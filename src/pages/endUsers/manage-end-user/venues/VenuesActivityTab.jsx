@@ -3,6 +3,7 @@ import React from 'react'
 import { Link } from 'react-router-dom';
 import { DateCell } from '../UploadGun';
 import { UserNameCell } from './VenueList';
+import { Tooltip } from '@progress/kendo-react-tooltip';
 const ActionCell = (props) => {
 
 
@@ -19,12 +20,28 @@ const ActionCell = (props) => {
         </td>
     );
 };
-const TextCell = ({ tdProps, dataItem, field }) => (
-    <td {...tdProps}>
+const TextCell = ({ tdProps, dataItem, field }) => {
+    const value = dataItem[field];
 
-        {dataItem[field] ?? "-"}
-    </td>
-);
+    return (
+        <td {...tdProps}>
+            <Tooltip anchorElement="target" position="top">
+                <span
+                    title={value}
+                    style={{
+                        display: "inline-block",
+                        width: "100%",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                    }}
+                >
+                    {value ?? '-'}
+                </span>
+            </Tooltip>
+        </td>
+    );
+};
 const ImagesVdeo = ({ tdProps, dataItem }) => {
 
     const isVideo = (url) => {
@@ -128,12 +145,13 @@ export default function VenuesActivityTab({ activityTabData }) {
                 <div className="accordion-body mt-3 mt-xxl-4">
                     <div className="row">
                         <div className="col-12">
-                            <div className="table-responsive">
+                            <div className="">
                                 <Grid
                                     className="table-wrapper  text-center"
                                     data={activityTabData}
                                     sortable
                                     pageable={{
+                                            responsive: false,
                                         buttonCount: 5,
                                         pageSizes: [10, 20, 50],
                                         info: true,

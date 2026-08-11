@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { logIn } from '../../../../slice/user.slice';
 import { usePermission } from '../../../../hooks/UsePermission';
 import { MENU } from '../../../../data/Menu';
+import Cookies from "js-cookie";
 export default function LoginForm() {
     const navigate = useNavigate()
     const { token } = useSelector((store) => store.user)
@@ -18,8 +19,9 @@ export default function LoginForm() {
     // console.log(token);
     const permission = usePermission()
     const [shouldRedirect, setShouldRedirect] = useState(false)
-    console.log(permission);
-
+    // console.log(permission);
+    const rememberedEmail = Cookies.get("rememberedEmail");
+    const rememberedPassword = Cookies.get("rememberedPassword") ? atob(Cookies.get("rememberedPassword")) : "";
     useEffect(() => {
         if (!shouldRedirect || !permission?.length) return
 
@@ -55,7 +57,12 @@ export default function LoginForm() {
         handleSubmit,
         formState: { errors, touchedFields, isSubmitting },
     } = useForm({
-        resolver: zodResolver(loginSchema)
+        resolver: zodResolver(loginSchema),
+        defaultValues: {
+            email: rememberedEmail || "",
+            password: rememberedPassword || "",
+            rememberMe: !!rememberedEmail,
+        },
     });
 
     const loginUser = async (data) => {
@@ -66,13 +73,31 @@ export default function LoginForm() {
         })
         console.log(res);
         if (res.status) {
+            if (data.rememberMe) {
+                console.log("sdnjsd");
+
+                Cookies.set("rememberedEmail", data.email, {
+                    expires: 30,
+                    secure: window.location.protocol === "https:",
+                    sameSite: "lax",
+                });
+                Cookies.set("rememberedPassword", btoa(data.password), {
+                    expires: 30,
+                    secure: window.location.protocol === "https:",
+                    sameSite: "lax",
+                });
+            } else {
+                Cookies.remove("rememberedEmail");
+                Cookies.remove("rememberedPassword");
+            }
+
             dispatch(logIn({
                 token: res.data.token,
                 permission: res.data.userDetails.menuPermissions
-            }))
-            setShouldRedirect(true)
-        }
+            }));
 
+            setShouldRedirect(true);
+        }
     }
     return (
         <form onSubmit={handleSubmit(loginUser)}>
@@ -106,7 +131,11 @@ export default function LoginForm() {
                 <div className="col-12 round-checkbox">
                     <label className="custom-checkbox fw-medium mb-0">
                         Remember me
-                        <input type="checkbox" className="child-checkbox" />
+                        <input
+                            type="checkbox"
+                            className="child-checkbox"
+                            {...register("rememberMe")}
+                        />
                         <span className="checkmark" />
                     </label>
                 </div>

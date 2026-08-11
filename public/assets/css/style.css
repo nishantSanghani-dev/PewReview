@@ -3095,8 +3095,10 @@ span.chat-time {
     top: 1px;
   }
 
+  /* Ensure nav tabs are visible by default; some pages use accordion
+     headers on small screens, but we want tabs available across views. */
   .nav.nav-tabs {
-    display: none;
+    display: inline-flex;
   }
 
   .accordion-header {
@@ -3424,6 +3426,7 @@ span.chat-time {
 
 
 .k-grid-header {
+  
   background: #212529;
   color: #fff;
   width: 100% !important;

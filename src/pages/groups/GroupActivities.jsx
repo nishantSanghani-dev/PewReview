@@ -5,6 +5,7 @@ import { Link, useParams } from 'react-router-dom';
 import { apiRequest } from '../../services/Api';
 import { API_ROUTES } from '../../routes/api.routes';
 import { handleStatusChange } from '../../utils/ChangeStatus';
+import { Tooltip } from '@progress/kendo-react-tooltip';
 const ActionCell = (props) => {
 
 
@@ -21,12 +22,28 @@ const ActionCell = (props) => {
         </td>
     );
 };
-const TextCell = ({ tdProps, dataItem, field }) => (
-    <td {...tdProps}>
+const TextCell = ({ tdProps, dataItem, field }) => {
+    const value = dataItem[field];
 
-        {dataItem[field] ?? "-"}
-    </td>
-);
+    return (
+        <td {...tdProps}>
+            <Tooltip anchorElement="target" position="top">
+                <span
+                    title={value}
+                    style={{
+                        display: "inline-block",
+                        width: "100%",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                    }}
+                >
+                    {value ?? '-'}
+                </span>
+            </Tooltip>
+        </td>
+    );
+};
 const ImagesVdeo = ({ tdProps, dataItem }) => {
 
     const isVideo = (url) => {
@@ -158,12 +175,13 @@ export default function GroupActivities() {
                     <div className="col-xl-12 mt-3 mt-xxl-4">
                         <div className="row">
                             <div className="col-12">
-                                <div className="table-responsive">
+                                <div className="">
                                     <Grid
                                         className="table-wrapper  text-center"
                                         data={activityData}
                                         sortable
                                         pageable={{
+                                            responsive: false,
                                             buttonCount: 5,
                                             pageSizes: [20, 50, 150],
                                             info: true,
@@ -188,6 +206,7 @@ export default function GroupActivities() {
                                                         title={col.title}
                                                         width={col.width}
                                                         pageable={{
+                                            responsive: false,
                                                             buttonCount: 4,
                                                             pageSizes: [20, 50, 200],
                                                             previousNext: true,

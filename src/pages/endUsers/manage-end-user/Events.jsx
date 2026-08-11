@@ -122,7 +122,7 @@ export default function Events({ data, isUpcomingEvent, setisUpcomingEvent }) {
                         <div className="accordion-body mt-3 mt-xxl-4">
                             <div className="row">
                                 <div className="col-12">
-                                    <div className="table-responsive">
+                                    <div className="">
 
                                         {
                                             eventPermission.canRead
@@ -137,6 +137,7 @@ export default function Events({ data, isUpcomingEvent, setisUpcomingEvent }) {
                                                 sortable={{ allowUnsort: true, mode: 'single' }}
                                                 sort={gridSort}
                                                 pageable={{
+                                            responsive: false,
                                                     buttonCount: 5,
                                                     pageSizes: [10, 20, 50],
                                                     info: true,

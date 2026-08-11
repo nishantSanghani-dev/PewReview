@@ -1,6 +1,7 @@
 import { Grid, GridColumn } from '@progress/kendo-react-grid'
 import React from 'react'
 import { handleStatusChange } from '../../../utils/ChangeStatus';
+import { Tooltip } from '@progress/kendo-react-tooltip';
 
 const ActionCell = (props) => {
     console.log(props);
@@ -88,11 +89,28 @@ const columns = [
     { field: "isActive", title: "Status", cell: StatusCell },
 
 ];
-const TextCell = ({ tdProps, dataItem, field }) => (
-    <td {...tdProps}>
-        {dataItem[field] ?? "-"}
-    </td>
-);
+const TextCell = ({ tdProps, dataItem, field }) => {
+    const value = dataItem[field];
+
+    return (
+        <td {...tdProps}>
+            <Tooltip anchorElement="target" position="top">
+                <span
+                    title={value}
+                    style={{
+                        display: "inline-block",
+                        width: "100%",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                    }}
+                >
+                    {value ?? '-'}
+                </span>
+            </Tooltip>
+        </td>
+    );
+};
 export default function UploadGun({ data }) {
     console.log(data);
 
@@ -106,13 +124,14 @@ export default function UploadGun({ data }) {
             <div className="accordion-body mt-3 mt-xxl-4">
                 <div className="row">
                     <div className="col-12">
-                        <div className="table-responsive">
+                        <div className="">
                             <Grid
                                 className="table-wrapper  text-center"
                                 data={data}
                                 sortable
 
                                 pageable={{
+                                            responsive: false,
                                     buttonCount: 5,
                                     pageSizes: [10, 20, 50],
                                     info: true,

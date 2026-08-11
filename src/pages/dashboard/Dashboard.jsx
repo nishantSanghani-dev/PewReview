@@ -347,7 +347,7 @@ export default function Dashboard() {
                             </div>
                             <div className="row mt-3">
                                 <div className="col-12">
-                                    <div className="table-responsive">
+                                    <div className="">
                                         <TotalReportedPost dashboardPermission={dashboardPermission} filter={filter} topReportedPosts={topReportedPosts} />
                                         {/* <table className="table table-bordered mb-0">
                                         <thead className="table-light">
