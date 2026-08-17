@@ -6,8 +6,9 @@ import { filterIcon } from '@progress/kendo-svg-icons';
 import { ColumnMenu } from '../../../components/grid/ColumnMenu';
 import { getBackendFilters } from '../../../components/grid/GridFilter';
 import { DateCell } from '../../activity/Activity';
-import { handleStatusChange } from '../../../utils/ChangeStatus';
+import { useStatusChange } from '../../../hooks/useStatusChange';
 import { handleDelete } from '../../../utils/DeleteRecords';
+import AleartDialog from '../../../components/common/AleartDialog';
 import AccessoriesAdd from './AccessoriesAdd';
 import BreadCumb from '../../../components/common/breadCumb/BreadCumb';
 import SerachFilter from '../../../components/common/SerachFilter';
@@ -36,14 +37,10 @@ const ActionCell = (props) => {
         )}
         {props.accessoriesPermission.canDelete && (
           <button
-            onClick={() =>
-              handleDelete(
-                item.accessoryId,
-                'accessories',
-                'accessoroesDelete',
-                props.getAccessories
-              )
-            }
+            onClick={() => {
+              props.setSelectedAccessoryId(item.accessoryId);
+              props.setShowDeleteDialog(true);
+            }}
             type="button"
             className="small-square-btn danger-btn"
           >
@@ -65,12 +62,11 @@ const StatusCell = (props) => {
           checked={props.dataItem.isActive}
           readOnly
           onChange={(e) =>
-            handleStatusChange(
+            props.handleStatusChange(
               props.dataItem.accessoryId,
               e.target.checked,
               'accessories',
-              'accessoriesStatusUpdate',
-              props.getAccessories
+              'accessoriesStatusUpdate'
             )
           }
         />
@@ -105,6 +101,9 @@ export default function Accessories() {
   const [accessoriesData, setaccessoriesData] = useState([]);
   const [isAccessoriesOpen, setisAccessoriesOpen] = useState(false);
   const [id, setid] = useState(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [selectedAccessoryId, setSelectedAccessoryId] = useState(null);
+
   const [searchText, setSearchText] = useState('');
   const [customSearch, setcustomSearch] = useState('');
   const [filters, setFilters] = useState([]);
@@ -135,7 +134,7 @@ export default function Accessories() {
     );
     setaccessoriesData(res.data.data);
   };
-
+  const { handleStatusChange, statusConfirmDialog } = useStatusChange(getAccessories);
   const accessoriesColumn = [
     ...(accessoriesPermission?.canUpdate || accessoriesPermission?.canDelete
       ? [{ field: 'action', title: 'Action', cell: ActionCell, width: '100px' }]
@@ -301,23 +300,26 @@ export default function Accessories() {
                         cells={
                           col.cell
                             ? {
-                                data: (props) => (
-                                  <col.cell
-                                    {...props}
-                                    accessoriesPermission={
-                                      accessoriesPermission
-                                    }
-                                    getAccessories={getAccessories}
-                                    setisAccessoriesOpen={setisAccessoriesOpen}
-                                    setid={setid}
-                                  />
-                                ),
-                              }
+                              data: (props) => (
+                                <col.cell
+                                  {...props}
+                                  accessoriesPermission={
+                                    accessoriesPermission
+                                  }
+                                  getAccessories={getAccessories}
+                                  setisAccessoriesOpen={setisAccessoriesOpen}
+                                  setid={setid}
+                                  setShowDeleteDialog={setShowDeleteDialog}
+                                  setSelectedAccessoryId={setSelectedAccessoryId}
+                                  handleStatusChange={handleStatusChange}
+                                />
+                              ),
+                            }
                             : {
-                                data: (props) => (
-                                  <TextCell {...props} field={col.field} />
-                                ),
-                              }
+                              data: (props) => (
+                                <TextCell {...props} field={col.field} />
+                              ),
+                            }
                         }
                       />
                     );
@@ -338,6 +340,27 @@ export default function Accessories() {
           getAccessories={getAccessories}
         />
       )}
+      {showDeleteDialog && (
+        <AleartDialog
+          title="Confirm Delete"
+          message="Are you sure you want to delete this Accessory? This action cannot be undone."
+          onCancel={() => {
+            setShowDeleteDialog(false);
+            setSelectedAccessoryId(null);
+          }}
+          onConfirm={async () => {
+            await handleDelete(
+              selectedAccessoryId,
+              'accessories',
+              'accessoroesDelete',
+              getAccessories
+            );
+            setShowDeleteDialog(false);
+            setSelectedAccessoryId(null);
+          }}
+        />
+      )}
+      {statusConfirmDialog}
     </>
   );
 }

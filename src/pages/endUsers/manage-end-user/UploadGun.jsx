@@ -1,6 +1,6 @@
 import { Grid, GridColumn } from '@progress/kendo-react-grid';
 import React from 'react';
-import { handleStatusChange } from '../../../utils/ChangeStatus';
+import { useStatusChange } from '../../../hooks/useStatusChange';
 import { Tooltip } from '@progress/kendo-react-tooltip';
 
 const ActionCell = (props) => {
@@ -25,11 +25,11 @@ const StatusCell = (props) => {
           checked={props.dataItem.isActive}
           readOnly
           onChange={(e) =>
-            handleStatusChange(
+            props.handleStatusChange(
               props.dataItem.gunId,
               e.target.checked,
               'gun',
-              'gunStatusUpdate' // callback
+              'gunStatusUpdate'
             )
           }
         />
@@ -111,6 +111,7 @@ const TextCell = ({ tdProps, dataItem, field }) => {
   );
 };
 export default function UploadGun({ data }) {
+  const { handleStatusChange, statusConfirmDialog } = useStatusChange();
   console.log(data);
 
   return (
@@ -156,7 +157,14 @@ export default function UploadGun({ data }) {
                       width="150px"
                       cells={
                         col.cell
-                          ? { data: col.cell }
+                          ? {
+                              data: (props) => (
+                                <col.cell
+                                  {...props}
+                                  handleStatusChange={handleStatusChange}
+                                />
+                              ),
+                            }
                           : {
                               data: (props) => (
                                 <TextCell {...props} field={col.field} />
@@ -227,6 +235,7 @@ export default function UploadGun({ data }) {
           </div>
         </div>
       </div>
+      {statusConfirmDialog}
     </div>
   );
 }

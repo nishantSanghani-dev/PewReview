@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { apiRequest } from '../../services/Api';
 import { API_ROUTES } from '../../routes/api.routes';
 import { Link, useLocation } from 'react-router-dom';
+import AleartDialog from '../../components/common/AleartDialog';
 import { Grid, GridColumn } from '@progress/kendo-react-grid';
 import { filterIcon } from '@progress/kendo-svg-icons';
 import { ColumnMenu } from '../../components/grid/ColumnMenu';
@@ -15,22 +16,9 @@ import { usePermission } from '../../hooks/UsePermission';
 import { MENU } from '../../data/Menu';
 import useUserPermission from '../../utils/UserPermission';
 const ActionCell = (props) => {
-  const deleteTicket = async () => {
-    if (confirm('Are You Want To Delete Support Ticket ? ')) {
-      const res = await apiRequest(
-        'DELETE',
-        API_ROUTES.supportTicket.supportTicketDelete(props.dataItem.id),
-        null,
-        null,
-        {
-          showLoader: true,
-          showToaster: true,
-        }
-      );
-      if (res.status) {
-        props.getTickets();
-      }
-    }
+  const deleteTicket = () => {
+    props.setSelectedTicketId(props.dataItem.id);
+    props.setShowDeleteDialog(true);
   };
 
   return (
@@ -115,35 +103,14 @@ const ApprovalStatusCell = ({
   statusOptions,
   getTickets,
   supportTicketPermission,
+  onStatusChangeClick,
 }) => {
-  const supportTicketAsyncEdit = async (id) => {
-    const payload = {
-      statusId: id,
-      ticketId: dataItem.id,
-      adminDescription: null,
-    };
-    if (confirm('Are You Want To Chnage Ticket Status ? ')) {
-      const res = await apiRequest(
-        'POST',
-        API_ROUTES.supportTicket.supportTicketsUpdateAsync,
-        payload,
-        null,
-        {
-          showLoader: true,
-          showToaster: true,
-        }
-      );
-      if (res.status) {
-        getTickets();
-      }
-    }
-  };
   return (
     <td {...tdProps}>
       <div className="approval-status-wrapper">
         <select
           disabled={!supportTicketPermission?.canUpdate}
-          onChange={(e) => supportTicketAsyncEdit(e.target.value)}
+          onChange={(e) => onStatusChangeClick(dataItem.id, e.target.value)}
           className="approval-status-select"
           defaultValue={dataItem.status}
         >
@@ -168,9 +135,18 @@ export default function SupportTicket() {
   const [statusOptions, setStatusOptions] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [ticketId, setticketId] = useState(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [selectedTicketId, setSelectedTicketId] = useState(null);
   const [searchText, setSearchText] = useState('');
   const [customSearch, setcustomSearch] = useState('');
   const [filters, setFilters] = useState([]);
+  const [showStatusDialog, setShowStatusDialog] = useState(false);
+  const [pendingStatusData, setPendingStatusData] = useState(null);
+
+  const handleStatusChangeClick = (ticketId, statusId) => {
+    setPendingStatusData({ ticketId, statusId });
+    setShowStatusDialog(true);
+  };
   const {
     dataState,
     onDataStateChange,
@@ -273,7 +249,11 @@ export default function SupportTicket() {
       field: 'status',
       title: 'Ticket status',
       cell: (props) => (
-        <ApprovalStatusCell {...props} statusOptions={statusOptions} />
+        <ApprovalStatusCell
+          {...props}
+          statusOptions={statusOptions}
+          onStatusChangeClick={handleStatusChangeClick}
+        />
       ),
       filter: 'text',
       columnMenu: ColumnMenu,
@@ -348,23 +328,25 @@ export default function SupportTicket() {
                         cells={
                           col.cell
                             ? {
-                                data: (props) => (
-                                  <col.cell
-                                    {...props}
-                                    supportTicketPermission={
-                                      supportTicketPermission
-                                    }
-                                    setShowModal={setShowModal}
-                                    setticketId={setticketId}
-                                    getTickets={getTickets}
-                                  />
-                                ),
-                              }
+                              data: (props) => (
+                                <col.cell
+                                  {...props}
+                                  supportTicketPermission={
+                                    supportTicketPermission
+                                  }
+                                  setShowModal={setShowModal}
+                                  setticketId={setticketId}
+                                  getTickets={getTickets}
+                                  setShowDeleteDialog={setShowDeleteDialog}
+                                  setSelectedTicketId={setSelectedTicketId}
+                                />
+                              ),
+                            }
                             : {
-                                data: (props) => (
-                                  <TextCell {...props} field={col.field} />
-                                ),
-                              }
+                              data: (props) => (
+                                <TextCell {...props} field={col.field} />
+                              ),
+                            }
                         }
                       />
                     ))}
@@ -381,6 +363,68 @@ export default function SupportTicket() {
             ticketId={ticketId}
             statusOptions={statusOptions}
             getTickets={getTickets}
+          />
+        )}
+        {showDeleteDialog && (
+          <AleartDialog
+            title="Confirm Delete"
+            message="Are you sure you want to delete this Support Ticket? This action cannot be undone."
+            onCancel={() => {
+              setShowDeleteDialog(false);
+              setSelectedTicketId(null);
+            }}
+            onConfirm={async () => {
+              const res = await apiRequest(
+                'DELETE',
+                API_ROUTES.supportTicket.supportTicketDelete(selectedTicketId),
+                null,
+                null,
+                {
+                  showLoader: true,
+                  showToaster: true,
+                }
+              );
+              if (res.status) {
+                getTickets();
+              }
+              setShowDeleteDialog(false);
+              setSelectedTicketId(null);
+            }}
+          />
+        )}
+        {showStatusDialog && (
+          <AleartDialog
+            title="Confirm Status Change"
+            message="Are you sure you want to change the status of this support ticket?"
+            onCancel={() => {
+              setShowStatusDialog(false);
+              setPendingStatusData(null);
+              getTickets();
+            }}
+            onConfirm={async () => {
+              if (pendingStatusData) {
+                const payload = {
+                  statusId: pendingStatusData.statusId,
+                  ticketId: pendingStatusData.ticketId,
+                  adminDescription: null,
+                };
+                const res = await apiRequest(
+                  'POST',
+                  API_ROUTES.supportTicket.supportTicketsUpdateAsync,
+                  payload,
+                  null,
+                  {
+                    showLoader: true,
+                    showToaster: true,
+                  }
+                );
+                if (res.status) {
+                  getTickets();
+                }
+              }
+              setShowStatusDialog(false);
+              setPendingStatusData(null);
+            }}
           />
         )}
       </div>

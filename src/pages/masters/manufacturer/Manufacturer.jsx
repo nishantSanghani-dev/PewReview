@@ -5,8 +5,9 @@ import { Grid, GridColumn } from '@progress/kendo-react-grid';
 import { filterIcon } from '@progress/kendo-svg-icons';
 import { ColumnMenu } from '../../../components/grid/ColumnMenu';
 import { getBackendFilters } from '../../../components/grid/GridFilter';
-import { handleStatusChange } from '../../../utils/ChangeStatus';
+import { useStatusChange } from '../../../hooks/useStatusChange';
 import { handleDelete } from '../../../utils/DeleteRecords';
+import AleartDialog from '../../../components/common/AleartDialog';
 import { DateCell } from '../../activity/Activity';
 import ManufacturerAdd from './ManufacturerAdd';
 import BreadCumb from '../../../components/common/breadCumb/BreadCumb';
@@ -35,14 +36,10 @@ const ActionCell = (props) => {
         )}
         {props.manufecturePermission.canDelete && (
           <button
-            onClick={() =>
-              handleDelete(
-                item.id,
-                'manufacturer',
-                'manufacturerDelete',
-                props.getManufacturer
-              )
-            }
+            onClick={() => {
+              props.setSelectedManufacturerId(item.id);
+              props.setShowDeleteDialog(true);
+            }}
             type="button"
             className="small-square-btn danger-btn"
           >
@@ -86,12 +83,11 @@ const StatusCell = (props) => {
           checked={props.dataItem.isActive}
           readOnly
           onChange={(e) =>
-            handleStatusChange(
+            props.handleStatusChange(
               props.dataItem.id,
               e.target.checked,
               'manufacturer',
-              'manufacturerStatusUpdate',
-              props.getManufacturer
+              'manufacturerStatusUpdate'
             )
           }
         />
@@ -104,6 +100,9 @@ export default function Manufacturer() {
   const [manufacturerData, setmanufacturerData] = useState([]);
   const [ismanufacturerOpen, setismanufacturerOpen] = useState(false);
   const [id, setid] = useState(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [selectedManufacturerId, setSelectedManufacturerId] = useState(null);
+
   const [searchText, setSearchText] = useState('');
   const [customSearch, setcustomSearch] = useState('');
   const [filters, setFilters] = useState([]);
@@ -132,6 +131,7 @@ export default function Manufacturer() {
     );
     setmanufacturerData(res.data.data);
   };
+  const { handleStatusChange, statusConfirmDialog } = useStatusChange(getManufacturer);
   const manufectureColumns = [
     ...(manufecturePermission?.canUpdate || manufecturePermission?.canDelete
       ? [{ field: 'action', title: 'Action', cell: ActionCell, width: '80px' }]
@@ -289,25 +289,28 @@ export default function Manufacturer() {
                         cells={
                           col.cell
                             ? {
-                                data: (props) => (
-                                  <col.cell
-                                    {...props}
-                                    manufecturePermission={
-                                      manufecturePermission
-                                    }
-                                    getManufacturer={getManufacturer}
-                                    setismanufacturerOpen={
-                                      setismanufacturerOpen
-                                    }
-                                    setid={setid}
-                                  />
-                                ),
-                              }
+                              data: (props) => (
+                                <col.cell
+                                  {...props}
+                                  manufecturePermission={
+                                    manufecturePermission
+                                  }
+                                  getManufacturer={getManufacturer}
+                                  setismanufacturerOpen={
+                                    setismanufacturerOpen
+                                  }
+                                  setid={setid}
+                                  setShowDeleteDialog={setShowDeleteDialog}
+                                  setSelectedManufacturerId={setSelectedManufacturerId}
+                                  handleStatusChange={handleStatusChange}
+                                />
+                              ),
+                            }
                             : {
-                                data: (props) => (
-                                  <TextCell {...props} field={col.field} />
-                                ),
-                              }
+                              data: (props) => (
+                                <TextCell {...props} field={col.field} />
+                              ),
+                            }
                         }
                       />
                     );
@@ -327,6 +330,27 @@ export default function Manufacturer() {
           setismanufacturerOpen={setismanufacturerOpen}
         />
       )}
+      {showDeleteDialog && (
+        <AleartDialog
+          title="Confirm Delete"
+          message="Are you sure you want to delete this Manufacturer? This action cannot be undone."
+          onCancel={() => {
+            setShowDeleteDialog(false);
+            setSelectedManufacturerId(null);
+          }}
+          onConfirm={async () => {
+            await handleDelete(
+              selectedManufacturerId,
+              'manufacturer',
+              'manufacturerDelete',
+              getManufacturer
+            );
+            setShowDeleteDialog(false);
+            setSelectedManufacturerId(null);
+          }}
+        />
+      )}
+      {statusConfirmDialog}
     </>
   );
 }

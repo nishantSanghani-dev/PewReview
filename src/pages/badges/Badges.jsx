@@ -13,7 +13,12 @@ import { usePermission } from '../../hooks/UsePermission';
 import { MENU } from '../../data/Menu';
 import useUserPermission from '../../utils/UserPermission';
 import { Tooltip } from '@progress/kendo-react-tooltip';
+import AleartDialog from '../../components/common/AleartDialog';
 const ActionCell = (props) => {
+  const deleteEvent = () => {
+    props.setSelectedBadgeId(props.dataItem.id);
+    props.setShowDeleteDialog(true);
+  };
   return (
     <td {...props.tdProps}>
       <div className="d-flex gap-2 align-items-center">
@@ -31,14 +36,7 @@ const ActionCell = (props) => {
         )}
         {props.badgePermission.canDelete && (
           <button
-            onClick={() =>
-              handleDelete(
-                props.dataItem.id,
-                'badges',
-                'badgeDelete',
-                props.getBadges
-              )
-            }
+            onClick={deleteEvent}
 
             className="small-square-btn danger-btn"
           >
@@ -89,6 +87,8 @@ export default function Badges() {
   const [badgesData, setbadgesData] = useState([]);
   const [id, setid] = useState(null);
   const [filters, setFilters] = useState([]);
+  const [selectedBadgeId, setSelectedBadgeId] = useState(null)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const { dataState, onDataStateChange, page, pageSize } =
     useGridPagination(10);
   const permission = usePermission();
@@ -248,22 +248,24 @@ export default function Badges() {
                       cells={
                         col.cell
                           ? {
-                              data: (props) => (
-                                <col.cell
-                                  setisBadgeOpen={setisBadgeOpen}
-                                  {...props}
-                                  setid={setid}
-                                  id={id}
-                                  getBadges={getBadges}
-                                  badgePermission={badgePermission}
-                                />
-                              ),
-                            }
+                            data: (props) => (
+                              <col.cell
+                                setisBadgeOpen={setisBadgeOpen}
+                                {...props}
+                                setid={setid}
+                                id={id}
+                                getBadges={getBadges}
+                                badgePermission={badgePermission}
+                                setSelectedBadgeId={setSelectedBadgeId}
+                                setShowDeleteDialog={setShowDeleteDialog}
+                              />
+                            ),
+                          }
                           : {
-                              data: (props) => (
-                                <TextCell {...props} field={col.field} />
-                              ),
-                            }
+                            data: (props) => (
+                              <TextCell {...props} field={col.field} />
+                            ),
+                          }
                       }
                     />
                   ))}
@@ -278,6 +280,26 @@ export default function Badges() {
           id={id}
           getBadges={getBadges}
           setisBadgeOpen={setisBadgeOpen}
+        />
+      )}
+      {showDeleteDialog && (
+        <AleartDialog
+          title="Confirm Delete"
+          message="Are you sure you want to delete this Badge? This action cannot be undone."
+          onCancel={() => {
+            setShowDeleteDialog(false);
+            setSelectedBadgeId(null);
+          }}
+          onConfirm={async () => {
+            await handleDelete(
+              selectedBadgeId,
+              'badges',
+              'badgeDelete',
+              getBadges
+            );
+            setShowDeleteDialog(false);
+            setSelectedBadgeId(null);
+          }}
         />
       )}
     </div>

@@ -6,7 +6,7 @@ import { Grid, GridColumn } from '@progress/kendo-react-grid';
 import GunDetails from '../../../../components/common/gunDetails/GunDetails';
 import { DateTimeCell } from '../Events';
 import VenueAdd from './VenueAdd';
-import { handleStatusChange } from '../../../../utils/ChangeStatus';
+import { useStatusChange } from '../../../../hooks/useStatusChange';
 import SerachFilter from '../../../../components/common/SerachFilter';
 import useGridPagination from '../../../../hooks/useGridPagination';
 import { Tooltip } from '@progress/kendo-react-tooltip';
@@ -17,6 +17,7 @@ import { filterIcon } from '@progress/kendo-svg-icons';
 import { ColumnMenu } from '../../../../components/grid/ColumnMenu';
 import { getBackendFilters } from '../../../../components/grid/GridFilter';
 import useUserPermission from '../../../../utils/UserPermission';
+import AleartDialog from '../../../../components/common/AleartDialog';
 
 const DetailCell = ({ tdProps, dataItem, field }) => {
   return (
@@ -115,12 +116,11 @@ const StatusCell = (props) => {
       <div className="form-check form-switch">
         <input
           onChange={(e) =>
-            handleStatusChange(
+            props.handleStatusChange(
               props.dataItem.venueId,
               e.target.checked,
               'venue',
-              'venueStatusUpdate',
-              props.getVenueList
+              'venueStatusUpdate'
             )
           }
           className="form-check-input"
@@ -138,9 +138,9 @@ export const UserNameCell = ({ tdProps, dataItem, field, userPermission }) => {
   return (
     <td {...tdProps}>
       {userPermission?.canUpdate &&
-      userPermission?.canCreate &&
-      userPermission?.canDelete &&
-      userPermission?.canRead ? (
+        userPermission?.canCreate &&
+        userPermission?.canDelete &&
+        userPermission?.canRead ? (
         <Link
           className="text-primary"
           to={`/admin/user/edit/${dataItem.userId}`}
@@ -162,6 +162,9 @@ export default function VenueList() {
   const [searchText, setSearchText] = useState('');
   const [customSearch, setcustomSearch] = useState('');
   const [totalRecords, settotalRecords] = useState(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [selectedVenueId, setSelectedVenueId] = useState(null);
+
   const [filters, setFilters] = useState([]);
   const [scrollableMode, setScrollableMode] = useState('scrollable');
   const {
@@ -194,6 +197,7 @@ export default function VenueList() {
     setvenueListData(res.data.data);
     settotalRecords(res.data.totalRecord);
   };
+  const { handleStatusChange, statusConfirmDialog } = useStatusChange(getVenueList);
   const getVenueGunDetails = async (venueId) => {
     const res = await apiRequest(
       'GET',
@@ -208,7 +212,24 @@ export default function VenueList() {
     );
     setgunDetailsData(res.data);
   };
-
+  const deleteVenue = async () => {
+    if (!selectedVenueId) return
+    const res = await apiRequest(
+      'DELETE',
+      API_ROUTES.venue.venueDelete(selectedVenueId),
+      null,
+      null,
+      {
+        showLoader: true,
+        showToaster: true,
+      }
+    );
+    if (res.status) {
+      getVenueList();
+    }
+    setShowDeleteDialog(false);
+    setSelectedVenueId(null)
+  };
   const GunCell = ({ tdProps, dataItem, setShowGunDetails }) => {
     // console.log(dataItem.venueId);
 
@@ -251,24 +272,12 @@ export default function VenueList() {
   };
   const ActionCell = (props) => {
     // console.log(props.dataItem.venueId);
-
-    const deleteEvent = async () => {
-      if (confirm('Are You Want To Delete Venue ? ')) {
-        const res = await apiRequest(
-          'DELETE',
-          API_ROUTES.venue.venueDelete(props.dataItem.venueId),
-          null,
-          null,
-          {
-            showLoader: true,
-            showToaster: true,
-          }
-        );
-        if (res.status) {
-          getVenueList();
-        }
-      }
+    const deleteEvent = () => {
+      setSelectedVenueId(props.dataItem.venueId);
+      setShowDeleteDialog(true);
     };
+
+
 
     return (
       <td {...props.tdProps}>
@@ -296,7 +305,7 @@ export default function VenueList() {
           )}
           {props.venuePermission.canDelete && (
             <button
-              onClick={() => deleteEvent()}
+              onClick={deleteEvent}
               className="small-square-btn danger-btn"
             >
               <i className="demo-icon icon-delete-1"></i>
@@ -542,21 +551,22 @@ export default function VenueList() {
                         cells={
                           col.cell
                             ? {
-                                data: (props) => (
-                                  <col.cell
-                                    {...props}
-                                    venuePermission={venuePermission}
-                                    getVenueList={getVenueList}
-                                    setShowGunDetails={setShowGunDetails}
-                                    userPermission={userPermission}
-                                  />
-                                ),
-                              }
+                              data: (props) => (
+                                <col.cell
+                                  {...props}
+                                  venuePermission={venuePermission}
+                                  getVenueList={getVenueList}
+                                  setShowGunDetails={setShowGunDetails}
+                                  userPermission={userPermission}
+                                  handleStatusChange={handleStatusChange}
+                                />
+                              ),
+                            }
                             : {
-                                data: (props) => (
-                                  <TextCell {...props} field={col.field} />
-                                ),
-                              }
+                              data: (props) => (
+                                <TextCell {...props} field={col.field} />
+                              ),
+                            }
                         }
                       />
                     ))}
@@ -574,6 +584,18 @@ export default function VenueList() {
           setEditVenueId={setEditVenueId}
         />
       )}
+      {showDeleteDialog && (
+        <AleartDialog
+          title="Confirm Delete"
+          message="Are you sure you want to delete this venue? This action cannot be undone."
+          onCancel={() => {
+            setShowDeleteDialog(false);
+            setSelectedVenueId(null);
+          }}
+          onConfirm={deleteVenue}
+        />
+      )}
+      {statusConfirmDialog}
     </div>
   );
 }

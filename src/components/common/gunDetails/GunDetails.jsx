@@ -80,7 +80,7 @@ export default function GunDetails({ setShowGunDetails, gunDetailsData }) {
     <div
       className="modal fade show d-block gun-modal-wrapper"
       tabIndex="-1"
-      style={{ background: 'rgba(0, 0, 0, 0.4)' }}
+      
     >
       <div className="modal-dialog gun-modal-dialog">
         <div className="modal-content gun-details-modal">

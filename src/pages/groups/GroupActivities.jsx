@@ -4,7 +4,7 @@ import BreadCumb from '../../components/common/breadCumb/BreadCumb';
 import { Link, useParams } from 'react-router-dom';
 import { apiRequest } from '../../services/Api';
 import { API_ROUTES } from '../../routes/api.routes';
-import { handleStatusChange } from '../../utils/ChangeStatus';
+import { useStatusChange } from '../../hooks/useStatusChange';
 import { Tooltip } from '@progress/kendo-react-tooltip';
 const ActionCell = (props) => {
   return (
@@ -92,12 +92,11 @@ const StatusCell = (props) => {
           checked={props.dataItem.isActive}
           readOnly
           onChange={(e) =>
-            handleStatusChange(
+            props.handleStatusChange(
               props.dataItem.postId,
               e.target.checked,
               'activities',
-              'activitiesPostStatus',
-              props.getActivities
+              'activitiesPostStatus'
             )
           }
         />
@@ -132,11 +131,8 @@ const UserNameCell = ({ tdProps, dataItem, field }) => {
 export default function GroupActivities() {
   const [activityData, setactivityData] = useState([]);
   const { id } = useParams();
-  const [total, setTotal] = useState(0);
-  const [dataState, setDataState] = useState({
-    skip: 0,
-    take: 10,
-  });
+  const { handleStatusChange, statusConfirmDialog } = useStatusChange(getActivities);
+  const [dataState, setDataState] = useState({ skip: 0, take: 20 });
 
   const getActivities = async () => {
     const page = Math.floor(dataState.skip / dataState.take) + 1;
@@ -245,6 +241,7 @@ export default function GroupActivities() {
                                   data: (props) => (
                                     <col.cell
                                       getActivities={getActivities}
+                                      handleStatusChange={handleStatusChange}
                                       {...props}
                                     />
                                   ),
@@ -265,6 +262,7 @@ export default function GroupActivities() {
           </div>
         </div>
       </div>
+      {statusConfirmDialog}
     </div>
   );
 }

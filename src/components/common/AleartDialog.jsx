@@ -1,6 +1,14 @@
 import React, { useEffect } from 'react';
 import '../common/alertDialog.css';
-export default function AleartDialog() {
+
+export default function AleartDialog({
+  title = 'Confirm Action',
+  message = 'Are you sure you want to continue?',
+  onCancel,
+  onConfirm,
+}) {
+  console.log(onConfirm);
+  
   useEffect(() => {
     document.body.style.overflow = 'hidden';
 
@@ -8,6 +16,7 @@ export default function AleartDialog() {
       document.body.style.overflow = '';
     };
   }, []);
+
   return (
     <div
       className="modal fade show d-block"
@@ -30,17 +39,16 @@ export default function AleartDialog() {
           <div className="modal-header border-bottom px-4 py-3">
             <h3
               className="modal-title fw-bold mb-0"
-              style={{
-                fontSize: '20px',
-              }}
+              style={{ fontSize: '20px' }}
             >
-              Confirm Status Change
+              {title}
             </h3>
 
             <button
               type="button"
               className="btn-close fs-5 shadow-none"
-            ></button>
+              onClick={onCancel}
+            />
           </div>
 
           {/* Body */}
@@ -52,8 +60,7 @@ export default function AleartDialog() {
                 lineHeight: '1.5',
               }}
             >
-              Are you sure you want to inactivate this role? Inactivating this
-              role will prevent all associated users from accessing the system.
+              {message}
             </p>
           </div>
 
@@ -62,6 +69,7 @@ export default function AleartDialog() {
             <button
               type="button"
               className="btn btn-outline-secondary"
+              onClick={onCancel}
               style={{
                 width: '100px',
                 height: '40px',
@@ -75,13 +83,15 @@ export default function AleartDialog() {
             <button
               type="button"
               className="btn text-white"
+              onClick={onConfirm}
               style={{
                 width: '110px',
                 height: '40px',
                 borderRadius: '10px',
                 fontWeight: '600',
                 border: 'none',
-                background: 'linear-gradient(90deg,#c1272d 0%,#7d1b1f 100%)',
+                background:
+                  'linear-gradient(90deg,#c1272d 0%,#7d1b1f 100%)',
               }}
             >
               Confirm

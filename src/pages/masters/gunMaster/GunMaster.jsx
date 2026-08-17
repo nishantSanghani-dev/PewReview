@@ -3,8 +3,9 @@ import { apiRequest } from '../../../services/Api';
 import { API_ROUTES } from '../../../routes/api.routes';
 import { Grid, GridColumn } from '@progress/kendo-react-grid';
 import { DateCell } from '../../activity/Activity';
-import { handleStatusChange } from '../../../utils/ChangeStatus';
+import { useStatusChange } from '../../../hooks/useStatusChange';
 import { handleDelete } from '../../../utils/DeleteRecords';
+import AleartDialog from '../../../components/common/AleartDialog';
 import BreadCumb from '../../../components/common/breadCumb/BreadCumb';
 import SerachFilter from '../../../components/common/SerachFilter';
 import useGridPagination from '../../../hooks/useGridPagination';
@@ -33,9 +34,10 @@ const ActionCell = (props) => {
         )}
         {props.gunMasterPermission.canDelete && (
           <button
-            onClick={() =>
-              handleDelete(item.gunId, 'gun', 'gunDelete', props.getGun)
-            }
+            onClick={() => {
+              props.setSelectedGunId(item.gunId);
+              props.setShowDeleteDialog(true);
+            }}
             type="button"
             className="small-square-btn danger-btn"
           >
@@ -57,12 +59,11 @@ const StatusCell = (props) => {
           checked={props.dataItem.isActive}
           readOnly
           onChange={(e) =>
-            handleStatusChange(
+            props.handleStatusChange(
               props.dataItem.gunId,
               e.target.checked,
               'gun',
-              'gunStatusUpdate',
-              props.getGun
+              'gunStatusUpdate'
             )
           }
         />
@@ -151,6 +152,8 @@ export default function GunMaster() {
   const [filters, setFilters] = useState([]);
   const [isAddGunOpen, setIsAddGunOpen] = useState(false);
   const [id, setId] = useState(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [selectedGunId, setSelectedGunId] = useState(null);
   const {
     dataState,
     onDataStateChange,
@@ -175,16 +178,18 @@ export default function GunMaster() {
     );
     setgunData(res.data.data);
   };
+
+  const { handleStatusChange, statusConfirmDialog } = useStatusChange(getGun);
   const gunCoulmn = [
     ...(gunMasterPermission?.canUpdate || gunMasterPermission?.canDelete
       ? [
-          {
-            field: 'action',
-            title: 'Action',
-            cell: ActionCell,
-            width: '100px',
-          },
-        ]
+        {
+          field: 'action',
+          title: 'Action',
+          cell: ActionCell,
+          width: '100px',
+        },
+      ]
       : []),
 
     {
@@ -360,7 +365,7 @@ export default function GunMaster() {
                       width={col.width || '150px'}
                       sortable={
                         col.field === 'action' ||
-                        col.field == 'attachmentFullPath'
+                          col.field == 'attachmentFullPath'
                           ? false
                           : true
                       }
@@ -375,22 +380,25 @@ export default function GunMaster() {
                       cells={
                         col.cell
                           ? {
-                              data: (props) => (
-                                <col.cell
-                                  gunMasterPermission={gunMasterPermission}
-                                  {...props}
-                                  statusOptions={statusOptions}
-                                  getGun={getGun}
-                                  setIsAddGunOpen={setIsAddGunOpen}
-                                  setId={setId}
-                                />
-                              ),
-                            }
+                            data: (props) => (
+                              <col.cell
+                                gunMasterPermission={gunMasterPermission}
+                                {...props}
+                                statusOptions={statusOptions}
+                                getGun={getGun}
+                                setIsAddGunOpen={setIsAddGunOpen}
+                                setId={setId}
+                                setShowDeleteDialog={setShowDeleteDialog}
+                                setSelectedGunId={setSelectedGunId}
+                                handleStatusChange={handleStatusChange}
+                              />
+                            ),
+                          }
                           : {
-                              data: (props) => (
-                                <TextCell {...props} field={col.field} />
-                              ),
-                            }
+                            data: (props) => (
+                              <TextCell {...props} field={col.field} />
+                            ),
+                          }
                       }
                     />
                   );
@@ -408,6 +416,22 @@ export default function GunMaster() {
             setId={setId}
           />
         )}
+        {showDeleteDialog && (
+          <AleartDialog
+            title="Confirm Delete"
+            message="Are you sure you want to delete this Gun? This action cannot be undone."
+            onCancel={() => {
+              setShowDeleteDialog(false);
+              setSelectedGunId(null);
+            }}
+            onConfirm={async () => {
+              await handleDelete(selectedGunId, 'gun', 'gunDelete', getGun);
+              setShowDeleteDialog(false);
+              setSelectedGunId(null);
+            }}
+          />
+        )}
+        {statusConfirmDialog}
       </div>
     </div>
   );

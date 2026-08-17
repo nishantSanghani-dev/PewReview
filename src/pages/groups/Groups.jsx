@@ -4,7 +4,7 @@ import { API_ROUTES } from '../../routes/api.routes';
 import { Grid, GridColumn } from '@progress/kendo-react-grid';
 import { Link } from 'react-router-dom';
 import { DateCell } from '../activity/Activity';
-import { handleStatusChange } from '../../utils/ChangeStatus';
+import { useStatusChange } from '../../hooks/useStatusChange';
 import { handleDelete } from '../../utils/DeleteRecords';
 import SerachFilter from '../../components/common/SerachFilter';
 import useGridPagination from '../../hooks/useGridPagination';
@@ -15,6 +15,7 @@ import { ColumnMenu } from '../../components/grid/ColumnMenu';
 import { getBackendFilters } from '../../components/grid/GridFilter';
 import useUserPermission from '../../utils/UserPermission';
 import { Tooltip } from '@progress/kendo-react-tooltip';
+import AleartDialog from '../../components/common/AleartDialog';
 const ActionCell = (props) => {
   return (
     <td {...props.tdProps}>
@@ -28,14 +29,10 @@ const ActionCell = (props) => {
         </Link>
         {props.grpPermission.canDelete && (
           <button
-            onClick={() =>
-              handleDelete(
-                props.dataItem.id,
-                'groups',
-                'groupDelete',
-                props.getGroups
-              )
-            }
+            onClick={() => {
+              props.setSelectedGroupId(props.dataItem.id);
+              props.setShowDeleteDialog(true);
+            }}
             className="small-square-btn danger-btn"
           >
             <i className="demo-icon icon-delete-1"></i>
@@ -96,13 +93,11 @@ const StatusCell = (props) => {
           readOnly
           disabled={!props.grpPermission.canUpdate}
           onChange={(e) =>
-            handleStatusChange(
+            props.handleStatusChange(
               props.dataItem.id,
               e.target.checked,
               'groups',
-              'groupUpdateStatus',
-
-              props.getGroups // callback
+              'groupUpdateStatus'
             )
           }
         />
@@ -171,6 +166,8 @@ export default function Groups() {
   const [filter, setFilter] = useState(null);
   const [totalRecords, settotalRecords] = useState(null);
   const [filters, setFilters] = useState([]);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [selectedGroupId, setSelectedGroupId] = useState(null);
   const {
     dataState,
     onDataStateChange,
@@ -204,6 +201,7 @@ export default function Groups() {
     setgroupData(res.data.data);
     settotalRecords(res.data.totalRecord);
   };
+  const { handleStatusChange, statusConfirmDialog } = useStatusChange(getGroups);
   const groupColumns = [
     {
       field: 'action',
@@ -357,7 +355,7 @@ export default function Groups() {
                       width={col.width || '150px'}
                       sortable={
                         col.field === 'action' ||
-                        col.field == 'groupImageFullUrl'
+                          col.field == 'groupImageFullUrl'
                           ? false
                           : true
                       }
@@ -367,21 +365,24 @@ export default function Groups() {
                       cells={
                         col.cell
                           ? {
-                              data: (props) => (
-                                <col.cell
-                                  {...props}
-                                  grpPermission={grpPermission}
-                                  getGroups={getGroups}
-                                  endUserPermission={endUserPermission}
-                                  activityPermission={activityPermission}
-                                />
-                              ),
-                            }
+                            data: (props) => (
+                              <col.cell
+                                {...props}
+                                grpPermission={grpPermission}
+                                getGroups={getGroups}
+                                endUserPermission={endUserPermission}
+                                activityPermission={activityPermission}
+                                setShowDeleteDialog={setShowDeleteDialog}
+                                setSelectedGroupId={setSelectedGroupId}
+                                handleStatusChange={handleStatusChange}
+                              />
+                            ),
+                          }
                           : {
-                              data: (props) => (
-                                <TextCell {...props} field={col.field} />
-                              ),
-                            }
+                            data: (props) => (
+                              <TextCell {...props} field={col.field} />
+                            ),
+                          }
                       }
                     />
                   ))}
@@ -391,6 +392,27 @@ export default function Groups() {
           </div>
         </div>
       </div>
+      {showDeleteDialog && (
+        <AleartDialog
+          title="Confirm Delete"
+          message="Are you sure you want to delete this Group? This action cannot be undone."
+          onCancel={() => {
+            setShowDeleteDialog(false);
+            setSelectedGroupId(null);
+          }}
+          onConfirm={async () => {
+            await handleDelete(
+              selectedGroupId,
+              'groups',
+              'groupDelete',
+              getGroups
+            );
+            setShowDeleteDialog(false);
+            setSelectedGroupId(null);
+          }}
+        />
+      )}
+      {statusConfirmDialog}
     </div>
   );
 }

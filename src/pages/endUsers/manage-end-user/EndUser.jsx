@@ -6,6 +6,7 @@ import { API_ROUTES } from '../../../routes/api.routes';
 import { Link } from 'react-router-dom';
 import { handleDelete } from '../../../utils/DeleteRecords';
 import SerachFilter from '../../../components/common/SerachFilter';
+import AleartDialog from '../../../components/common/AleartDialog';
 import useGridPagination from '../../../hooks/useGridPagination';
 import { usePermission } from '../../../hooks/UsePermission';
 import { MENU } from '../../../data/Menu';
@@ -19,6 +20,8 @@ import { Button } from 'bootstrap';
 export default function EndUser() {
   const [manageUserData, setmanageUserData] = useState([]);
   const [total, setTotal] = useState(0);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState(null);
   const {
     dataState,
     onDataStateChange,
@@ -90,14 +93,10 @@ export default function EndUser() {
 
           {props.endUserPermission.canDelete && (
             <button
-              onClick={() =>
-                handleDelete(
-                  item.id,
-                  'endUser',
-                  'endUserDelete',
-                  getManageEndUser
-                )
-              }
+              onClick={() => {
+                setSelectedUserId(item.id);
+                setShowDeleteDialog(true);
+              }}
               type="button"
               className="small-square-btn danger-btn"
             >
@@ -318,6 +317,26 @@ export default function EndUser() {
           </div>
         </div>
       </div>
+      {showDeleteDialog && (
+        <AleartDialog
+          title="Confirm Delete"
+          message="Are you sure you want to delete this End User? This action cannot be undone."
+          onCancel={() => {
+            setShowDeleteDialog(false);
+            setSelectedUserId(null);
+          }}
+          onConfirm={async () => {
+            await handleDelete(
+              selectedUserId,
+              'endUser',
+              'endUserDelete',
+              getManageEndUser
+            );
+            setShowDeleteDialog(false);
+            setSelectedUserId(null);
+          }}
+        />
+      )}
     </div>
   );
 }

@@ -3,6 +3,7 @@ import { process } from '@progress/kendo-data-query';
 import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { handleDelete } from '../../../utils/DeleteRecords';
+import AleartDialog from '../../../components/common/AleartDialog';
 import { useSelector } from 'react-redux';
 import { MENU } from '../../../data/Menu';
 import useUserPermission from '../../../utils/UserPermission';
@@ -18,16 +19,22 @@ export const ActionCell = (props) => {
         >
           <i className="demo-icon icon-eye-line"></i>
         </Link>
-        {props.eventPermission?.canDelete && (
+        {props.eventPermission?.canDelete
+          &&
           <button
-            onClick={() =>
-              handleDelete(props.dataItem.eventId, 'events', 'eventDelete')
-            }
+            onClick={() => {
+              if (props.setShowDeleteDialog && props.setSelectedEventId) {
+                props.setSelectedEventId(props.dataItem.eventId);
+                props.setShowDeleteDialog(true);
+              } else {
+                handleDelete(props.dataItem.eventId, 'events', 'eventDelete');
+              }
+            }}
             className="small-square-btn danger-btn"
           >
             <i className="demo-icon icon-delete-1"></i>
           </button>
-        )}
+        }
       </div>
     </td>
   );
@@ -76,6 +83,8 @@ export const AddressCell = (props) => {
 };
 export default function Events({ data, isUpcomingEvent, setisUpcomingEvent }) {
   const [gridSort, setGridSort] = useState([]);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [selectedEventId, setSelectedEventId] = useState(null);
   const sortedData = useMemo(
     () => process(data, { sort: gridSort }).data,
     [data, gridSort]
@@ -89,110 +98,145 @@ export default function Events({ data, isUpcomingEvent, setisUpcomingEvent }) {
   const { eventPermission } = useUserPermission();
   return (
     <>
-      {eventPermission?.canRead && (
-        <div>
-          <div className="event-tabs">
-            <button
-              className={`event-tab-btn ${isUpcomingEvent === true ? 'active' : ''}`}
-              onClick={() => setisUpcomingEvent(true)}
+      {eventPermission?.canRead &&
+        <>
+          <div>
+            <div className="event-tabs">
+              <button
+                className={`event-tab-btn ${isUpcomingEvent === true ? 'active' : ''}`}
+                onClick={() => setisUpcomingEvent(true)}
+              >
+                Upcoming Events
+              </button>
+
+              <button
+                className={`event-tab-btn ${isUpcomingEvent === false ? 'active' : ''}`}
+                onClick={() => setisUpcomingEvent(false)}
+              >
+                Passed Events
+              </button>
+
+              <button
+                className={`event-tab-btn ${isUpcomingEvent === null ? 'active' : ''}`}
+                onClick={() => setisUpcomingEvent(null)}
+              >
+                Event Requests
+              </button>
+            </div>
+
+            <div
+              id="collapseTwo"
+              className="accordion-collapse collapse show d-lg-block"
+              aria-labelledby="headingTwo"
+              data-bs-parent="#myTabContent"
             >
-              Upcoming Events
-            </button>
+              <div className="accordion-body mt-3 mt-xxl-4">
+                <div className="row">
+                  <div className="col-12">
+                    <div className="">
+                      {eventPermission?.canRead
+                        &&
+                        <Grid
+                          className="table-wrapper fw-bold text-center"
+                          style={{
+                            zIndex: '999',
+                          }}
+                          data={sortedData}
+                          sortable={{ allowUnsort: true, mode: 'single' }}
+                          sort={gridSort}
+                          pageable={{
+                            responsive: false,
+                            buttonCount: 5,
+                            pageSizes: [10, 20, 50],
+                            info: true,
+                            previousNext: true,
+                            type: 'numeric',
+                          }}
+                          onDataStateChange={(event) =>
+                            setGridSort(event.dataState?.sort || [])
+                          }
+                        >
+                          <GridColumn
+                            title="Action"
+                            width="120px"
+                            cells={{
+                              data: (props) => (
+                                <ActionCell
+                                  {...props}
+                                  eventPermission={eventPermission}
+                                  setShowDeleteDialog={setShowDeleteDialog}
+                                  setSelectedEventId={setSelectedEventId}
+                                />
+                              )
+                            }}
+                          />
 
-            <button
-              className={`event-tab-btn ${isUpcomingEvent === false ? 'active' : ''}`}
-              onClick={() => setisUpcomingEvent(false)}
-            >
-              Passed Events
-            </button>
+                          <GridColumn
+                            title="Host Name"
+                            width="200px"
+                            cells={{ data: HostNameCell }}
+                          />
 
-            <button
-              className={`event-tab-btn ${isUpcomingEvent === null ? 'active' : ''}`}
-              onClick={() => setisUpcomingEvent(null)}
-            >
-              Event Requests
-            </button>
-          </div>
+                          <GridColumn
+                            title="Event Name"
+                            width="200px"
+                            cells={{ data: EventNameCell }}
+                          />
 
-          <div
-            id="collapseTwo"
-            className="accordion-collapse collapse show d-lg-block"
-            aria-labelledby="headingTwo"
-            data-bs-parent="#myTabContent"
-          >
-            <div className="accordion-body mt-3 mt-xxl-4">
-              <div className="row">
-                <div className="col-12">
-                  <div className="">
-                    {eventPermission.canRead && (
-                      <Grid
-                        className="table-wrapper fw-bold text-center"
-                        style={{
-                          zIndex: '999',
-                        }}
-                        data={sortedData}
-                        sortable={{ allowUnsort: true, mode: 'single' }}
-                        sort={gridSort}
-                        pageable={{
-                          responsive: false,
-                          buttonCount: 5,
-                          pageSizes: [10, 20, 50],
-                          info: true,
-                          previousNext: true,
-                          type: 'numeric',
-                        }}
-                        onDataStateChange={(event) =>
-                          setGridSort(event.dataState?.sort || [])
-                        }
-                      >
-                        <GridColumn
-                          title="Action"
-                          width="120px"
-                          cells={{ data: ActionCell }}
-                        />
+                          <GridColumn
+                            title="Date & Time"
+                            width="200px"
+                            cells={{ data: DateTimeCell }}
+                          />
 
-                        <GridColumn
-                          title="Host Name"
-                          width="200px"
-                          cells={{ data: HostNameCell }}
-                        />
-
-                        <GridColumn
-                          title="Event Name"
-                          width="200px"
-                          cells={{ data: EventNameCell }}
-                        />
-
-                        <GridColumn
-                          title="Date & Time"
-                          width="200px"
-                          cells={{ data: DateTimeCell }}
-                        />
-
-                        <GridColumn
-                          title="Address"
-                          width="250px"
-                          cells={{ data: AddressCell }}
-                        />
-                        <GridColumn
-                          field="userName"
-                          title="Created By"
-                          width="150px"
-                        />
-                        <GridColumn
-                          field="approvalStatusName"
-                          title="status"
-                          width="150px"
-                        />
-                      </Grid>
-                    )}
+                          <GridColumn
+                            title="Address"
+                            width="250px"
+                            cells={{ data: AddressCell }}
+                          />
+                          <GridColumn
+                            field="userName"
+                            title="Created By"
+                            width="150px"
+                          />
+                          <GridColumn
+                            field="approvalStatusName"
+                            title="status"
+                            width="150px"
+                          />
+                        </Grid>
+                      }
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+          {showDeleteDialog
+            &&
+            <AleartDialog
+              title="Confirm Delete"
+              message="Are you sure you want to delete this Event? This action cannot be undone."
+              onCancel={() => {
+                setShowDeleteDialog(false);
+                setSelectedEventId(null);
+              }}
+              onConfirm={async () => {
+                await handleDelete(selectedEventId, 'events', 'eventDelete');
+                // Since Events component doesn't have a direct refresh function passed,
+                // but we can trigger window.location.reload() or if it gets new data via props.
+                // Wait, let's see: the original handleDelete didn't have a callback in Events.jsx.
+                // So we just call handleDelete, then close dialog.
+                setShowDeleteDialog(false);
+                setSelectedEventId(null);
+              }}
+            />
+          }
+
+        </>
+      }
+
+
     </>
   );
 }

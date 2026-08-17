@@ -6,8 +6,9 @@ import { filterIcon } from '@progress/kendo-svg-icons';
 import { ColumnMenu } from '../../../components/grid/ColumnMenu';
 import { getBackendFilters } from '../../../components/grid/GridFilter';
 import { DateCell } from '../../activity/Activity';
-import { handleStatusChange } from '../../../utils/ChangeStatus';
+import { useStatusChange } from '../../../hooks/useStatusChange';
 import { handleDelete } from '../../../utils/DeleteRecords';
+import AleartDialog from '../../../components/common/AleartDialog';
 import BreadCumb from '../../../components/common/breadCumb/BreadCumb';
 import SerachFilter from '../../../components/common/SerachFilter';
 import useGridPagination from '../../../hooks/useGridPagination';
@@ -29,14 +30,10 @@ const ActionCell = (props) => {
         )}
         {props.gunCategoryMasterPermission.canDelete && (
           <button
-            onClick={() =>
-              handleDelete(
-                item.categoryId,
-                'category',
-                'categoryMasterDelete',
-                props.getCategoryMaster
-              )
-            }
+            onClick={() => {
+              props.setSelectedCategoryId(item.categoryId);
+              props.setShowDeleteDialog(true);
+            }}
             type="button"
             className="small-square-btn danger-btn"
           >
@@ -58,12 +55,11 @@ const StatusCell = (props) => {
           checked={props.dataItem.isActive}
           readOnly
           onChange={(e) =>
-            handleStatusChange(
+            props.handleStatusChange(
               props.dataItem.categoryId,
               e.target.checked,
               'category',
-              'categoryMasterUpdate',
-              props.getCategoryMaster
+              'categoryMasterUpdate'
             )
           }
         />
@@ -97,6 +93,9 @@ const TextCell = ({ tdProps, dataItem, field }) => {
 
 export default function CategoryMaster() {
   const [categoryMasterData, setcategoryMasterData] = useState([]);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [selectedCategoryId, setSelectedCategoryId] = useState(null);
+
   const [searchText, setSearchText] = useState('');
   const [customSearch, setcustomSearch] = useState('');
   const [filters, setFilters] = useState([]);
@@ -125,9 +124,10 @@ export default function CategoryMaster() {
     );
     setcategoryMasterData(res.data.data);
   };
+  const { handleStatusChange, statusConfirmDialog } = useStatusChange(getCategoryMaster);
   const categoryMasterColumns = [
     ...(gunCategoryMasterPermission?.canUpdate ||
-    gunCategoryMasterPermission?.canDelete
+      gunCategoryMasterPermission?.canDelete
       ? [{ field: 'action', title: 'Action', cell: ActionCell, width: '100px' }]
       : []),
     {
@@ -296,21 +296,24 @@ export default function CategoryMaster() {
                         cells={
                           col.cell
                             ? {
-                                data: (props) => (
-                                  <col.cell
-                                    {...props}
-                                    gunCategoryMasterPermission={
-                                      gunCategoryMasterPermission
-                                    }
-                                    getCategoryMaster={getCategoryMaster}
-                                  />
-                                ),
-                              }
+                              data: (props) => (
+                                <col.cell
+                                  {...props}
+                                  gunCategoryMasterPermission={
+                                    gunCategoryMasterPermission
+                                  }
+                                  getCategoryMaster={getCategoryMaster}
+                                  setShowDeleteDialog={setShowDeleteDialog}
+                                  setSelectedCategoryId={setSelectedCategoryId}
+                                  handleStatusChange={handleStatusChange}
+                                />
+                              ),
+                            }
                             : {
-                                data: (props) => (
-                                  <TextCell {...props} field={col.field} />
-                                ),
-                              }
+                              data: (props) => (
+                                <TextCell {...props} field={col.field} />
+                              ),
+                            }
                         }
                       />
                     );
@@ -329,6 +332,27 @@ export default function CategoryMaster() {
           setisCategoryOpen={setisCategoryOpen}
         />
       )}
+      {showDeleteDialog && (
+        <AleartDialog
+          title="Confirm Delete"
+          message="Are you sure you want to delete this Category? This action cannot be undone."
+          onCancel={() => {
+            setShowDeleteDialog(false);
+            setSelectedCategoryId(null);
+          }}
+          onConfirm={async () => {
+            await handleDelete(
+              selectedCategoryId,
+              'category',
+              'categoryMasterDelete',
+              getCategoryMaster
+            );
+            setShowDeleteDialog(false);
+            setSelectedCategoryId(null);
+          }}
+        />
+      )}
+      {statusConfirmDialog}
     </>
   );
 }

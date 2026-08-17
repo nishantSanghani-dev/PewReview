@@ -15,6 +15,8 @@ import { usePermission } from '../../hooks/UsePermission';
 import { MENU } from '../../data/Menu';
 import { useSearchParams } from 'react-router-dom';
 import useUserPermission from '../../utils/UserPermission';
+import AleartDialog from '../../components/common/AleartDialog';
+import { handleDelete } from '../../utils/DeleteRecords';
 
 const getParamsForTab = (tab) => {
   switch (tab) {
@@ -41,6 +43,8 @@ export default function Event() {
     : 'upcomingEvents';
   const params = useMemo(() => getParamsForTab(eventTabs), [eventTabs]);
   const [eventsData, seteventsData] = useState([]);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [selectedEventId, setSelectedEventId] = useState(null);
   const [searchText, setSearchText] = useState('');
   const [customSearch, setcustomSearch] = useState('');
   const [filters, setFilters] = useState([]);
@@ -204,6 +208,8 @@ export default function Event() {
                                   <ActionCell
                                     {...props}
                                     eventPermission={eventPermission}
+                                    setShowDeleteDialog={setShowDeleteDialog}
+                                    setSelectedEventId={setSelectedEventId}
                                   />
                                 ),
                               }}
@@ -252,6 +258,21 @@ export default function Event() {
             </div>
           </div>
         </div>
+        {showDeleteDialog && (
+          <AleartDialog
+            title="Confirm Delete"
+            message="Are you sure you want to delete this Event? This action cannot be undone."
+            onCancel={() => {
+              setShowDeleteDialog(false);
+              setSelectedEventId(null);
+            }}
+            onConfirm={async () => {
+              await handleDelete(selectedEventId, 'events', 'eventDelete', getEevent);
+              setShowDeleteDialog(false);
+              setSelectedEventId(null);
+            }}
+          />
+        )}
       </div>
     </div>
   );

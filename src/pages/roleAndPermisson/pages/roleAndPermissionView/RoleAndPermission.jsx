@@ -4,8 +4,9 @@ import { Link } from 'react-router-dom';
 import { apiRequest } from '../../../../services/Api';
 import { API_ROUTES } from '../../../../routes/api.routes';
 import RoleRow from '../../components/RoleRow';
+import AleartDialog from '../../../../components/common/AleartDialog';
 import { Grid, GridColumn } from '@progress/kendo-react-grid';
-import { handleStatusChange } from '../../../../utils/ChangeStatus';
+import { useStatusChange } from '../../../../hooks/useStatusChange';
 import SerachFilter from '../../../../components/common/SerachFilter';
 import { usePermission } from '../../../../hooks/UsePermission';
 import { MENU } from '../../../../data/Menu';
@@ -55,12 +56,11 @@ const RoleStatusCell = (props) => {
           disabled={!props.rolePermission.canUpdate}
           checked={item.isActive}
           onChange={(e) =>
-            handleStatusChange(
+            props.handleStatusChange(
               props.dataItem.id,
               e.target.checked,
               'role',
-              'roleStatusEdit',
-              props.getRole // callback
+              'roleStatusEdit'
             )
           }
         />
@@ -71,6 +71,9 @@ const RoleStatusCell = (props) => {
 };
 export default function RoleAndPermission() {
   const [roleData, setroleData] = useState([]);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [selectedRoleId, setSelectedRoleId] = useState(null);
+
   const [customSearch, setcustomSearch] = useState('');
   const [total, setTotal] = useState(0);
   const [dataState, setDataState] = useState({
@@ -116,22 +119,10 @@ export default function RoleAndPermission() {
     setroleData(res.data.data);
     setTotal(res.data.totalRecord || 0);
   };
-  const handleRoleDelete = async (id) => {
-    if (confirm('Are You Want To Delete Role ?')) {
-      const res = await apiRequest(
-        'DELETE',
-        API_ROUTES.role.roleDelete(id),
-        null,
-        null,
-        {
-          showLoader: true,
-          showToaster: true,
-        }
-      );
-      if (res.status) {
-        getRole();
-      }
-    }
+  const { handleStatusChange: handleRoleStatusChange, statusConfirmDialog } = useStatusChange(getRole);
+  const handleRoleDelete = (id) => {
+    setSelectedRoleId(id);
+    setShowDeleteDialog(true);
   };
   const handleToggle = async (id, checked) => {
     console.log(id, checked);
@@ -141,7 +132,8 @@ export default function RoleAndPermission() {
     };
     console.log(typeof checked);
 
-    if (confirm('Are You Want To Update Status ?')) {
+    const confirmed = await window.customConfirm('Are You Want To Update Status ?');
+    if (confirmed) {
       const res = await apiRequest(
         'PUT',
         API_ROUTES.role.roleStatusEdit(id),
@@ -333,6 +325,7 @@ export default function RoleAndPermission() {
                         {...props}
                         getRole={getRole}
                         rolePermission={rolePermission}
+                        handleStatusChange={handleRoleStatusChange}
                       />
                     ),
                   }}
@@ -366,6 +359,34 @@ export default function RoleAndPermission() {
           </div>
         </div>
       </div>
+      {showDeleteDialog && (
+        <AleartDialog
+          title="Confirm Delete"
+          message="Are you sure you want to delete this Role? This action cannot be undone."
+          onCancel={() => {
+            setShowDeleteDialog(false);
+            setSelectedRoleId(null);
+          }}
+          onConfirm={async () => {
+            const res = await apiRequest(
+              'DELETE',
+              API_ROUTES.role.roleDelete(selectedRoleId),
+              null,
+              null,
+              {
+                showLoader: true,
+                showToaster: true,
+              }
+            );
+            if (res.status) {
+              getRole();
+            }
+            setShowDeleteDialog(false);
+            setSelectedRoleId(null);
+          }}
+        />
+      )}
+      {statusConfirmDialog}
     </div>
   );
 }

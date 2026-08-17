@@ -6,8 +6,9 @@ import { filterIcon } from '@progress/kendo-svg-icons';
 import { ColumnMenu } from '../../../components/grid/ColumnMenu';
 import { getBackendFilters } from '../../../components/grid/GridFilter';
 import { DateCell } from '../../activity/Activity';
-import { handleStatusChange } from '../../../utils/ChangeStatus';
+import { useStatusChange } from '../../../hooks/useStatusChange';
 import { handleDelete } from '../../../utils/DeleteRecords';
+import AleartDialog from '../../../components/common/AleartDialog';
 import AmmunitionAdd from './AmmunitionAdd';
 import BreadCumb from '../../../components/common/breadCumb/BreadCumb';
 import SerachFilter from '../../../components/common/SerachFilter';
@@ -36,14 +37,10 @@ const ActionCell = (props) => {
         )}
         {props.ammunitionPermission.canDelete && (
           <button
-            onClick={() =>
-              handleDelete(
-                item.id,
-                'ammunition',
-                'ammunitionDelete',
-                props.getAmmunition
-              )
-            }
+            onClick={() => {
+              props.setSelectedAmmunitionId(item.id);
+              props.setShowDeleteDialog(true);
+            }}
             type="button"
             className="small-square-btn danger-btn"
           >
@@ -87,12 +84,11 @@ const StatusCell = (props) => {
           checked={props.dataItem.isActive}
           readOnly
           onChange={(e) =>
-            handleStatusChange(
+            props.handleStatusChange(
               props.dataItem.id,
               e.target.checked,
               'ammunition',
-              'ammunitionStatusUpdate',
-              props.getAmmunition
+              'ammunitionStatusUpdate'
             )
           }
         />
@@ -105,6 +101,9 @@ export default function Ammunition() {
   const [ammunitionData, setammunitionData] = useState([]);
   const [isAmmunitionOpen, setisAmmunitionOpen] = useState(false);
   const [id, setid] = useState(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [selectedAmmunitionId, setSelectedAmmunitionId] = useState(null);
+
   const [searchText, setSearchText] = useState('');
   const [customSearch, setcustomSearch] = useState('');
   const [filters, setFilters] = useState([]);
@@ -133,6 +132,7 @@ export default function Ammunition() {
     );
     setammunitionData(res.data.data);
   };
+  const { handleStatusChange, statusConfirmDialog } = useStatusChange(getAmmunition);
 
   const ammunitionColumns = [
     ...(ammunitionPermission?.canUpdate || ammunitionPermission?.canDelete
@@ -282,21 +282,24 @@ export default function Ammunition() {
                       cells={
                         col.cell
                           ? {
-                              data: (props) => (
-                                <col.cell
-                                  {...props}
-                                  ammunitionPermission={ammunitionPermission}
-                                  getAmmunition={getAmmunition}
-                                  setisAmmunitionOpen={setisAmmunitionOpen}
-                                  setid={setid}
-                                />
-                              ),
-                            }
+                            data: (props) => (
+                              <col.cell
+                                {...props}
+                                ammunitionPermission={ammunitionPermission}
+                                getAmmunition={getAmmunition}
+                                setisAmmunitionOpen={setisAmmunitionOpen}
+                                setid={setid}
+                                setShowDeleteDialog={setShowDeleteDialog}
+                                setSelectedAmmunitionId={setSelectedAmmunitionId}
+                                handleStatusChange={handleStatusChange}
+                              />
+                            ),
+                          }
                           : {
-                              data: (props) => (
-                                <TextCell {...props} field={col.field} />
-                              ),
-                            }
+                            data: (props) => (
+                              <TextCell {...props} field={col.field} />
+                            ),
+                          }
                       }
                     />
                   );
@@ -315,6 +318,27 @@ export default function Ammunition() {
           setisAmmunitionOpen={setisAmmunitionOpen}
         />
       )}
+      {showDeleteDialog && (
+        <AleartDialog
+          title="Confirm Delete"
+          message="Are you sure you want to delete this Ammunition? This action cannot be undone."
+          onCancel={() => {
+            setShowDeleteDialog(false);
+            setSelectedAmmunitionId(null);
+          }}
+          onConfirm={async () => {
+            await handleDelete(
+              selectedAmmunitionId,
+              'ammunition',
+              'ammunitionDelete',
+              getAmmunition
+            );
+            setShowDeleteDialog(false);
+            setSelectedAmmunitionId(null);
+          }}
+        />
+      )}
+      {statusConfirmDialog}
     </div>
   );
 }

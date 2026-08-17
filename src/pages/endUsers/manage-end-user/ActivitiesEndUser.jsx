@@ -1,7 +1,7 @@
 import { Grid, GridColumn } from '@progress/kendo-react-grid';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { handleStatusChange } from '../../../utils/ChangeStatus';
+import { useStatusChange } from '../../../hooks/useStatusChange';
 import { Tooltip } from '@progress/kendo-react-tooltip';
 const ActionCell = (props) => {
   return (
@@ -89,7 +89,7 @@ const StatusCell = (props) => {
           checked={props.dataItem.isActive}
           readOnly
           onChange={(e) =>
-            handleStatusChange(
+            props.handleStatusChange(
               props.dataItem.postId,
               e.target.checked,
               'activities',
@@ -123,6 +123,7 @@ const DetailCell = ({ tdProps, dataItem, field }) => {
 };
 
 export default function ActivitiesEndUser({ data }) {
+  const { handleStatusChange, statusConfirmDialog } = useStatusChange();
   const activityTabColumn = [
     { field: 'action', title: 'Action', cell: ActionCell, width: '80px' },
     { field: 'createdOn', title: 'Created On', cell: DateCell, width: '150px' },
@@ -187,7 +188,7 @@ export default function ActivitiesEndUser({ data }) {
                       cells={
                         col.cell
                           ? {
-                              data: (props) => <col.cell {...props} />,
+                              data: (props) => <col.cell {...props} handleStatusChange={handleStatusChange} />,
                             }
                           : {
                               data: (props) => (
@@ -203,6 +204,7 @@ export default function ActivitiesEndUser({ data }) {
           </div>
         </div>
       </div>
+      {statusConfirmDialog}
     </div>
   );
 }

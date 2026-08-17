@@ -4,8 +4,9 @@ import { apiRequest } from '../../../services/Api';
 import { API_ROUTES } from '../../../routes/api.routes';
 import { Grid, GridColumn } from '@progress/kendo-react-grid';
 import { handleDelete } from '../../../utils/DeleteRecords';
+import AleartDialog from '../../../components/common/AleartDialog';
 import { DateCell } from '../../activity/Activity';
-import { handleStatusChange } from '../../../utils/ChangeStatus';
+import { useStatusChange } from '../../../hooks/useStatusChange';
 import ProhibitedAdd from './ProhibitedAdd';
 import BreadCumb from '../../../components/common/breadCumb/BreadCumb';
 import SerachFilter from '../../../components/common/SerachFilter';
@@ -35,14 +36,10 @@ const ActionCell = (props) => {
         )}
         {props.prohibitedPermission.canDelete && (
           <button
-            onClick={() =>
-              handleDelete(
-                item.id,
-                'prohibited',
-                'prohibitedDelete',
-                props.getProhibited
-              )
-            }
+            onClick={() => {
+              props.setSelectedProhibitedId(item.id);
+              props.setShowDeleteDialog(true);
+            }}
             type="button"
             className="small-square-btn danger-btn"
           >
@@ -86,12 +83,11 @@ const StatusCell = (props) => {
           checked={props.dataItem.status}
           readOnly
           onChange={(e) =>
-            handleStatusChange(
+            props.handleStatusChange(
               props.dataItem.id,
               e.target.checked,
               'prohibited',
-              'prohibitedStatusChange',
-              props.getProhibited
+              'prohibitedStatusChange'
             )
           }
         />
@@ -104,6 +100,9 @@ export default function Prohibited() {
   const [prohibitedData, setprohibitedData] = useState([]);
   const [isProhibitedOpen, setisProhibitedOpen] = useState(false);
   const [id, setid] = useState(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [selectedProhibitedId, setSelectedProhibitedId] = useState(null);
+
   const [searchText, setSearchText] = useState('');
   const [customSearch, setcustomSearch] = useState('');
   const [filters, setFilters] = useState([]);
@@ -134,7 +133,7 @@ export default function Prohibited() {
     );
     setprohibitedData(res.data.data);
   };
-
+  const { handleStatusChange, statusConfirmDialog } = useStatusChange(getProhibited);
   const prohibitedColumns = [
     ...(prohibitedPermission?.canUpdate || prohibitedPermission?.canDelete
       ? [{ field: 'action', title: 'Action', cell: ActionCell, width: '100px' }]
@@ -276,25 +275,27 @@ export default function Prohibited() {
                           cells={
                             col.cell
                               ? {
-                                  data: (props) => (
-                                    <col.cell
-                                      {...props}
-                                      prohibitedPermission={
-                                        prohibitedPermission
-                                      }
+                                data: (props) => (
+                                  <col.cell
+                                    {...props}
+                                    prohibitedPermission={
+                                      prohibitedPermission
+                                    }
 
-                                      getProhibited={getProhibited}
-                                      setisProhibitedOpen={setisProhibitedOpen}
-
-                                      setid={setid}
-                                    />
-                                  ),
-                                }
+                                    getProhibited={getProhibited}
+                                    setisProhibitedOpen={setisProhibitedOpen}
+                                    setid={setid}
+                                    setShowDeleteDialog={setShowDeleteDialog}
+                                    setSelectedProhibitedId={setSelectedProhibitedId}
+                                    handleStatusChange={handleStatusChange}
+                                  />
+                                ),
+                              }
                               : {
-                                  data: (props) => (
-                                    <TextCell {...props} field={col.field} />
-                                  ),
-                                }
+                                data: (props) => (
+                                  <TextCell {...props} field={col.field} />
+                                ),
+                              }
                           }
                         />
                       );
@@ -315,6 +316,27 @@ export default function Prohibited() {
           setisProhibitedOpen={setisProhibitedOpen}
         />
       )}
+      {showDeleteDialog && (
+        <AleartDialog
+          title="Confirm Delete"
+          message="Are you sure you want to delete this Prohibited Word? This action cannot be undone."
+          onCancel={() => {
+            setShowDeleteDialog(false);
+            setSelectedProhibitedId(null);
+          }}
+          onConfirm={async () => {
+            await handleDelete(
+              selectedProhibitedId,
+              'prohibited',
+              'prohibitedDelete',
+              getProhibited
+            );
+            setShowDeleteDialog(false);
+            setSelectedProhibitedId(null);
+          }}
+        />
+      )}
+      {statusConfirmDialog}
     </>
   );
 }

@@ -11,8 +11,9 @@ import { Grid, GridColumn } from '@progress/kendo-react-grid';
 import { filterIcon } from '@progress/kendo-svg-icons';
 import { Tooltip } from '@progress/kendo-react-tooltip';
 import { ColumnMenu } from '../../../components/grid/ColumnMenu';
-import { handleStatusChange } from '../../../utils/ChangeStatus';
+import { useStatusChange } from '../../../hooks/useStatusChange';
 import { getBackendFilters } from '../../../components/grid/GridFilter';
+import AleartDialog from '../../../components/common/AleartDialog';
 const CheckboxCell = (props) => {
   const id = props.dataItem.id;
 
@@ -60,12 +61,11 @@ const StatusCell = (props) => {
       <div className="form-check form-switch">
         <input
           onChange={(e) =>
-            handleStatusChange(
+            props.handleStatusChange(
               item.id,
               e.target.checked,
               'user',
-              'userStatusUpdate',
-              props.getManageUser // callback
+              'userStatusUpdate'
             )
           }
           className="form-check-input"
@@ -106,6 +106,9 @@ export default function ManageUser() {
   const [manageUserData, setmanageUserData] = useState([]);
   const [ids, setids] = useState([]);
   const [searchText, setSearchText] = useState('');
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+
   const [customSearch, setcustomSearch] = useState('');
   const [filters, setFilters] = useState([]);
   const [total, setTotal] = useState(0);
@@ -159,6 +162,7 @@ export default function ManageUser() {
     setmanageUserData(res.data.data);
     setTotal(res.data.totalRecord);
   };
+  const { handleStatusChange, statusConfirmDialog } = useStatusChange(getManageUser);
   const handleChange = (event) => {
     if (event.target.checked) {
       setids([...ids, event.target.value]);
@@ -167,47 +171,38 @@ export default function ManageUser() {
     }
   };
 
-  const handleStatusChange = async (id, checked) => {
-    if (confirm('Are You Want To Change Status ? ')) {
-      const res = await apiRequest(
-        'PUT',
-        API_ROUTES.user.userStatusUpdate(id),
-        null,
-        {
-          isActive: checked,
-        },
-        {
-          showLoader: true,
-          showToaster: true,
-        }
-      );
-      if (res.status) {
-        getManageUser();
-      }
-      console.log(res);
-    }
-  };
+  // const handleStatusChange = async (id, checked) => {
+  //   if (confirm('Are You Want To Change Status ? ')) {
+  //     const res = await apiRequest(
+  //       'PUT',
+  //       API_ROUTES.user.userStatusUpdate(id),
+  //       null,
+  //       {
+  //         isActive: checked,
+  //       },
+  //       {
+  //         showLoader: true,
+  //         showToaster: true,
+  //       }
+  //     );
+  //     if (res.status) {
+  //       getManageUser();
+  //     }
+  //     console.log(res);
+  //   }
+  // };
 
-  const handleDelete = async () => {
-    if (ids.length == 0) {
-      alert('Please Select Records');
-      return;
-    }
-    if (confirm('Are You Want To Delete User ?')) {
-      const res = await apiRequest(
-        'DELETE',
-        API_ROUTES.user.userDelete,
-        { userIds: ids },
-        null,
-        {
-          showLoader: true,
-          showToaster: true,
-        }
-      );
-      if (res.status) {
-        getManageUser();
-        setids([]);
+  const handleDelete = (id) => {
+    if (id && (typeof id === 'string' || typeof id === 'number')) {
+      setDeleteTarget(id);
+      setShowDeleteDialog(true);
+    } else {
+      if (ids.length === 0) {
+        alert('Please Select Records');
+        return;
       }
+      setDeleteTarget('bulk');
+      setShowDeleteDialog(true);
     }
   };
 
@@ -437,21 +432,22 @@ export default function ManageUser() {
                         cells={
                           col.cell
                             ? {
-                                data: (props) => (
-                                  <col.cell
-                                    {...props}
-                                    ids={ids}
-                                    getManageUser={getManageUser}
-                                    handleChange={handleChange}
-                                    handleDelete={handleDelete}
-                                  />
-                                ),
-                              }
+                              data: (props) => (
+                                <col.cell
+                                  {...props}
+                                  ids={ids}
+                                  getManageUser={getManageUser}
+                                  handleChange={handleChange}
+                                  handleDelete={handleDelete}
+                                  handleStatusChange={handleStatusChange}
+                                />
+                              ),
+                            }
                             : {
-                                data: (props) => (
-                                  <TextCell {...props} field={col.field} />
-                                ),
-                              }
+                              data: (props) => (
+                                <TextCell {...props} field={col.field} />
+                              ),
+                            }
                         }
                       />
                     ))}
@@ -462,6 +458,40 @@ export default function ManageUser() {
           </div>
         </div>
       )}
+      {showDeleteDialog && (
+        <AleartDialog
+          title="Confirm Delete"
+          message="Are you sure you want to delete this User? This action cannot be undone."
+          onCancel={() => {
+            setShowDeleteDialog(false);
+            setDeleteTarget(null);
+          }}
+          onConfirm={async () => {
+            const targets = deleteTarget === 'bulk' ? ids : [deleteTarget];
+            const res = await apiRequest(
+              'DELETE',
+              API_ROUTES.user.userDelete,
+              { userIds: targets },
+              null,
+              {
+                showLoader: true,
+                showToaster: true,
+              }
+            );
+            if (res.status) {
+              getManageUser();
+              if (deleteTarget === 'bulk') {
+                setids([]);
+              } else {
+                setids(ids.filter(val => val !== deleteTarget));
+              }
+            }
+            setShowDeleteDialog(false);
+            setDeleteTarget(null);
+          }}
+        />
+      )}
+      {statusConfirmDialog}
     </>
   );
 }
