@@ -1,224 +1,180 @@
 .venue-page {
-    background: #fff;
-    padding: 10px 15px;
+  background: #fff;
+  padding: 10px 15px;
 }
 
-
 .venue-breadcrumb {
-    font-size: 20px;
-    font-weight: 600;
-    margin-bottom: 20px;
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 20px;
 }
 
 .venue-breadcrumb span {
-    color: #d71920;
+  color: #d71920;
 }
-
-
 
 .venue-card {
-    border: 1px solid #ddd;
-    border-radius: 12px;
-    padding: 18px;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 18px;
 }
-
-
 
 .check-title {
-    font-size: 18px;
-    font-weight: 700;
+  font-size: 18px;
+  font-weight: 700;
 }
-
-
 
 .venue-header {
-    margin-top: 15px;
+  margin-top: 15px;
 }
-
 
 .venue-logo {
-    width: 80px;
-    height: 80px;
-    object-fit: contain;
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
 }
-
 
 .venue-header h4 {
-    font-size: 20px;
-    font-weight: 700;
-    margin-bottom: 8px;
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 8px;
 }
-
 
 .venue-header p {
-    color: #707070;
-    margin: 0;
-    font-size: 16px;
+  color: #707070;
+  margin: 0;
+  font-size: 16px;
 }
-
-
 
 /* Inner Cards */
 
 .inner-card {
-    border: 1px solid #ddd;
-    border-radius: 12px;
-    padding: 16px;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 16px;
 }
-
 
 .card-heading {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
-
 
 .card-heading h6 {
-    font-weight: 700;
-    margin: 0;
+  font-weight: 700;
+  margin: 0;
 }
-
 
 .card-heading span {
-    color: #888;
-    font-size: 14px;
+  color: #888;
+  font-size: 14px;
 }
-
-
-
 
 /* Guns */
 
 .guns-card {
-    min-height: 235px;
+  min-height: 235px;
 }
-
 
 .gun-item {
-    display: flex;
-    gap: 15px;
-    margin-top: 18px;
+  display: flex;
+  gap: 15px;
+  margin-top: 18px;
 }
-
 
 .gun-item img {
-    width: 60px;
-    height: 60px;
-    object-fit: contain;
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
 }
-
 
 .gun-item h6 {
-    margin: 0;
-    font-size: 16px;
+  margin: 0;
+  font-size: 16px;
 }
-
 
 .gun-item p {
-    margin: 2px 0;
+  margin: 2px 0;
 }
-
 
 .gun-item small {
-    color: #777;
+  color: #777;
 }
-
-
 
 /* Details */
 
 .details-card {
-    min-height: 190px;
+  min-height: 190px;
 }
-
 
 .detail-row {
-    display: flex;
-    gap: 15px;
-    align-items: center;
-    margin-top: 18px;
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  margin-top: 18px;
 }
-
 
 .detail-row i {
-    font-size: 24px;
-    font-weight: 700 !important;
-    color: black;
+  font-size: 24px;
+  font-weight: 700 !important;
+  color: black;
 }
-
 
 .detail-row p {
-    margin: 0;
-    font-size: 15px;
+  margin: 0;
+  font-size: 15px;
 }
-
-
 
 /* Photos */
 
 .photos-card {
-    margin-top: 25px;
+  margin-top: 25px;
 }
-
 
 .photos {
-    display: flex;
-    gap: 15px;
-    margin-top: 20px;
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
 }
-
 
 .photos img {
-    width: 55px;
-    height: 55px;
-    object-fit: cover;
-    border-radius: 5px;
+  width: 55px;
+  height: 55px;
+  object-fit: cover;
+  border-radius: 5px;
 }
-
-
 
 /* Responsive */
 
-@media(max-width:992px) {
+@media (max-width: 992px) {
+  .venue-header {
+    align-items: flex-start !important;
+  }
 
-    .venue-header {
-        align-items: flex-start !important;
-    }
+  .venue-header p {
+    font-size: 14px;
+  }
 
-
-    .venue-header p {
-        font-size: 14px;
-    }
-
-
-    .details-card {
-        margin-top: 20px;
-    }
-
+  .details-card {
+    margin-top: 20px;
+  }
 }
 
+@media (max-width: 576px) {
+  .venue-card {
+    padding: 12px;
+  }
 
-@media(max-width:576px) {
+  .venue-header {
+    flex-direction: column;
+  }
 
-    .venue-card {
-        padding: 12px;
-    }
+  .venue-header .ms-4 {
+    margin-left: 0 !important;
+    margin-top: 15px;
+  }
 
-
-    .venue-header {
-        flex-direction: column;
-    }
-
-
-    .venue-header .ms-4 {
-        margin-left: 0 !important;
-        margin-top: 15px;
-    }
-
-
-    .photos {
-        flex-wrap: wrap;
-    }
-
+  .photos {
+    flex-wrap: wrap;
+  }
 }

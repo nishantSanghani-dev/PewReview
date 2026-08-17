@@ -20,7 +20,6 @@
 //     MANUFACTURER: 12,
 // };
 
-
 export const MENU = {
   DASHBOARD: 1,
   ACTIVITY: 2,
@@ -42,4 +41,4 @@ export const MENU = {
   GUN_CATEGORY_MASTER: 18,
   MANUFACTURER: 19,
   MY_MESSAGE: 20,
-}
+};

@@ -1,13 +1,24 @@
 import * as React from 'react';
-import { GridColumnMenuFilter, GridColumnMenuCheckboxFilter } from '@progress/kendo-react-grid';
-export const ColumnMenu = props => {
-    return <div>
-        <GridColumnMenuFilter {...props} expanded={true} hideSecondFilter={true} filterUI={false} />
-    </div>;
+import {
+  GridColumnMenuFilter,
+  GridColumnMenuCheckboxFilter,
+} from '@progress/kendo-react-grid';
+export const ColumnMenu = (props) => {
+  return (
+    <div>
+      <GridColumnMenuFilter
+        {...props}
+        expanded={true}
+        hideSecondFilter={true}
+        filterUI={false}
+      />
+    </div>
+  );
 };
-export const ColumnMenuCheckboxFilter = props => {
-    return <div>
-        
-        <GridColumnMenuCheckboxFilter {...props} expanded={true} />
-    </div>;
+export const ColumnMenuCheckboxFilter = (props) => {
+  return (
+    <div>
+      <GridColumnMenuCheckboxFilter {...props} expanded={true} />
+    </div>
+  );
 };

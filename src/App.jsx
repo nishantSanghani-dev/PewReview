@@ -1,15 +1,12 @@
+import { RouterProvider } from 'react-router-dom';
+import './App.css';
+import { routes } from './routes/app.routes';
+import { ToastContainer } from 'react-toastify';
 
-import { RouterProvider } from 'react-router-dom'
-import './App.css'
-import { routes } from './routes/app.routes'
-import { ToastContainer } from 'react-toastify'
-
-import LoaderProvider from './context/LoaderProvider'
-import AppProvider from './context/AppProvider'
+import LoaderProvider from './context/LoaderProvider';
+import AppProvider from './context/AppProvider';
 
 function App() {
-
-
   return (
     <>
       <AppProvider>
@@ -19,7 +16,7 @@ function App() {
         </LoaderProvider>
       </AppProvider>
     </>
-  )
+  );
 }
 
-export default App
+export default App;

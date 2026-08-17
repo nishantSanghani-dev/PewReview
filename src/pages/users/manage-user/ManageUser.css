@@ -1,240 +1,240 @@
 /* Kendo Grid Container Styling */
 .k-grid.table {
-    border: 1px solid #dee2e6;
-    border-radius: 4px;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
 }
 
 .table-responsive .k-grid {
-    border: 1px solid #dee2e6;
-    border-radius: 4px;
-    overflow: hidden;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  overflow: hidden;
 }
 
 /* Grid Wrapper */
 .k-grid-table {
-    width: 100%;
-    border-collapse: collapse;
+  width: 100%;
+  border-collapse: collapse;
 }
 
 /* Grid Header Styling - table-dark */
 .k-grid.table-dark .k-grid-header,
 .k-grid.table-dark .k-grid-header-wrap {
-    background-color: #212529 !important;
+  background-color: #212529 !important;
 }
 
 .k-grid.table-dark .k-grid-header th {
-    background-color: #212529 !important;
-    color: #fff !important;
-    border-color: #454d55 !important;
-    padding: 12px 16px !important;
-    font-weight: 500;
-    text-align: left;
+  background-color: #212529 !important;
+  color: #fff !important;
+  border-color: #454d55 !important;
+  padding: 12px 16px !important;
+  font-weight: 500;
+  text-align: left;
 }
 
 .k-grid .k-grid-header th {
-    background-color: #212529;
-    color: #fff;
-    border-color: #454d55;
-    padding: 12px 16px;
-    font-weight: 500;
-    border-right: 1px solid #454d55;
-    text-align: left;
+  background-color: #212529;
+  color: #fff;
+  border-color: #454d55;
+  padding: 12px 16px;
+  font-weight: 500;
+  border-right: 1px solid #454d55;
+  text-align: left;
 }
 
 .k-grid .k-grid-header th:last-child {
-    border-right: none;
+  border-right: none;
 }
 
 /* Grid Body Styling */
 .k-grid .k-grid-content {
-    background-color: #fff;
+  background-color: #fff;
 }
 
 .k-grid .k-grid-content-locked {
-    border-right: 1px solid #dee2e6;
+  border-right: 1px solid #dee2e6;
 }
 
 /* Grid Row Styling */
 .k-grid tbody tr {
-    border-bottom: 1px solid #dee2e6 !important;
-    height: auto;
+  border-bottom: 1px solid #dee2e6 !important;
+  height: auto;
 }
 
 .k-grid tbody tr:last-child {
-    border-bottom: none !important;
+  border-bottom: none !important;
 }
 
 .k-grid tbody td {
-    padding: 12px 16px !important;
-    vertical-align: middle !important;
-    border-right: 1px solid #dee2e6 !important;
+  padding: 12px 16px !important;
+  vertical-align: middle !important;
+  border-right: 1px solid #dee2e6 !important;
 }
 
 .k-grid tbody td:last-child {
-    border-right: none !important;
+  border-right: none !important;
 }
 
 .k-grid .k-grid-content tr {
-    border-bottom: 1px solid #dee2e6;
+  border-bottom: 1px solid #dee2e6;
 }
 
 .k-grid .k-grid-content tr:last-child {
-    border-bottom: none;
+  border-bottom: none;
 }
 
 .k-grid .k-grid-content td {
-    padding: 12px 16px;
-    vertical-align: middle;
-    border-right: 1px solid #dee2e6;
+  padding: 12px 16px;
+  vertical-align: middle;
+  border-right: 1px solid #dee2e6;
 }
 
 .k-grid .k-grid-content td:last-child {
-    border-right: none;
+  border-right: none;
 }
 
 /* Alternating Row Colors & Hover */
 .k-grid tbody tr:hover {
-    background-color: #f8f9fa;
+  background-color: #f8f9fa;
 }
 
 .k-grid .k-grid-content tr:hover {
-    background-color: #f8f9fa;
+  background-color: #f8f9fa;
 }
 
 /* Checkbox Cell */
 .checkbox-cell {
-    text-align: center;
+  text-align: center;
 }
 
 /* Custom Checkbox Styling */
 .custom-checkbox {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    position: relative;
-    padding-left: 0;
-    margin-bottom: 0;
-    user-select: none;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+  padding-left: 0;
+  margin-bottom: 0;
+  user-select: none;
 }
 
 .custom-checkbox input {
-    position: absolute;
-    opacity: 0;
-    cursor: pointer;
-    height: 0;
-    width: 0;
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
 }
 
 .custom-checkbox .checkmark {
-    height: 18px;
-    width: 18px;
-    background-color: #eee;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    display: inline-block;
-    position: relative;
+  height: 18px;
+  width: 18px;
+  background-color: #eee;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  display: inline-block;
+  position: relative;
 }
 
 .custom-checkbox input:checked ~ .checkmark {
-    background-color: #007bff;
-    border-color: #007bff;
+  background-color: #007bff;
+  border-color: #007bff;
 }
 
 .custom-checkbox .checkmark:after {
-    content: "";
-    position: absolute;
-    display: none;
+  content: '';
+  position: absolute;
+  display: none;
 }
 
 .custom-checkbox input:checked ~ .checkmark:after {
-    display: block;
-    left: 6px;
-    top: 2px;
-    width: 6px;
-    height: 10px;
-    border: solid white;
-    border-width: 0 2px 2px 0;
-    transform: rotate(45deg);
+  display: block;
+  left: 6px;
+  top: 2px;
+  width: 6px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
 }
 
 /* Action Buttons Styling */
 .small-square-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    border-radius: 4px;
-    border: 1px solid transparent;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    font-size: 16px;
-    padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  font-size: 16px;
+  padding: 0;
 }
 
 .small-square-btn.edit-btn {
-    background-color: #e3f2fd;
-    color: #1976d2;
-    border-color: #90caf9;
+  background-color: #e3f2fd;
+  color: #1976d2;
+  border-color: #90caf9;
 }
 
 .small-square-btn.edit-btn:hover {
-    background-color: #bbdefb;
-    border-color: #64b5f6;
+  background-color: #bbdefb;
+  border-color: #64b5f6;
 }
 
 .small-square-btn.danger-btn {
-    background-color: #ffebee;
-    color: #d32f2f;
-    border-color: #ef9a9a;
+  background-color: #ffebee;
+  color: #d32f2f;
+  border-color: #ef9a9a;
 }
 
 .small-square-btn.danger-btn:hover {
-    background-color: #ffcdd2;
-    border-color: #e57373;
+  background-color: #ffcdd2;
+  border-color: #e57373;
 }
 
 /* Tag Styling */
 .tag {
-    display: inline-block;
-    padding: 6px 12px;
-    border-radius: 4px;
-    font-size: 12px;
-    font-weight: 500;
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
 }
 
 .tag.basic-tag {
-    background-color: #f5f5f5;
-    color: #666;
-    border: 1px solid #ddd;
+  background-color: #f5f5f5;
+  color: #666;
+  border: 1px solid #ddd;
 }
 
 /* Flex Utilities */
 .d-flex {
-    display: flex !important;
+  display: flex !important;
 }
 
 .gap-2 {
-    gap: 8px !important;
+  gap: 8px !important;
 }
 
 .align-items-center {
-    align-items: center !important;
+  align-items: center !important;
 }
 
 /* Responsive Table */
 .table-responsive {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Remove Kendo Grid Default Padding */
 .k-grid {
-    font-size: 14px;
+  font-size: 14px;
 }
 
 .k-grid .k-grid-pager {
-    background-color: #f8f9fa;
-    border-top: 1px solid #dee2e6;
+  background-color: #f8f9fa;
+  border-top: 1px solid #dee2e6;
 }

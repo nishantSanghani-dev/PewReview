@@ -3,141 +3,130 @@
 ================================ */
 
 .birthday-field {
-    width: 100%;
+  width: 100%;
 }
 
 .birthday-field .k-datepicker {
-    width: 100%;
-    height: 40px;
+  width: 100%;
+  height: 40px;
 }
 
 /* Input */
 .birthday-field .k-input-inner {
-    height: 40px;
-    padding: 0 12px;
-    font-size: 15px;
-    color: #333;
+  height: 40px;
+  padding: 0 12px;
+  font-size: 15px;
+  color: #333;
 }
 
 /* DatePicker wrapper */
 .birthday-field .k-picker {
-    width: 100%;
-    min-height: 40px;
-    border: 1px solid #d5d5d5;
-    border-radius: 8px;
-    background: #fff;
+  width: 100%;
+  min-height: 40px;
+  border: 1px solid #d5d5d5;
+  border-radius: 8px;
+  background: #fff;
 }
 
 /* Focus */
 .birthday-field .k-picker:focus-within {
-    border-color: #8b0000;
-    box-shadow: 0 0 0 2px rgba(139, 0, 0, 0.08);
+  border-color: #8b0000;
+  box-shadow: 0 0 0 2px rgba(139, 0, 0, 0.08);
 }
 
 /* Calendar button */
 .birthday-field .k-input-button {
-    width: 42px;
-    border-left: 1px solid #ddd;
+  width: 42px;
+  border-left: 1px solid #ddd;
 }
 
 /* Calendar icon */
 .birthday-field .k-input-button .k-icon {
-    font-size: 18px;
+  font-size: 18px;
 }
-
 
 /* ================================
    Calendar Popup
 ================================ */
 
 .birthday-calendar-popup {
-    border-radius: 8px;
-    overflow: hidden;
-    border: 1px solid #e0e0e0;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
 }
 
 /* Calendar */
 .birthday-calendar-popup .k-calendar {
-    min-width: 300px;
-    background: #fff;
+  min-width: 300px;
+  background: #fff;
 }
 
 /* Calendar header */
 .birthday-calendar-popup .k-calendar-header {
-    padding: 12px 14px;
+  padding: 12px 14px;
 }
 
 /* Month / year title */
 .birthday-calendar-popup .k-calendar-title {
-    font-size: 16px;
-    font-weight: 600;
+  font-size: 16px;
+  font-weight: 600;
 }
 
 /* Navigation buttons */
 .birthday-calendar-popup .k-calendar-nav button {
-    border-radius: 6px;
+  border-radius: 6px;
 }
 
 /* Week names */
 .birthday-calendar-popup .k-calendar-table th {
-    font-size: 12px;
-    font-weight: 500;
-    color: #777;
+  font-size: 12px;
+  font-weight: 500;
+  color: #777;
 }
 
 /* Calendar days */
 .birthday-calendar-popup .k-calendar-table td {
-    padding: 3px;
+  padding: 3px;
 }
 
 /* Day buttons */
 .birthday-calendar-popup .k-calendar-table td .k-link {
-    width: 36px;
-    height: 36px;
-    border-radius: 6px;
-    font-size: 14px;
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  font-size: 14px;
 }
 
 /* Hover */
 .birthday-calendar-popup .k-calendar-table td .k-link:hover {
-    background: #f5e5e5;
+  background: #f5e5e5;
 }
 
 /* Selected date */
-.birthday-calendar-popup
-    .k-calendar-table
-    td.k-selected
-    .k-link {
-    background: #8b0000;
-    color: #fff;
+.birthday-calendar-popup .k-calendar-table td.k-selected .k-link {
+  background: #8b0000;
+  color: #fff;
 }
 
 /* Today */
-.birthday-calendar-popup
-    .k-calendar-table
-    td.k-today
-    .k-link {
-    border: 1px solid #8b0000;
+.birthday-calendar-popup .k-calendar-table td.k-today .k-link {
+  border: 1px solid #8b0000;
 }
-
 
 /* ================================
    Mobile responsive
 ================================ */
 
 @media (max-width: 576px) {
-    .birthday-calendar-popup .k-calendar {
-        min-width: 280px;
-        width: 100%;
-    }
+  .birthday-calendar-popup .k-calendar {
+    min-width: 280px;
+    width: 100%;
+  }
 
-    .birthday-calendar-popup
-        .k-calendar-table
-        td
-        .k-link {
-        width: 32px;
-        height: 32px;
-        font-size: 13px;
-    }
+  .birthday-calendar-popup .k-calendar-table td .k-link {
+    width: 32px;
+    height: 32px;
+    font-size: 13px;
+  }
 }

@@ -1,7 +1,6 @@
-import { useSelector } from "react-redux"
+import { useSelector } from 'react-redux';
 
 export const useAuth = () => {
-    const token = useSelector((store) => store.user)
-    return token
-
-}
+  const token = useSelector((store) => store.user);
+  return token;
+};

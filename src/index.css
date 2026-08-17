@@ -39,57 +39,57 @@
 } */
 
 @media (max-width: 768px) {
-    .table-responsive {
-        padding-bottom: 0.5rem;
-    }
+  .table-responsive {
+    padding-bottom: 0.5rem;
+  }
 
-    .table-responsive .k-grid {
-        min-width: 760px;
-    }
+  .table-responsive .k-grid {
+    min-width: 760px;
+  }
 }
 
 /* Make Bootstrap nav-tabs behave like desktop on small screens by allowing
    horizontal scrolling and hiding the accordion headers used elsewhere. */
 @media (max-width: 991.98px) {
-    /* More specific selector to override existing `.nav.nav-tabs` rules */
-    .nav.nav-tabs,
-    .nav-tabs {
-        display: flex !important;
-        flex-wrap: nowrap !important;
-        overflow-x: auto !important;
-        -webkit-overflow-scrolling: touch !important;
-        -ms-overflow-style: none; /* IE and Edge */
-        scrollbar-width: none; /* Firefox */
-        gap: 0.5rem;
-        padding-bottom: 0.25rem;
-        width: 100%;
-    }
+  /* More specific selector to override existing `.nav.nav-tabs` rules */
+  .nav.nav-tabs,
+  .nav-tabs {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+    gap: 0.5rem;
+    padding-bottom: 0.25rem;
+    width: 100%;
+  }
 
-    .nav-tabs::-webkit-scrollbar {
-        display: none;
-    }
+  .nav-tabs::-webkit-scrollbar {
+    display: none;
+  }
 
-    .nav.nav-tabs .nav-item,
-    .nav-tabs .nav-item {
-        flex: 0 0 auto;
-    }
+  .nav.nav-tabs .nav-item,
+  .nav-tabs .nav-item {
+    flex: 0 0 auto;
+  }
 
-    .nav.nav-tabs .nav-link,
-    .nav-tabs .nav-link {
-        white-space: nowrap;
-        padding: 0.5rem 0.75rem;
-    }
+  .nav.nav-tabs .nav-link,
+  .nav-tabs .nav-link {
+    white-space: nowrap;
+    padding: 0.5rem 0.75rem;
+  }
 
-    /* If the markup includes accordion headers for mobile, hide them so
+  /* If the markup includes accordion headers for mobile, hide them so
        the tab UI remains consistent with desktop behavior. */
-    .tab-content.accordion .accordion-header,
-    .tab-content.accordion .accordion-button {
-        display: none !important;
-    }
+  .tab-content.accordion .accordion-header,
+  .tab-content.accordion .accordion-button {
+    display: none !important;
+  }
 
-    /* Ensure panes still render and the active pane is controlled by
+  /* Ensure panes still render and the active pane is controlled by
        the existing `show active` classes applied in the JSX. */
-    .tab-content .tab-pane {
-        display: block;
-    }
+  .tab-content .tab-pane {
+    display: block;
+  }
 }

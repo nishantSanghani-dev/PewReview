@@ -1,282 +1,320 @@
-import React, { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { apiRequest } from '../../../services/Api'
-import { API_ROUTES } from '../../../routes/api.routes'
-import { Grid, GridColumn } from '@progress/kendo-react-grid'
-import { handleDelete } from '../../../utils/DeleteRecords'
-import { DateCell } from '../../activity/Activity'
-import { handleStatusChange } from '../../../utils/ChangeStatus'
-import ProhibitedAdd from './ProhibitedAdd'
-import BreadCumb from '../../../components/common/breadCumb/BreadCumb'
-import SerachFilter from '../../../components/common/SerachFilter'
-import useGridPagination from '../../../hooks/useGridPagination'
-import { usePermission } from '../../../hooks/UsePermission'
-import { MENU } from '../../../data/Menu'
-import { ColumnMenu } from '../../../components/grid/ColumnMenu'
-import useUserPermission from '../../../utils/UserPermission'
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { apiRequest } from '../../../services/Api';
+import { API_ROUTES } from '../../../routes/api.routes';
+import { Grid, GridColumn } from '@progress/kendo-react-grid';
+import { handleDelete } from '../../../utils/DeleteRecords';
+import { DateCell } from '../../activity/Activity';
+import { handleStatusChange } from '../../../utils/ChangeStatus';
+import ProhibitedAdd from './ProhibitedAdd';
+import BreadCumb from '../../../components/common/breadCumb/BreadCumb';
+import SerachFilter from '../../../components/common/SerachFilter';
+import useGridPagination from '../../../hooks/useGridPagination';
+import { usePermission } from '../../../hooks/UsePermission';
+import { MENU } from '../../../data/Menu';
+import { ColumnMenu } from '../../../components/grid/ColumnMenu';
+import useUserPermission from '../../../utils/UserPermission';
 import { Tooltip } from '@progress/kendo-react-tooltip';
 const ActionCell = (props) => {
-    const item = props.dataItem;
+  const item = props.dataItem;
 
+  return (
+    <td {...props.tdProps}>
+      <span className="d-flex gap-2 align-items-center">
+        {props.prohibitedPermission.canUpdate && (
+          <button
+            onClick={() => {
+              props.setisProhibitedOpen(true);
+              props.setid(item.id);
+            }}
 
-    return (
-        <td {...props.tdProps}>
-            <span className="d-flex gap-2 align-items-center">
-                {
-                    props.prohibitedPermission.canUpdate
-                    &&
-
-                    <button
-                        onClick={() => {
-                            props.setisProhibitedOpen(true)
-                            props.setid(item.id)
-                        }}
-
-                        className="small-square-btn edit-btn"
-
-                    >
-                        <i className="demo-icon icon-edit-1" />
-                    </button>
-                }
-                {
-                    props.prohibitedPermission.canDelete
-                    &&
-
-                    <button
-                        onClick={() => handleDelete(item.id, "prohibited", "prohibitedDelete", props.getProhibited)}
-                        type="button"
-                        className="small-square-btn danger-btn"
-                    >
-                        <i className="demo-icon icon-delete-1" />
-                    </button>
-                }
-
-
-            </span>
-        </td>
-    );
+            className="small-square-btn edit-btn"
+          >
+            <i className="demo-icon icon-edit-1" />
+          </button>
+        )}
+        {props.prohibitedPermission.canDelete && (
+          <button
+            onClick={() =>
+              handleDelete(
+                item.id,
+                'prohibited',
+                'prohibitedDelete',
+                props.getProhibited
+              )
+            }
+            type="button"
+            className="small-square-btn danger-btn"
+          >
+            <i className="demo-icon icon-delete-1" />
+          </button>
+        )}
+      </span>
+    </td>
+  );
 };
 const TextCell = ({ tdProps, dataItem, field }) => {
-    const value = dataItem[field];
+  const value = dataItem[field];
 
-    return (
-        <td {...tdProps}>
-            <Tooltip anchorElement="target" position="top">
-                <span
-                    title={value}
-                    style={{
-                        display: "inline-block",
-                        width: "100%",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                    }}
-                >
-                    {value ?? '-'}
-                </span>
-            </Tooltip>
-        </td>
-    );
+  return (
+    <td {...tdProps}>
+      <Tooltip anchorElement="target" position="top">
+        <span
+          title={value}
+          style={{
+            display: 'inline-block',
+            width: '100%',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {value ?? '-'}
+        </span>
+      </Tooltip>
+    </td>
+  );
 };
 const StatusCell = (props) => {
-    return (
-        <td {...props.tdProps}>
-            <div className="form-check form-switch mb-0">
-                <input
-                    className="form-check-input"
-                    type="checkbox"
-                    disabled={!props.prohibitedPermission.canUpdate}
-                    checked={props.dataItem.status}
-                    readOnly
-                    onChange={(e) => handleStatusChange(props.dataItem.id, e.target.checked, "prohibited", "prohibitedStatusChange", props.getProhibited)}
-                />
-                <label className="form-check-label"></label>
-            </div>
-        </td>
-    );
+  return (
+    <td {...props.tdProps}>
+      <div className="form-check form-switch mb-0">
+        <input
+          className="form-check-input"
+          type="checkbox"
+          disabled={!props.prohibitedPermission.canUpdate}
+          checked={props.dataItem.status}
+          readOnly
+          onChange={(e) =>
+            handleStatusChange(
+              props.dataItem.id,
+              e.target.checked,
+              'prohibited',
+              'prohibitedStatusChange',
+              props.getProhibited
+            )
+          }
+        />
+        <label className="form-check-label"></label>
+      </div>
+    </td>
+  );
 };
 export default function Prohibited() {
-    const [prohibitedData, setprohibitedData] = useState([])
-    const [isProhibitedOpen, setisProhibitedOpen] = useState(false)
-    const [id, setid] = useState(null)
-    const [searchText, setSearchText] = useState("")
-    const [customSearch, setcustomSearch] = useState("")
-    const [filters, setFilters] = useState([])
-    const {
-        dataState,
-        onDataStateChange,
-        page,
-        pageSize,
-        resetPage,
-        sort,
-        kendoSort,
-        setKendoSort,
-    } = useGridPagination(10)
+  const [prohibitedData, setprohibitedData] = useState([]);
+  const [isProhibitedOpen, setisProhibitedOpen] = useState(false);
+  const [id, setid] = useState(null);
+  const [searchText, setSearchText] = useState('');
+  const [customSearch, setcustomSearch] = useState('');
+  const [filters, setFilters] = useState([]);
+  const {
+    dataState,
+    onDataStateChange,
+    page,
+    pageSize,
+    resetPage,
+    sort,
+    kendoSort,
+    setKendoSort,
+  } = useGridPagination(10);
 
-    // const permission = usePermission()
-    // const prohibitedPermission = permission.find((value, index) => value.menuId === MENU.PROHIBITED_WORD)
-    const { prohibitedWordPermission:prohibitedPermission } = useUserPermission()
-    const getProhibited = async () => {
-        const res = await apiRequest("POST", API_ROUTES.prohibited.getProhibited, { page, pageSize, customSearch, Sorts: sort, Filters: filters }, null, {
-            showLoader: true
-        })
-        setprohibitedData(res.data.data)
+  // const permission = usePermission()
+  // const prohibitedPermission = permission.find((value, index) => value.menuId === MENU.PROHIBITED_WORD)
+  const { prohibitedWordPermission: prohibitedPermission } =
+    useUserPermission();
+  const getProhibited = async () => {
+    const res = await apiRequest(
+      'POST',
+      API_ROUTES.prohibited.getProhibited,
+      { page, pageSize, customSearch, Sorts: sort, Filters: filters },
+      null,
+      {
+        showLoader: true,
+      }
+    );
+    setprohibitedData(res.data.data);
+  };
+
+  const prohibitedColumns = [
+    ...(prohibitedPermission?.canUpdate || prohibitedPermission?.canDelete
+      ? [{ field: 'action', title: 'Action', cell: ActionCell, width: '100px' }]
+      : []),
+
+    {
+      field: 'words',
+      title: 'Prohibited Words',
+      filter: 'text',
+      columnMenu: ColumnMenu,
+    },
+    {
+      field: 'description',
+      title: 'Description',
+      filter: 'text',
+      columnMenu: ColumnMenu,
+    },
+    {
+      field: 'createdByUserName',
+      title: 'Created By',
+      filter: 'text',
+      columnMenu: ColumnMenu,
+    },
+    {
+      field: 'createdOn',
+      title: 'Created On',
+      cell: DateCell,
+      filter: 'text',
+      columnMenu: ColumnMenu,
+    },
+    {
+      field: 'updatedByUserName',
+      title: 'Modified By',
+      filter: 'text',
+      columnMenu: ColumnMenu,
+    },
+    {
+      field: 'status',
+      title: 'Status',
+      cell: StatusCell,
+      width: '100px',
+      filter: 'boolean',
+      columnMenu: ColumnMenu,
+    },
+  ];
+
+  const handleGridDataStateChange = (event) => {
+    onDataStateChange(event);
+    setKendoSort(event.dataState?.sort || []);
+    const nextFilter = event.dataState?.filter;
+    if (nextFilter) {
+      setFilters(getBackendFilters(nextFilter));
+    } else {
+      setFilters([]);
     }
+  };
 
-    const prohibitedColumns = [
-        ...(prohibitedPermission?.canUpdate || prohibitedPermission?.canDelete
-            ? [
-                { field: "action", title: "Action", cell: ActionCell, width: "100px" },
-            ]
-            : []),
-
-        { field: "words", title: "Prohibited Words", filter: "text", columnMenu: ColumnMenu },
-        { field: "description", title: "Description", filter: "text", columnMenu: ColumnMenu },
-        { field: "createdByUserName", title: "Created By", filter: "text", columnMenu: ColumnMenu },
-        { field: "createdOn", title: "Created On", cell: DateCell, filter: "text", columnMenu: ColumnMenu },
-        { field: "updatedByUserName", title: "Modified By", filter: "text", columnMenu: ColumnMenu },
-        { field: "status", title: "Status", cell: StatusCell, width: "100px", filter: "boolean", columnMenu: ColumnMenu }
-    ]
-
-    const handleGridDataStateChange = (event) => {
-        onDataStateChange(event)
-        setKendoSort(event.dataState?.sort || [])
-        const nextFilter = event.dataState?.filter
-        if (nextFilter) {
-            setFilters(getBackendFilters(nextFilter))
-        } else {
-            setFilters([])
-        }
-    }
-
-    useEffect(() => {
-        getProhibited()
-    }, [page, pageSize, customSearch, sort, filters])
-    return (
-        <>
-            <div className="container-fluid">
-                <div className="mb-3 activity-breadcrumb">
-                    <span style={{ color: "#666766" }} className="fw-bold">Masters</span>
-                    <span className="mx-2 text-dark">/</span>
-                    <span className="fw-bold text-dark">Prohibited Words</span>
-                </div>
-                <div className="tabbar-section">
-                    <div className="row align-items-center gap-3">
-                        <div className="col-12 col-lg-auto">
-                            <SerachFilter
-                                value={searchText}
-                                onChange={(e) => setSearchText(e.target.value)}
-                                onSubmit={(value) => {
-                                    resetPage()
-                                    setcustomSearch(value)
-                                }}
-                            />
-                        </div>
-                        {
-                            prohibitedPermission.canCreate
-                            &&
-
-                            <div className="col-12 col-lg">
-                                <div className="btn-list d-flex justify-content-lg-end flex-wrap gap-2 gap-md-3 text-end">
-
-                                    <button
-                                        onClick={() => setisProhibitedOpen(true)}
-                                        className="btn main-btn border-btn blue-btn"
-                                        style={{
-                                            background: "linear-gradient(90deg, rgb(193, 39, 45) 0%, rgb(0 0 0 / 92%) 100%)",
-                                            color: "white"
-                                        }}
-                                    >
-                                        Add
-                                    </button>
-                                </div>
-                            </div>
-                        }
-                    </div>
-
-                    <div className="row">
-                        <div className="col-12 mt-3 mt-xxl-4">
-                            <div className="">
-                                {
-                                    prohibitedPermission.canRead
-                                    &&
-
-                                    <Grid
-                                        className="table-wrapper"
-                                        data={prohibitedData}
-                                        skip={dataState.skip}
-                                        take={dataState.take}
-                                        sortable={{ allowUnsort: true, mode: 'single' }}
-                                        sort={kendoSort}
-                                        pageable={{
-                                            responsive: false,
-                                            buttonCount: 5,
-                                            pageSizes: [10, 20, 50],
-                                            previousNext: true,
-                                            info: true,
-                                            type: "numeric"
-                                        }}
-                                        onDataStateChange={handleGridDataStateChange}
-                                    >
-                                        {
-                                            prohibitedColumns?.map((col, ind) => {
-                                                return (
-                                                    <GridColumn
-                                                        key={col.field}
-                                                        field={col.field}
-                                                        title={col.title}
-                                                        width={col.width}
-                                                        sortable={col.field === 'action' ? false : true}
-                                                        pageable={{
-                                            responsive: false,
-                                                            buttonCount: 4,
-                                                            pageSizes: [20, 50, 200],
-                                                            previousNext: true,
-                                                            info: true,
-                                                            type: "numeric"
-                                                        }}
-                                                        cells={
-                                                            col.cell
-                                                                ? {
-                                                                    data: (props) => (
-                                                                        <col.cell
-                                                                            {...props}
-                                                                            prohibitedPermission={prohibitedPermission}
-                                                                          
-                                                                            getProhibited={getProhibited}
-                                                                            setisProhibitedOpen={setisProhibitedOpen}
-
-                                                                            setid={setid}
-                                                                        />
-                                                                    )
-                                                                }
-                                                                : {
-                                                                    data: (props) => (
-                                                                        <TextCell {...props} field={col.field} />
-                                                                    )
-                                                                }
-                                                        }
-                                                    />
-                                                )
-                                            })
-                                        }
-
-                                    </Grid>
-                                }
-                            </div>
-                        </div>
-                    </div>
-                </div>
+  useEffect(() => {
+    getProhibited();
+  }, [page, pageSize, customSearch, sort, filters]);
+  return (
+    <>
+      <div className="container-fluid">
+        <div className="mb-3 activity-breadcrumb">
+          <span style={{ color: '#666766' }} className="fw-bold">
+            Masters
+          </span>
+          <span className="mx-2 text-dark">/</span>
+          <span className="fw-bold text-dark">Prohibited Words</span>
+        </div>
+        <div className="tabbar-section">
+          <div className="row align-items-center gap-3">
+            <div className="col-12 col-lg-auto">
+              <SerachFilter
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                onSubmit={(value) => {
+                  resetPage();
+                  setcustomSearch(value);
+                }}
+              />
             </div>
-            {
-                isProhibitedOpen
-                &&
-                <ProhibitedAdd
-                    id={id}
-                    setid={setid}
-                    getProhibited={getProhibited}
-                    isProhibitedOpen={isProhibitedOpen} setisProhibitedOpen={setisProhibitedOpen} />
-            }
-        </>
-    )
+            {prohibitedPermission.canCreate && (
+              <div className="col-12 col-lg">
+                <div className="btn-list d-flex justify-content-lg-end flex-wrap gap-2 gap-md-3 text-end">
+                  <button
+                    onClick={() => setisProhibitedOpen(true)}
+                    className="btn main-btn border-btn blue-btn"
+                    style={{
+                      background:
+                        'linear-gradient(90deg, rgb(193, 39, 45) 0%, rgb(0 0 0 / 92%) 100%)',
+                      color: 'white',
+                    }}
+                  >
+                    Add
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="row">
+            <div className="col-12 mt-3 mt-xxl-4">
+              <div className="">
+                {prohibitedPermission.canRead && (
+                  <Grid
+                    className="table-wrapper"
+                    data={prohibitedData}
+                    skip={dataState.skip}
+                    take={dataState.take}
+                    sortable={{ allowUnsort: true, mode: 'single' }}
+                    sort={kendoSort}
+                    pageable={{
+                      responsive: false,
+                      buttonCount: 5,
+                      pageSizes: [10, 20, 50],
+                      previousNext: true,
+                      info: true,
+                      type: 'numeric',
+                    }}
+                    onDataStateChange={handleGridDataStateChange}
+                  >
+                    {prohibitedColumns?.map((col, ind) => {
+                      return (
+                        <GridColumn
+                          key={col.field}
+                          field={col.field}
+                          title={col.title}
+                          width={col.width}
+                          sortable={col.field === 'action' ? false : true}
+                          pageable={{
+                            responsive: false,
+                            buttonCount: 4,
+                            pageSizes: [20, 50, 200],
+                            previousNext: true,
+                            info: true,
+                            type: 'numeric',
+                          }}
+                          cells={
+                            col.cell
+                              ? {
+                                  data: (props) => (
+                                    <col.cell
+                                      {...props}
+                                      prohibitedPermission={
+                                        prohibitedPermission
+                                      }
+
+                                      getProhibited={getProhibited}
+                                      setisProhibitedOpen={setisProhibitedOpen}
+
+                                      setid={setid}
+                                    />
+                                  ),
+                                }
+                              : {
+                                  data: (props) => (
+                                    <TextCell {...props} field={col.field} />
+                                  ),
+                                }
+                          }
+                        />
+                      );
+                    })}
+                  </Grid>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {isProhibitedOpen && (
+        <ProhibitedAdd
+          id={id}
+          setid={setid}
+          getProhibited={getProhibited}
+          isProhibitedOpen={isProhibitedOpen}
+          setisProhibitedOpen={setisProhibitedOpen}
+        />
+      )}
+    </>
+  );
 }

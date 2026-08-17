@@ -1,9 +1,7 @@
-import { useContext } from "react"
-import { loaderContext } from "../context/LoaderProvider"
-
+import { useContext } from 'react';
+import { loaderContext } from '../context/LoaderProvider';
 
 export const useLoader = () => {
-    const loader = useContext(loaderContext)
-    return loader
-
-}
+  const loader = useContext(loaderContext);
+  return loader;
+};
