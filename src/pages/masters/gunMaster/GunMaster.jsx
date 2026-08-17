@@ -14,6 +14,7 @@ import { usePermission } from '../../../hooks/UsePermission';
 import { MENU } from '../../../data/Menu';
 import useUserPermission from '../../../utils/UserPermission';
 import { Tooltip } from '@progress/kendo-react-tooltip';
+import Gun from './Gun';
 const ActionCell = (props) => {
     const item = props.dataItem;
     return (
@@ -24,10 +25,11 @@ const ActionCell = (props) => {
                     &&
 
                     <button
-
-
+                        onClick={() => {
+                            props.setIsAddGunOpen(true)
+                            props.setId(item.gunId)
+                        }}
                         className="small-square-btn edit-btn"
-
                     >
                         <i className="demo-icon icon-edit-1" />
                     </button>
@@ -112,8 +114,6 @@ const DetailCell = ({ tdProps, dataItem, field }) => {
     )
 }
 const ApprovalStatusCell = ({ tdProps, dataItem, statusOptions, gunMasterPermission }) => {
-
-
     return (
         <td {...tdProps}>
             <div className="approval-status-wrapper">
@@ -136,6 +136,8 @@ export default function GunMaster() {
     const [searchText, setSearchText] = useState("")
     const [customSearch, setcustomSearch] = useState("")
     const [filters, setFilters] = useState([])
+    const [isAddGunOpen, setIsAddGunOpen] = useState(false)
+    const [id, setId] = useState(null)
     const {
         dataState,
         onDataStateChange,
@@ -229,7 +231,10 @@ export default function GunMaster() {
                             <div className="btn-list d-flex justify-content-lg-end flex-wrap gap-2 gap-md-3 text-end">
 
                                 <button
-                                    // onClick={() => setismanufacturerOpen(true)}
+                                    onClick={() => {
+                                        setIsAddGunOpen(true)
+                                        setId(null)
+                                    }}
                                     className="btn main-btn border-btn blue-btn"
                                     style={{
                                         background: "linear-gradient(90deg, rgb(193, 39, 45) 0%, rgb(0 0 0 / 92%) 100%)",
@@ -260,7 +265,7 @@ export default function GunMaster() {
                                 sortable={{ allowUnsort: true, mode: 'single' }}
                                 sort={kendoSort}
                                 pageable={{
-                                            responsive: false,
+                                    responsive: false,
                                     buttonCount: 5,
                                     pageSizes: [10, 20, 50],
                                     previousNext: true,
@@ -279,7 +284,7 @@ export default function GunMaster() {
                                                 width={col.width || "150px"}
                                                 sortable={col.field === 'action' || col.field == 'attachmentFullPath' ? false : true}
                                                 pageable={{
-                                            responsive: false,
+                                                    responsive: false,
                                                     buttonCount: 4,
                                                     pageSizes: [20, 50, 200],
                                                     previousNext: true,
@@ -295,6 +300,8 @@ export default function GunMaster() {
                                                                     {...props}
                                                                     statusOptions={statusOptions}
                                                                     getGun={getGun}
+                                                                    setIsAddGunOpen={setIsAddGunOpen}
+                                                                    setId={setId}
                                                                 />
                                                             )
                                                         }
@@ -313,7 +320,16 @@ export default function GunMaster() {
                         </div>
                     </div>
                 </div>
-
+                {
+                    isAddGunOpen &&
+                    <Gun
+                        isAddGunOpen={isAddGunOpen}
+                        setIsAddGunOpen={setIsAddGunOpen}
+                        getGun={getGun}
+                        id={id}
+                        setId={setId}
+                    />
+                }
             </div>
         </div>
     )

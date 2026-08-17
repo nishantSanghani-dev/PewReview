@@ -13,7 +13,7 @@ export const API_ROUTES = {
         userEdit: `User/update`,
         userExport: "User/GetExportUsersToken",
         forgotPassword: `User/ForgetPassword`,
-        resetPassword:"User/ResetPassword"
+        resetPassword: "User/ResetPassword"
     },
     endUser: {
         endUserView: "EndUser/GetUsers",
@@ -47,7 +47,10 @@ export const API_ROUTES = {
         getGunDropDown: "Gun/GetGunDropdownAll",
         gunStatusUpdate: (id) => `Gun/UpdateStatus/${id}`,
         getGun: "Gun/List",
-        gunDelete: (id) => `Gun/Delete/${id}`
+        gunDelete: (id) => `Gun/Delete/${id}`,
+        gunAdd: "Gun/Add",
+        gunGetById: "Gun/Get",
+        gunEdit: (id) => `Gun/Edit/${id}`
     },
     venue: {
         VenueAdd: "Venue/Add",
@@ -126,7 +129,8 @@ export const API_ROUTES = {
         ammunitionDelete: (id) => `Ammunition/Delete/${id}`,
         ammunitionAdd: "Ammunition/Add",
         ammunitionGetById: `Ammunition/Get`,
-        ammunitionUpdate: `Ammunition/Update`
+        ammunitionUpdate: `Ammunition/Update`,
+        ammunitionDropDown: "Ammunition/GetDropdownAmmunitions"
     },
     category: {
         getCategoryMaster: "GunCategoryMaster/List",

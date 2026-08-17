@@ -250,6 +250,36 @@ export const categorySchema = z.object({
 
 
 
+export const gunSchema = z.object({
+    gunName: z
+        .string()
+        .trim()
+        .min(1, "Gun name is required")
+        .max(100, "Maximum 100 characters allowed"),
+    categoryId: z
+        .string()
+        .min(1, "Please select a category."),
+    manufacturerIds: z
+        .array(z.string())
+        .min(1, "Please select at least one manufacturer."),
+    barrelLength: z
+        .string()
+        .trim()
+        .min(1, "Barrel length is required"),
+    details: z
+        .string()
+        .trim()
+        .min(1, "Details are required"),
+    ammunitionIds: z
+        .array(z.string())
+        .min(1, "Please select at least one ammunition."),
+    imageNames: z
+        .any()
+        .refine(file => file, "Please upload an image."),
+    approvalStatus: z
+        .number()
+        .optional()
+});
 
 export const changePasswordSchema = z
     .object({
