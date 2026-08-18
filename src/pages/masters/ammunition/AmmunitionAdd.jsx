@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import React, { useEffect, useState, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useForm } from 'react-hook-form';
 import { ammunitionSchema } from '../../../validation/zod.validation';
 import { apiRequest } from '../../../services/Api';
@@ -207,11 +208,17 @@ export default function AmmunitionAdd({
     fetchManufacturers();
   }, []);
 
-  return (
+  if (!isAmmunitionOpen) return null;
+
+  const modalContent = (
     <div
       className="modal fade show d-block"
       tabIndex="-1"
-      style={{ backgroundColor: 'rgba(0,0,0,0.55)' }}
+      style={{
+        backgroundColor: 'rgba(0,0,0,0.55)',
+        zIndex: 9999,
+        overflowY: 'hidden'
+      }}
     >
       <div className="modal-dialog-badges modal-dialog-centered modal-lg">
         <div
@@ -372,8 +379,8 @@ export default function AmmunitionAdd({
                                   ]);
                                   const singleId = String(
                                     selectedCategories[0].categoryId ||
-                                      selectedCategories[0].id ||
-                                      selectedCategories[0].value
+                                    selectedCategories[0].id ||
+                                    selectedCategories[0].value
                                   );
                                   setValue('categoryIds', [singleId], {
                                     shouldValidate: true,
@@ -581,4 +588,6 @@ export default function AmmunitionAdd({
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 }

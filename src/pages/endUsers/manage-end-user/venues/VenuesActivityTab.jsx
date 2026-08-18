@@ -1,9 +1,10 @@
 import { Grid, GridColumn } from '@progress/kendo-react-grid';
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { DateCell } from '../UploadGun';
 import { UserNameCell } from './VenueList';
 import { Tooltip } from '@progress/kendo-react-tooltip';
+import MediaController from '../../../../components/common/mediaController/MediaController';
 const ActionCell = (props) => {
   return (
     <td {...props.tdProps}>
@@ -40,7 +41,7 @@ const TextCell = ({ tdProps, dataItem, field }) => {
     </td>
   );
 };
-const ImagesVdeo = ({ tdProps, dataItem }) => {
+const ImagesVdeo = ({ tdProps, dataItem, handleImageClick }) => {
   const isVideo = (url) => {
     return /\.(mp4|webm|ogg|mov|avi|mkv)$/i.test(url);
   };
@@ -57,8 +58,8 @@ const ImagesVdeo = ({ tdProps, dataItem }) => {
                 src={value}
                 height="50"
                 className="rounded flex-shrink-0"
-
-                // autoPlay={true}
+                onClick={() => handleImageClick(value, dataItem.attachmentList || [])}
+                style={{ cursor: 'pointer', objectFit: 'cover' }}
               ></video>
             ) : (
               <img
@@ -68,7 +69,8 @@ const ImagesVdeo = ({ tdProps, dataItem }) => {
                 width="50"
                 height="50"
                 className="rounded flex-shrink-0"
-                style={{ objectFit: 'cover' }}
+                style={{ objectFit: 'cover', cursor: 'pointer' }}
+                onClick={() => handleImageClick(value, dataItem.attachmentList || [])}
               />
             )
           )}
@@ -95,6 +97,21 @@ const StatusCell = (props) => {
   );
 };
 export default function VenuesActivityTab({ activityTabData }) {
+  const [showMediaModal, setShowMediaModal] = useState(false);
+  const [selectedImage, setSelectedImage] = useState('');
+  const [totalThumbnailImages, setTotalThumbnailImages] = useState([]);
+
+  const handleImageClick = (image, attachments = []) => {
+    setSelectedImage(image);
+    setShowMediaModal(true);
+    setTotalThumbnailImages(attachments);
+  };
+
+  const handleCloseModal = () => {
+    setShowMediaModal(false);
+    setSelectedImage('');
+  };
+
   const venueActivityTabColumn = [
     { field: 'action', title: 'Action', cell: ActionCell, width: '80px' },
     {
@@ -180,7 +197,9 @@ export default function VenuesActivityTab({ activityTabData }) {
                         cells={
                           col.cell
                             ? {
-                                data: (props) => <col.cell {...props} />,
+                                data: (props) => (
+                                  <col.cell {...props} handleImageClick={handleImageClick} />
+                                ),
                               }
                             : {
                                 data: (props) => (
@@ -197,6 +216,13 @@ export default function VenuesActivityTab({ activityTabData }) {
           </div>
         </div>
       </div>
+      <MediaController
+        show={showMediaModal}
+        title="media"
+        onClose={handleCloseModal}
+        image={selectedImage}
+        totalThumbnailImages={totalThumbnailImages ?? []}
+      />
     </div>
   );
 }

@@ -42,7 +42,7 @@ export const useStatusChange = (refreshData) => {
       onCancel={() => {
         setShowStatusDialog(false);
         setStatusData(null);
-        if (refreshData) refreshData();
+        // if (refreshData) refreshData();
       }}
       onConfirm={confirmStatusChange}
     />

@@ -1,0 +1,421 @@
+/* =========================================
+   MEDIA OVERLAY
+========================================= */
+
+.custom-media-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+
+    background: rgba(0, 0, 0, 0.72);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+}
+
+
+/* =========================================
+   MODAL
+========================================= */
+
+.custom-media-modal {
+    width: min(1140px, 100%);
+    height: min(720px, calc(100vh - 40px));
+
+    background: #ffffff;
+    border-radius: 10px;
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.35);
+}
+
+
+/* =========================================
+   HEADER
+========================================= */
+
+.custom-media-header {
+    height: 64px;
+
+    flex-shrink: 0;
+
+    padding: 0 22px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.custom-media-header h5 {
+    font-size: 21px;
+    font-weight: 600;
+    color: #222;
+}
+
+
+/* =========================================
+   CLOSE BUTTON
+========================================= */
+
+.custom-media-close {
+    width: 38px;
+    height: 38px;
+
+    border: 0;
+    background: transparent;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+
+    border-radius: 50%;
+
+    transition: background 0.2s ease;
+}
+
+.custom-media-close:hover {
+    background: #f1f1f1;
+}
+
+.custom-media-close span {
+    font-size: 34px;
+    font-weight: 300;
+    line-height: 1;
+    color: #111;
+}
+
+
+/* =========================================
+   MAIN BODY
+========================================= */
+
+.custom-media-body {
+    position: relative;
+
+    flex: 1;
+
+    min-height: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 8px 80px;
+
+    background: #ffffff;
+}
+
+
+/* =========================================
+   MAIN IMAGE
+========================================= */
+
+.main-media-wrapper {
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    overflow: hidden;
+}
+
+.main-media-image {
+    max-width: 100%;
+    max-height: 100%;
+
+    width: auto;
+    height: auto;
+
+    object-fit: contain;
+
+    display: block;
+
+    user-select: none;
+}
+
+
+/* =========================================
+   NAVIGATION ARROWS
+========================================= */
+
+.media-navigation {
+    position: absolute;
+
+    top: 50%;
+    transform: translateY(-50%);
+
+    width: 40px;
+    height: 40px;
+
+    border: 0;
+    border-radius: 50%;
+
+    background: #e2e2e2;
+
+    color: #222;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+
+    z-index: 2;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+.media-navigation:hover {
+    background: #d2d2d2;
+
+    transform: translateY(-50%) scale(1.05);
+}
+
+.media-navigation span {
+    font-size: 38px;
+    font-weight: 300;
+
+    line-height: 30px;
+
+    margin-top: -4px;
+}
+
+.media-navigation-left {
+    left: 20px;
+}
+
+.media-navigation-right {
+    right: 20px;
+}
+
+
+/* =========================================
+   THUMBNAILS AREA
+========================================= */
+
+.custom-media-thumbnails-wrapper {
+    flex-shrink: 0;
+
+    padding: 12px 20px 18px;
+
+    display: flex;
+    justify-content: center;
+
+    background: #ffffff;
+}
+
+.custom-media-thumbnails {
+    max-width: 100%;
+
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    overflow-x: auto;
+
+    padding: 2px 2px 5px;
+
+    scrollbar-width: thin;
+}
+
+
+/* =========================================
+   THUMBNAIL
+========================================= */
+
+.media-thumbnail {
+    flex: 0 0 auto;
+
+    width: 62px;
+    height: 62px;
+
+    padding: 0;
+
+    border: 2px solid transparent;
+
+    border-radius: 10px;
+
+    overflow: hidden;
+
+    background: #f5f5f5;
+
+    cursor: pointer;
+
+    transition:
+        border-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.media-thumbnail:hover {
+    transform: translateY(-2px);
+}
+
+.media-thumbnail.active {
+    border-color: #333;
+}
+
+.media-thumbnail img {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+}
+
+
+/* =========================================
+   TABLET
+========================================= */
+
+@media (max-width: 768px) {
+
+    .custom-media-overlay {
+        padding: 10px;
+    }
+
+    .custom-media-modal {
+        height: calc(100vh - 20px);
+
+        border-radius: 8px;
+    }
+
+    .custom-media-header {
+        height: 56px;
+
+        padding: 0 16px;
+    }
+
+    .custom-media-header h5 {
+        font-size: 18px;
+    }
+
+    .custom-media-body {
+        padding: 10px 55px;
+    }
+
+    .media-navigation {
+        width: 36px;
+        height: 36px;
+    }
+
+    .media-navigation-left {
+        left: 10px;
+    }
+
+    .media-navigation-right {
+        right: 10px;
+    }
+
+    .media-thumbnail {
+        width: 56px;
+        height: 56px;
+    }
+
+    .custom-media-thumbnails-wrapper {
+        padding: 10px 12px 14px;
+    }
+
+    .custom-media-thumbnails {
+        gap: 8px;
+    }
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 576px) {
+
+    .custom-media-overlay {
+        padding: 0;
+    }
+
+    .custom-media-modal {
+        width: 100%;
+        height: 100vh;
+
+        border-radius: 0;
+    }
+
+    .custom-media-header {
+        height: 52px;
+
+        padding: 0 14px;
+    }
+
+    .custom-media-body {
+        padding: 10px 45px;
+    }
+
+    .media-navigation {
+        width: 34px;
+        height: 34px;
+    }
+
+    .media-navigation-left {
+        left: 6px;
+    }
+
+    .media-navigation-right {
+        right: 6px;
+    }
+
+    .media-navigation span {
+        font-size: 32px;
+    }
+
+    .custom-media-thumbnails-wrapper {
+        padding: 8px 10px 12px;
+    }
+
+    .media-thumbnail {
+        width: 52px;
+        height: 52px;
+
+        border-radius: 7px;
+    }
+}
+
+
+/* =========================================
+   VERY SMALL MOBILE
+========================================= */
+
+@media (max-width: 375px) {
+
+    .custom-media-body {
+        padding-left: 40px;
+        padding-right: 40px;
+    }
+
+    .media-navigation-left {
+        left: 4px;
+    }
+
+    .media-navigation-right {
+        right: 4px;
+    }
+
+    .media-thumbnail {
+        width: 48px;
+        height: 48px;
+    }
+}

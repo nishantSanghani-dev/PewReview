@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { gunSchema } from '../../../validation/zod.validation';
@@ -353,11 +354,15 @@ export default function Gun({
         );
     };
 
-    return (
+    const modalContent = (
         <div
             className="modal fade show d-block"
             tabIndex="-1"
-            style={{ backgroundColor: 'rgba(0,0,0,0.55)' }}
+            style={{
+                backgroundColor: 'rgba(0,0,0,0.55)',
+                zIndex: 9999,
+                overflowY: 'auto'
+            }}
         >
             <div className="modal-dialog modal-dialog-centered modal-xl">
                 <div
@@ -678,4 +683,6 @@ export default function Gun({
             </div>
         </div>
     );
+
+    return createPortal(modalContent, document.body);
 }

@@ -18,6 +18,7 @@ const CheckboxCell = (props) => {
   const id = props.dataItem.id;
 
   return (
+
     <td {...props.tdProps} className="text-center">
       <label className="custom-checkbox mb-0">
         <input
@@ -90,9 +91,16 @@ const ActionCell = (props) => {
           </Link>
         }
         {
+          props.manageUserPermission?.canDelete
+          &&
+
           <button
             type="button"
-            onClick={() => props.handleDelete(props.dataItem.id)}
+            onClick={() => {
+              if (props.ids?.length > 0){
+                 props.handleDelete(props.dataItem.id)
+              }
+            }}
             className="small-square-btn danger-btn"
           >
             <i className="demo-icon icon-delete-1" />
@@ -226,7 +234,15 @@ export default function ManageUser() {
   };
 
   const manageUserColumn = [
-    { title: '', cell: CheckboxCell, width: '100px' },
+
+    ...(manageUserPermission?.canDelete
+      ? [
+        { title: '', cell: CheckboxCell, width: '100px' },
+      ]
+      : []),
+
+
+
     { field: 'action', title: 'Action', cell: ActionCell, width: '100px' },
     { field: 'firstName', title: 'FirstName', columnMenu: ColumnMenu },
     { field: 'lastName', title: 'LirstName', columnMenu: ColumnMenu },
@@ -286,102 +302,7 @@ export default function ManageUser() {
             <div className="row">
               <div className="col-12 mt-3 mt-xxl-4">
                 <div className="table-responsive">
-                  {/* <table className="table">
-                                        <thead className="table-dark">
-                                            <tr>
-                                                {manageUserPermission?.canDelete && <th></th>}
 
-                                                {(manageUserPermission?.canUpdate ||
-                                                    manageUserPermission?.canDelete) && (
-                                                        <th>Action</th>
-                                                    )}
-
-                                                <th>First Name</th>
-                                                <th>Last Name</th>
-                                                <th>Role</th>
-                                                <th>Phone</th>
-                                                <th>Email</th>
-                                                <th>Status</th>
-                                            </tr>
-                                        </thead>
-
-                                        <tbody>
-                                            {manageUserData?.length > 0 ? (
-                                                manageUserData.map((value) => (
-                                                    <tr key={value.id}>
-                                                        {manageUserPermission?.canDelete && (
-                                                            <td>
-                                                                <label className="custom-checkbox">
-                                                                    <input
-                                                                        type="checkbox"
-                                                                        className="child-checkbox"
-                                                                        value={value.id}
-                                                                        onChange={handleChange}
-                                                                    />
-                                                                    <span className="checkmark"></span>
-                                                                </label>
-                                                            </td>
-                                                        )}
-
-                                                        {(manageUserPermission?.canUpdate ||
-                                                            manageUserPermission?.canDelete) && (
-                                                                <td>
-                                                                    <span className="d-flex gap-2 align-items-center">
-                                                                        {manageUserPermission?.canUpdate && (
-                                                                            <Link
-                                                                                to={`/admin/user/edit/${value.id}`}
-                                                                                className="small-square-btn edit-btn"
-                                                                            >
-                                                                                <i className="demo-icon icon-edit-1" />
-                                                                            </Link>
-                                                                        )}
-
-                                                                        {manageUserPermission?.canDelete && (
-                                                                            <button
-                                                                                type="button"
-                                                                                onClick={() => handleDelete(value.id)}
-                                                                                className="small-square-btn danger-btn"
-                                                                            >
-                                                                                <i className="demo-icon icon-delete-1" />
-                                                                            </button>
-                                                                        )}
-                                                                    </span>
-                                                                </td>
-                                                            )}
-
-                                                        <td>{value.firstName}</td>
-                                                        <td>{value.lastName}</td>
-                                                        <td>{value.roleName}</td>
-                                                        <td>{value.contactNumber}</td>
-                                                        <td>{value.email}</td>
-
-                                                        <td>
-                                                            <div className="form-check form-switch">
-                                                                <input
-                                                                    className="form-check-input"
-                                                                    type="checkbox"
-                                                                    disabled={!manageUserPermission?.canUpdate}
-                                                                    checked={value.isActive}
-                                                                    onChange={(e) =>
-                                                                        handleStatusChange(value.id, e.target.checked)
-                                                                    }
-                                                                />
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                ))
-                                            ) : (
-                                                <tr>
-                                                    <td
-                                                        colSpan={manageUserPermission?.canDelete ? 8 : 7}
-                                                        className="text-center"
-                                                    >
-                                                        No users found.
-                                                    </td>
-                                                </tr>
-                                            )}
-                                        </tbody>
-                                    </table> */}
                   <Grid
                     className="table-wrapper  text-center"
                     data={manageUserData}
@@ -440,6 +361,7 @@ export default function ManageUser() {
                                   handleChange={handleChange}
                                   handleDelete={handleDelete}
                                   handleStatusChange={handleStatusChange}
+                                  manageUserPermission={manageUserPermission}
                                 />
                               ),
                             }

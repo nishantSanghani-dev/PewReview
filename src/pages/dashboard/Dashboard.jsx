@@ -77,7 +77,7 @@ export default function Dashboard() {
         <div className="col mb-3">
           <h3 className="">Dashboard</h3>
         </div>
-        {/* <div className="page-heading">
+        <div className="page-heading">
           <div className="row align-items-center gap-3 mb-3 mb-xxl-4">
             <div className="col-12 col-md">
               <h2 className="page-title">Welcome to Dashboard, John!</h2>
@@ -99,7 +99,7 @@ export default function Dashboard() {
               </select>
             </div>
           </div>
-        </div> */}
+        </div>
 
         {customDate && (
           <div className="row align-items-center mb-5">

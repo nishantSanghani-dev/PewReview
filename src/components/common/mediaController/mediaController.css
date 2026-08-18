@@ -1,0 +1,686 @@
+/* =========================================================
+   MEDIA MODAL
+   ========================================================= */
+
+body.media-modal-open {
+    overflow: hidden !important;
+}
+
+
+/* =========================================================
+   MODAL OVERLAY
+   ========================================================= */
+
+.media-preview-modal {
+    display: block;
+
+    position: fixed;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    padding: 0 !important;
+    margin: 0;
+
+    overflow: hidden;
+
+    z-index: 9999;
+}
+
+
+/* =========================================================
+   MODAL DIALOG
+   ========================================================= */
+
+.media-preview-dialog {
+    width: 1140px;
+    max-width: calc(100vw - 30px);
+
+    /* height: 684px;
+    max-height: calc(100vh - 30px); */
+
+    padding: 0;
+    margin: 5% auto;
+}
+
+
+/* =========================================================
+   MODAL CONTENT
+   ========================================================= */
+
+.media-preview-content {
+    width: 100%;
+    height: 100%;
+    max-height: 100%;
+
+    padding: 0 !important;
+    margin: 0;
+
+    border: 0;
+    border-radius: 10px;
+
+    background-color: #ffffff;
+
+    overflow: hidden;
+
+    display: flex;
+    flex-direction: column;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.media-preview-header {
+    width: 100%;
+    height: 64px;
+    min-height: 64px;
+
+    flex: 0 0 64px;
+
+    padding: 0 18px 0 20px !important;
+    margin: 0 !important;
+
+    border: 0 !important;
+    border-bottom: 1px solid #dedede !important;
+
+    border-radius: 0;
+
+    background-color: #ffffff;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   HEADER TITLE
+   ========================================================= */
+
+.media-preview-header .modal-title {
+    padding: 0 !important;
+    margin: 0 !important;
+
+    color: #161616;
+
+    font-size: 21px;
+    font-weight: 600;
+
+    line-height: 1;
+
+    text-align: left;
+}
+
+
+/* =========================================================
+   CLOSE BUTTON
+   ========================================================= */
+
+/*
+   Bootstrap's .btn-close normally uses:
+   - padding
+   - background SVG
+   - background-size
+   - opacity
+
+   All of those are reset here.
+*/
+
+.media-preview-header .media-preview-close {
+    position: relative;
+
+    width: 20px;
+    height: 20px;
+
+    min-width: 20px;
+    min-height: 20px;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    border: 0 !important;
+    border-radius: 0;
+
+    background-color: transparent !important;
+    background-image: none !important;
+
+    opacity: 1;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+
+    box-shadow: none !important;
+
+    flex-shrink: 0;
+}
+
+
+/* =========================================================
+   CUSTOM CLOSE ICON - LINE 1
+   ========================================================= */
+
+.media-preview-header .media-preview-close::before {
+    content: "";
+
+    position: absolute;
+
+    top: 50%;
+    left: 50%;
+
+    width: 20px;
+    height: 2px;
+
+    background-color: #111111;
+
+    border-radius: 2px;
+
+    transform: translate(-50%, -50%) rotate(45deg);
+}
+
+
+/* =========================================================
+   CUSTOM CLOSE ICON - LINE 2
+   ========================================================= */
+
+.media-preview-header .media-preview-close::after {
+    content: "";
+
+    position: absolute;
+
+    top: 50%;
+    left: 50%;
+
+    width: 20px;
+    height: 2px;
+
+    background-color: #111111;
+
+    border-radius: 2px;
+
+    transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+
+/* =========================================================
+   CLOSE BUTTON STATES
+   ========================================================= */
+
+.media-preview-header .media-preview-close:hover {
+    opacity: 1;
+    background-color: transparent !important;
+}
+
+
+.media-preview-header .media-preview-close:hover::before,
+.media-preview-header .media-preview-close:hover::after {
+    background-color: #000000;
+}
+
+
+.media-preview-header .media-preview-close:focus,
+.media-preview-header .media-preview-close:active,
+.media-preview-header .media-preview-close:focus-visible {
+    outline: none !important;
+
+    border: 0 !important;
+
+    box-shadow: none !important;
+
+    background-color: transparent !important;
+}
+
+
+/* =========================================================
+   MODAL BODY
+   ========================================================= */
+
+.media-preview-body {
+    width: 100%;
+    height: calc(100% - 64px);
+
+    flex: 1 1 auto;
+
+    padding: 7px 0 18px !important;
+    margin: 0 !important;
+
+    overflow: hidden;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   MAIN IMAGE WRAPPER
+   ========================================================= */
+
+.media-preview-wrapper {
+    position: relative;
+
+    width: 100%;
+    height: 526px;
+
+    flex: 0 0 526px;
+
+    padding: 0;
+    margin: 0;
+
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+
+    overflow: hidden;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   PREVIOUS / NEXT BUTTONS
+   ========================================================= */
+
+.media-preview-nav {
+    position: absolute;
+
+    top: 50%;
+    transform: translateY(-50%);
+
+    width: 40px;
+    height: 40px;
+
+    padding: 0;
+    margin: 0;
+
+    border: 0;
+    border-radius: 50%;
+
+    background-color: #dedede;
+
+    color: #111111;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 34px;
+    font-weight: 300;
+    line-height: 1;
+
+    cursor: pointer;
+
+    z-index: 5;
+
+    box-shadow: none;
+
+    transition:
+        background-color 0.15s ease,
+        transform 0.15s ease;
+}
+
+.media-preview-nav:hover {
+    background-color: #cfcfcf;
+}
+
+.media-preview-nav:active {
+    background-color: #c5c5c5;
+}
+
+.media-preview-nav:focus {
+    outline: none;
+}
+
+.media-preview-nav:focus-visible {
+    outline: 2px solid #666666;
+    outline-offset: 2px;
+}
+
+
+/* PREVIOUS BUTTON */
+
+.media-preview-prev {
+    left: 20px;
+}
+
+
+/* NEXT BUTTON */
+
+.media-preview-next {
+    right: 20px;
+}
+
+
+/* DISABLED */
+
+.media-preview-nav:disabled {
+    opacity: 0.35;
+    cursor: default;
+}
+
+.media-preview-nav:disabled:hover {
+    background-color: #dedede;
+}
+
+/* =========================================================
+   MAIN IMAGE
+   ========================================================= */
+
+.media-preview-image {
+    display: block;
+
+    width: auto;
+    height: 503px;
+
+    max-width: 100%;
+    max-height: 503px;
+
+    padding: 0;
+    margin: 0;
+
+    object-fit: contain;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   EMPTY IMAGE
+   ========================================================= */
+
+.media-preview-empty {
+    width: 300px;
+    height: 400px;
+
+    padding: 0;
+    margin: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background-color: #f8f9fa;
+
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+
+    color: #6c757d;
+
+    font-size: 14px;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   THUMBNAIL WRAPPER
+   ========================================================= */
+
+.media-preview-thumbnail-wrapper {
+    width: 100%;
+    height: 60px;
+
+    flex: 0 0 60px;
+
+    padding: 0;
+    margin: 8px 0 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    overflow: hidden;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   THUMBNAIL
+   ========================================================= */
+
+.media-preview-thumbnail {
+    width: 60px;
+    height: 60px;
+
+    padding: 2px !important;
+    margin: 0;
+
+    border: 2px solid transparent;
+    border-radius: 10px;
+
+    background-color: #ffffff;
+
+    overflow: hidden;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   ACTIVE THUMBNAIL
+   ========================================================= */
+
+.media-preview-thumbnail.active {
+    border-color: #6c6c6c;
+}
+
+
+/* =========================================================
+   THUMBNAIL IMAGE
+   ========================================================= */
+
+.media-preview-thumbnail img {
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    padding: 0;
+    margin: 0;
+
+    object-fit: cover;
+
+    border-radius: 7px;
+}
+
+
+/* =========================================================
+   BACKDROP
+   ========================================================= */
+
+.media-preview-backdrop {
+    position: fixed;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    padding: 0;
+    margin: 0;
+
+    background-color: #000000;
+
+    z-index: 9998;
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 991.98px) {
+
+    .media-preview-dialog {
+        width: calc(100vw - 30px);
+        max-width: calc(100vw - 30px);
+
+        height: calc(100vh - 30px);
+        max-height: calc(100vh - 30px);
+
+        margin: 15px auto;
+    }
+
+
+    .media-preview-content {
+        width: 100%;
+        height: 100%;
+    }
+
+
+    .media-preview-header {
+        height: 60px;
+        min-height: 60px;
+
+        flex: 0 0 60px;
+
+        padding: 0 16px 0 18px !important;
+    }
+
+
+    .media-preview-header .modal-title {
+        font-size: 20px;
+    }
+
+
+    .media-preview-body {
+        height: calc(100% - 60px);
+
+        padding: 7px 0 15px !important;
+    }
+
+
+    .media-preview-wrapper {
+        width: 100%;
+        height: calc(100% - 68px);
+
+        flex: 1 1 auto;
+    }
+
+
+    .media-preview-image {
+        width: auto;
+        height: auto;
+
+        max-width: 100%;
+        max-height: 100%;
+    }
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 575.98px) {
+
+    .media-preview-dialog {
+        width: calc(100vw - 20px);
+        max-width: calc(100vw - 20px);
+
+        height: calc(100vh - 20px);
+        max-height: calc(100vh - 20px);
+
+        margin: 10px auto;
+    }
+
+
+    .media-preview-content {
+        width: 100%;
+        height: 100%;
+
+        border-radius: 8px;
+    }
+
+
+    .media-preview-header {
+        height: 55px;
+        min-height: 55px;
+
+        flex: 0 0 55px;
+
+        padding: 0 14px 0 16px !important;
+    }
+
+
+    .media-preview-header .modal-title {
+        font-size: 18px;
+    }
+
+
+    .media-preview-header .media-preview-close {
+        width: 18px;
+        height: 18px;
+
+        min-width: 18px;
+        min-height: 18px;
+    }
+
+
+    .media-preview-header .media-preview-close::before,
+    .media-preview-header .media-preview-close::after {
+        width: 18px;
+        height: 2px;
+    }
+
+
+    .media-preview-body {
+        height: calc(100% - 55px);
+
+        padding: 7px 0 12px !important;
+    }
+
+
+    .media-preview-wrapper {
+        width: 100%;
+        height: calc(100% - 63px);
+
+        flex: 1 1 auto;
+    }
+
+
+    .media-preview-image {
+        width: auto;
+        height: auto;
+
+        max-width: 100%;
+        max-height: 100%;
+
+        object-fit: contain;
+    }
+
+
+    .media-preview-thumbnail-wrapper {
+        width: 100%;
+        height: 55px;
+
+        flex: 0 0 55px;
+
+        margin: 8px 0 0;
+    }
+
+
+    .media-preview-thumbnail {
+        width: 55px;
+        height: 55px;
+    }
+}

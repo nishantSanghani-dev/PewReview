@@ -23,12 +23,8 @@ export const ActionCell = (props) => {
           &&
           <button
             onClick={() => {
-              if (props.setShowDeleteDialog && props.setSelectedEventId) {
-                props.setSelectedEventId(props.dataItem.eventId);
-                props.setShowDeleteDialog(true);
-              } else {
-                handleDelete(props.dataItem.eventId, 'events', 'eventDelete');
-              }
+              props.setSelectedEventId(props.dataItem.eventId);
+              props.setShowDeleteDialog(true);
             }}
             className="small-square-btn danger-btn"
           >

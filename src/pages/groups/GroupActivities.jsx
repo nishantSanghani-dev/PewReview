@@ -6,6 +6,7 @@ import { apiRequest } from '../../services/Api';
 import { API_ROUTES } from '../../routes/api.routes';
 import { useStatusChange } from '../../hooks/useStatusChange';
 import { Tooltip } from '@progress/kendo-react-tooltip';
+import MediaController from '../../components/common/mediaController/MediaController';
 const ActionCell = (props) => {
   return (
     <td {...props.tdProps}>
@@ -43,7 +44,7 @@ const TextCell = ({ tdProps, dataItem, field }) => {
     </td>
   );
 };
-const ImagesVdeo = ({ tdProps, dataItem }) => {
+const ImagesVdeo = ({ tdProps, dataItem, handleImageClick }) => {
   const isVideo = (url) => {
     return /\.(mp4|webm|ogg|mov|avi|mkv)$/i.test(url);
   };
@@ -60,8 +61,8 @@ const ImagesVdeo = ({ tdProps, dataItem }) => {
                 src={value}
                 height="50"
                 className="rounded flex-shrink-0"
-
-                // autoPlay={true}
+                onClick={() => handleImageClick(value, dataItem.attachmentList || [])}
+                style={{ cursor: 'pointer', objectFit: 'cover' }}
               ></video>
             ) : (
               <img
@@ -71,7 +72,8 @@ const ImagesVdeo = ({ tdProps, dataItem }) => {
                 width="50"
                 height="50"
                 className="rounded flex-shrink-0"
-                style={{ objectFit: 'cover' }}
+                style={{ objectFit: 'cover', cursor: 'pointer' }}
+                onClick={() => handleImageClick(value, dataItem.attachmentList || [])}
               />
             )
           )}
@@ -131,8 +133,21 @@ const UserNameCell = ({ tdProps, dataItem, field }) => {
 export default function GroupActivities() {
   const [activityData, setactivityData] = useState([]);
   const { id } = useParams();
-  const { handleStatusChange, statusConfirmDialog } = useStatusChange(getActivities);
   const [dataState, setDataState] = useState({ skip: 0, take: 20 });
+  const [showMediaModal, setShowMediaModal] = useState(false);
+  const [selectedImage, setSelectedImage] = useState('');
+  const [totalThumbnailImages, setTotalThumbnailImages] = useState([]);
+
+  const handleImageClick = (image, attachments = []) => {
+    setSelectedImage(image);
+    setShowMediaModal(true);
+    setTotalThumbnailImages(attachments);
+  };
+
+  const handleCloseModal = () => {
+    setShowMediaModal(false);
+    setSelectedImage('');
+  };
 
   const getActivities = async () => {
     const page = Math.floor(dataState.skip / dataState.take) + 1;
@@ -152,6 +167,7 @@ export default function GroupActivities() {
     );
     setactivityData(res.data.data);
   };
+  const { handleStatusChange, statusConfirmDialog } = useStatusChange(getActivities);
   const venueActivityTabColumn = [
     { field: 'action', title: 'Action', cell: ActionCell, width: '80px' },
     {
@@ -238,19 +254,20 @@ export default function GroupActivities() {
                           cells={
                             col.cell
                               ? {
-                                  data: (props) => (
-                                    <col.cell
-                                      getActivities={getActivities}
-                                      handleStatusChange={handleStatusChange}
-                                      {...props}
-                                    />
-                                  ),
-                                }
+                                data: (props) => (
+                                  <col.cell
+                                    getActivities={getActivities}
+                                    handleStatusChange={handleStatusChange}
+                                    handleImageClick={handleImageClick}
+                                    {...props}
+                                  />
+                                ),
+                              }
                               : {
-                                  data: (props) => (
-                                    <TextCell {...props} field={col.field} />
-                                  ),
-                                }
+                                data: (props) => (
+                                  <TextCell {...props} field={col.field} />
+                                ),
+                              }
                           }
                         />
                       );
@@ -262,6 +279,13 @@ export default function GroupActivities() {
           </div>
         </div>
       </div>
+      <MediaController
+        show={showMediaModal}
+        title="media"
+        onClose={handleCloseModal}
+        image={selectedImage}
+        totalThumbnailImages={totalThumbnailImages ?? []}
+      />
       {statusConfirmDialog}
     </div>
   );

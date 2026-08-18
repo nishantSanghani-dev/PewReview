@@ -127,18 +127,19 @@ export default function CategoryModel({ isCategoryOpen, setisCategoryOpen }) {
 
                 <div className="d-flex align-items-center gap-4">
                   {applicationForData.map((value) => (
-                    <div className="form-check" key={value.id}>
+                    <div key={value.id}>
                       <input
-                        className="form-check-input"
                         type="radio"
                         id={`application-${value.id}`}
                         value={value.id}
                         {...register('applicationFor')}
+                        style={{ position: 'absolute', left: '-9999px' }}
                       />
 
                       <label
-                        className="form-check-label"
+                        className="mb-0"
                         htmlFor={`application-${value.id}`}
+                        style={{ fontSize: '15px' }}
                       >
                         {value.description}
                       </label>
@@ -166,11 +167,10 @@ export default function CategoryModel({ isCategoryOpen, setisCategoryOpen }) {
                   type="text"
                   placeholder="Enter Category Name"
                   {...register('categoryName')}
-                  className={`form-control ${
-                    touchedFields.categoryName &&
+                  className={`form-control ${touchedFields.categoryName &&
                     errors.categoryName &&
                     'border-danger'
-                  }`}
+                    }`}
                   style={{
                     height: '42px',
                     borderRadius: '10px',
@@ -196,11 +196,10 @@ export default function CategoryModel({ isCategoryOpen, setisCategoryOpen }) {
                   rows={4}
                   placeholder="Enter Description"
                   {...register('description')}
-                  className={`form-control ${
-                    touchedFields.description &&
+                  className={`form-control ${touchedFields.description &&
                     errors.description &&
                     'border-danger'
-                  }`}
+                    }`}
                   style={{
                     borderRadius: '10px',
                     resize: 'none',

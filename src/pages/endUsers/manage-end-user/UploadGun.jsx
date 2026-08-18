@@ -1,7 +1,8 @@
 import { Grid, GridColumn } from '@progress/kendo-react-grid';
-import React from 'react';
+import React, { useState } from 'react';
 import { useStatusChange } from '../../../hooks/useStatusChange';
 import { Tooltip } from '@progress/kendo-react-tooltip';
+import MediaController from '../../../components/common/mediaController/MediaController';
 
 const ActionCell = (props) => {
   console.log(props);
@@ -39,17 +40,21 @@ const StatusCell = (props) => {
   );
 };
 const ImageCell = (props) => {
+  const image = props.dataItem.attachmentFullPath;
+
   return (
     <td {...props.tdProps}>
-      {props.dataItem.attachmentFullPath ? (
+      {image ? (
         <img
-          src={props.dataItem.attachmentFullPath}
+          src={image}
           alt=""
+          onClick={() => props.handleImageClick(image, [image])}
           style={{
             width: '50px',
             height: '50px',
             objectFit: 'cover',
             borderRadius: '4px',
+            cursor: 'pointer',
           }}
         />
       ) : (
@@ -112,7 +117,21 @@ const TextCell = ({ tdProps, dataItem, field }) => {
 };
 export default function UploadGun({ data }) {
   const { handleStatusChange, statusConfirmDialog } = useStatusChange();
+  const [showMediaModal, setShowMediaModal] = useState(false);
+  const [selectedImage, setSelectedImage] = useState('');
+  const [totalThumbnailImages, setTotalThumbnailImages] = useState([]);
   console.log(data);
+
+  const handleImageClick = (image, attachments = []) => {
+    setSelectedImage(image);
+    setShowMediaModal(true);
+    setTotalThumbnailImages(attachments);
+  };
+
+  const handleCloseModal = () => {
+    setShowMediaModal(false);
+    setSelectedImage('');
+  };
 
   return (
     <div
@@ -162,6 +181,7 @@ export default function UploadGun({ data }) {
                                 <col.cell
                                   {...props}
                                   handleStatusChange={handleStatusChange}
+                                  handleImageClick={handleImageClick}
                                 />
                               ),
                             }
@@ -235,6 +255,13 @@ export default function UploadGun({ data }) {
           </div>
         </div>
       </div>
+      <MediaController
+        show={showMediaModal}
+        title="media"
+        onClose={handleCloseModal}
+        image={selectedImage}
+        totalThumbnailImages={totalThumbnailImages ?? []}
+      />
       {statusConfirmDialog}
     </div>
   );

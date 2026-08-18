@@ -14,6 +14,7 @@ import { MENU } from '../../data/Menu';
 import useUserPermission from '../../utils/UserPermission';
 import { Tooltip } from '@progress/kendo-react-tooltip';
 import AleartDialog from '../../components/common/AleartDialog';
+import MediaController from '../../components/common/mediaController/MediaController';
 const ActionCell = (props) => {
   const deleteEvent = () => {
     props.setSelectedBadgeId(props.dataItem.id);
@@ -77,6 +78,7 @@ const ImageCell = (props) => {
           src={props.dataItem.imageFullPath}
           alt="Badge"
           className="gun-img"
+          onClick={() => props.handleImageClick(props.dataItem.imageFullPath)}
         />
       ) : null}
     </td>
@@ -92,6 +94,9 @@ export default function Badges() {
   const { dataState, onDataStateChange, page, pageSize } =
     useGridPagination(10);
   const permission = usePermission();
+  const [showMediaModal, setShowMediaModal] = useState(false);
+  const [selectedImage, setSelectedImage] = useState("");
+  const [totalThumbnailImages, setTotalThumbnailImages] = useState([]);
   // const badgePermission = permission.find((value, index) => value.menuId === MENU.BADGE)
   // console.log(badgePermission);
   const { badgePermission } = useUserPermission();
@@ -135,6 +140,16 @@ export default function Badges() {
       columnMenu: ColumnMenu,
     },
   ];
+  const handleImageClick = (image, attachments = []) => {
+    setSelectedImage(image);
+    setShowMediaModal(true);
+    setTotalThumbnailImages(attachments.length ? attachments : [image]);
+  };
+
+  const handleCloseModal = () => {
+    setShowMediaModal(false);
+    setSelectedImage("");
+  };
 
   useEffect(() => {
     getBadges();
@@ -256,8 +271,10 @@ export default function Badges() {
                                 id={id}
                                 getBadges={getBadges}
                                 badgePermission={badgePermission}
+                                handleImageClick={handleImageClick}
                                 setSelectedBadgeId={setSelectedBadgeId}
                                 setShowDeleteDialog={setShowDeleteDialog}
+                                setShowMediaModal={setShowMediaModal}
                               />
                             ),
                           }
@@ -302,6 +319,18 @@ export default function Badges() {
           }}
         />
       )}
+
+      {
+        showMediaModal
+        &&
+        <MediaController
+          show={showMediaModal}
+          title='media'
+          onClose={handleCloseModal}
+          image={selectedImage}
+          totalThumbnailImages={totalThumbnailImages ?? []}
+        />
+      }
     </div>
   );
 }

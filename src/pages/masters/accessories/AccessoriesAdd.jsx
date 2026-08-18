@@ -14,6 +14,7 @@ export default function AccessoriesAdd({
 }) {
   const [categories, setCategories] = useState([]);
   const [gunData, setgunData] = useState([]);
+  const [rawAccessoryData, setRawAccessoryData] = useState(null);
   const [selectedGuns, setSelectedGuns] = useState([]);
   const [isGunOpen, setIsGunOpen] = useState(false);
   const gunDropdownRef = useRef(null);
@@ -72,44 +73,50 @@ export default function AccessoriesAdd({
     }
   };
 
-  const getSingleRecord = async () => {
-    const res = await apiRequest(
-      'GET',
-      API_ROUTES.accessories.accessoriesGetById,
-      null,
-      { id },
-      {
-        showLoader: true,
-      }
-    );
-
-    if (res.status && res.data) {
-      reset({
-        accessoryName: res.data.accessoryName || '',
-        categoryId: res.data.categoryId || '',
-        gunIds: res.data.gunIds || [],
-        description: res.data.description || '',
-      });
-
-      // Map and set the selected gun objects for pills
-      if (gunData.length > 0 && res.data.gunIds) {
-        const selected = gunData.filter((gun) => {
-          const gunIdStr = String(gun.gunId || gun.id);
-          return res.data.gunIds.includes(gunIdStr);
-        });
-        setSelectedGuns(selected);
-      } else if (res.data.guns && Array.isArray(res.data.guns)) {
-        setSelectedGuns(res.data.guns);
-      }
-    }
-  };
-
-  // Keep selectedGuns in sync if guns load after single record
   useEffect(() => {
-    if (id && gunData.length > 0) {
+    fetchCategories();
+    getGun();
+
+    if (id) {
+      const getSingleRecord = async () => {
+        const res = await apiRequest(
+          'GET',
+          API_ROUTES.accessories.accessoriesGetById,
+          null,
+          { id },
+          { showLoader: true }
+        );
+        if (res.status && res.data) {
+          setRawAccessoryData(res.data);
+        }
+      };
       getSingleRecord();
     }
-  }, [gunData]);
+  }, [id]);
+
+  useEffect(() => {
+    if (rawAccessoryData && gunData.length > 0 && categories.length > 0) {
+      const data = rawAccessoryData;
+      const apiGunIds = data.guids || data.gunIds || [];
+      reset({
+        accessoryName: data.accessoryName || '',
+        categoryId: data.categoryId || '',
+        gunIds: apiGunIds,
+        description: data.description || '',
+      });
+
+      if (apiGunIds.length > 0) {
+        const selected = gunData.filter((gun) => {
+          const gunIdStr = String(gun.gunId || gun.id);
+          return apiGunIds.includes(gunIdStr);
+        });
+        setSelectedGuns(selected);
+      } else if (data.guns && Array.isArray(data.guns)) {
+        setSelectedGuns(data.guns);
+      }
+      setRawAccessoryData(null);
+    }
+  }, [rawAccessoryData, gunData, categories, reset]);
 
   const onSubmit = async (data) => {
     let res;
@@ -196,23 +203,21 @@ export default function AccessoriesAdd({
     };
   }, []);
 
-  useEffect(() => {
-    fetchCategories();
-    getGun();
-  }, []);
+  // Dropdown APIs are now fetched in the id-dependency useEffect
 
   return (
     <div
       className="modal fade show d-block"
       tabIndex="-1"
-      style={{ backgroundColor: 'rgba(0,0,0,0.55)' }}
+
+      style={{ backgroundColor: 'rgba(0,0,0,0.55)', overflowY: "hidden" }}
     >
       <div className="modal-dialog-badges modal-dialog-centered modal-lg">
         <div
           className="modal-content border-0"
           style={{
             borderRadius: '14px',
-            overflow: 'hidden',
+            overflowY: 'hidden',
           }}
         >
           {/* Header */}

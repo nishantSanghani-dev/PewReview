@@ -16,6 +16,7 @@ import { getBackendFilters } from '../../components/grid/GridFilter';
 import useUserPermission from '../../utils/UserPermission';
 import { Tooltip } from '@progress/kendo-react-tooltip';
 import AleartDialog from '../../components/common/AleartDialog';
+import MediaController from '../../components/common/mediaController/MediaController';
 const ActionCell = (props) => {
   return (
     <td {...props.tdProps}>
@@ -68,13 +69,17 @@ const GroupTypeCell = ({ tdProps, dataItem, field }) => (
   <td {...tdProps}>{dataItem.isPublic ? 'Public' : 'Private'}</td>
 );
 const ImageCell = (props) => {
+  const image = props.dataItem.groupImageFullUrl;
+
   return (
     <td {...props.tdProps}>
-      {props.dataItem.groupImageFullUrl ? (
+      {image ? (
         <img
-          src={props.dataItem.groupImageFullUrl}
+          src={image}
           alt="Gun"
           className="gun-img"
+          onClick={() => props.handleImageClick(image, [image])}
+          style={{ cursor: 'pointer' }}
         />
       ) : (
         <span></span>
@@ -168,6 +173,9 @@ export default function Groups() {
   const [filters, setFilters] = useState([]);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [selectedGroupId, setSelectedGroupId] = useState(null);
+  const [showMediaModal, setShowMediaModal] = useState(false);
+  const [selectedImage, setSelectedImage] = useState('');
+  const [totalThumbnailImages, setTotalThumbnailImages] = useState([]);
   const {
     dataState,
     onDataStateChange,
@@ -202,6 +210,17 @@ export default function Groups() {
     settotalRecords(res.data.totalRecord);
   };
   const { handleStatusChange, statusConfirmDialog } = useStatusChange(getGroups);
+  const handleImageClick = (image, attachments = []) => {
+    setSelectedImage(image);
+    setShowMediaModal(true);
+    setTotalThumbnailImages(attachments);
+  };
+
+  const handleCloseModal = () => {
+    setShowMediaModal(false);
+    setSelectedImage('');
+  };
+
   const groupColumns = [
     {
       field: 'action',
@@ -375,6 +394,7 @@ export default function Groups() {
                                 setShowDeleteDialog={setShowDeleteDialog}
                                 setSelectedGroupId={setSelectedGroupId}
                                 handleStatusChange={handleStatusChange}
+                                handleImageClick={handleImageClick}
                               />
                             ),
                           }
@@ -412,6 +432,13 @@ export default function Groups() {
           }}
         />
       )}
+      <MediaController
+        show={showMediaModal}
+        title="media"
+        onClose={handleCloseModal}
+        image={selectedImage}
+        totalThumbnailImages={totalThumbnailImages ?? []}
+      />
       {statusConfirmDialog}
     </div>
   );

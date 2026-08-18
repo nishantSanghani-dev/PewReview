@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { venueSchema } from '../../../../validation/zod.validation';
@@ -26,6 +27,7 @@ export default function VenueAdd({
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [existingImageName, setExistingImageName] = useState('');
+  const [rawVenueData, setRawVenueData] = useState(null);
   const fileInputRef = useRef(null);
   const mapRef = useRef(null);
   const userDropdownRef = useRef(null);
@@ -408,27 +410,33 @@ export default function VenueAdd({
   }, []);
 
   useEffect(() => {
-    const getSingleVenue = async () => {
-      if (!editVenueId) return;
-
-      const res = await apiRequest(
-        'GET',
-        API_ROUTES.venue.getVenueById(editVenueId),
-        null,
-        null,
-        {
-          showLoader: true,
+    if (editVenueId) {
+      const fetchSingleVenue = async () => {
+        const res = await apiRequest(
+          'GET',
+          API_ROUTES.venue.getVenueById(editVenueId),
+          null,
+          null,
+          {
+            showLoader: true,
+          }
+        );
+        if (res && res.data) {
+          setRawVenueData(res.data);
         }
-      );
+      };
+      fetchSingleVenue();
+    }
+  }, [editVenueId]);
 
-      if (res && res.data) {
-        const data = res.data;
-
-        console.log(data);
-        setcountryDetails({
-          countryCode: data.countryCode,
-          countryCodeName: data.countryCodeName,
-        });
+  useEffect(() => {
+    const processSingleVenue = () => {
+      const data = rawVenueData;
+      console.log(data);
+      setcountryDetails({
+        countryCode: data.countryCode,
+        countryCodeName: data.countryCodeName,
+      });
         setValue('userId', data.userId, { shouldValidate: true });
         setValue('venueName', data.venueName, { shouldValidate: true });
         setValue('description', data.description, { shouldValidate: true });
@@ -448,9 +456,9 @@ export default function VenueAdd({
           setValue(
             'userId',
             matchingUser.key ||
-              matchingUser.userId ||
-              matchingUser.id ||
-              data.userId,
+            matchingUser.userId ||
+            matchingUser.id ||
+            data.userId,
             { shouldValidate: true }
           );
         } else {
@@ -507,7 +515,7 @@ export default function VenueAdd({
                 venueCountryCode === phone ||
                 (venueCountryCodeName &&
                   code.toLowerCase() ===
-                    String(venueCountryCodeName).toLowerCase()) ||
+                  String(venueCountryCodeName).toLowerCase()) ||
                 (venueCountryCode &&
                   String(c.countryId) === String(venueCountryCode))
               );
@@ -540,11 +548,11 @@ export default function VenueAdd({
 
         const previewUrl = getImagePreviewUrl(
           data.imagePath ||
-            data.imageUrl ||
-            data.imageName ||
-            data.imageFullPath ||
-            data.venueImagePath ||
-            data.venueImageUrl
+          data.imageUrl ||
+          data.imageName ||
+          data.imageFullPath ||
+          data.venueImagePath ||
+          data.venueImageUrl
         );
         if (previewUrl) {
           setImagePreview(previewUrl);
@@ -569,18 +577,20 @@ export default function VenueAdd({
             { shouldValidate: true }
           );
         }
-      }
+      
+      // Prevent reprocessing
+      setRawVenueData(null);
     };
 
     if (
-      editVenueId &&
+      rawVenueData &&
       countryData.length > 0 &&
       endUserData.length > 0 &&
       getVenueType.length > 0
     ) {
-      getSingleVenue();
+      processSingleVenue();
     }
-  }, [editVenueId, countryData, endUserData, getVenueType, setValue]);
+  }, [rawVenueData, countryData, endUserData, getVenueType, setValue]);
 
   useEffect(() => {
     getEndUuser();
@@ -629,25 +639,24 @@ export default function VenueAdd({
   useEffect(() => {
     console.log(countryDetails);
   }, [countryDetails]);
-  return (
+  const modalContent = (
     <div
-      className="modal mb-5 mt-5 fade show d-block venue-modal"
-      style={{ background: 'rgba(0,0,0,0.4)' }}
+      className="modal fade show d-block venue-modal"
+      style={{
+        background: 'rgba(0,0,0,0.4)',
+        zIndex: 9999,
+        overflowY: 'auto'
+      }}
     >
       <div
-        style={{
-          marginTop: '40px',
-          marginBottom: '40px',
-        }}
         className="modal-dialog modal-xl modal-dialog-centered"
       >
         <div className="modal-content border-0 rounded-4 shadow">
           <form onSubmit={handleSubmit(handleSave)}>
-            {/* Header */}
-            <div className="modal-header border-0 px-4 pt-4 pb-3">
-              <h2 className="fw-bold mb-0">
+            <div className="modal-header border-bottom px-4 py-3">
+              <h4 className="modal-title fw-bold mb-0" style={{ fontSize: '20px' }}>
                 {editVenueId ? 'Edit Venue' : 'Add Venue'}
-              </h2>
+              </h4>
 
               <button
                 onClick={() => {
@@ -660,7 +669,7 @@ export default function VenueAdd({
               ></button>
             </div>
 
-            <div className="modal-body px-4 pb-4">
+            <div className="modal-body px-4 py-3">
               {/* Row 1 */}
               <div className="row">
                 <div className="col-lg-6 mb-3">
@@ -677,17 +686,16 @@ export default function VenueAdd({
                       <span>
                         {selectedUser
                           ? selectedUser.userName ||
-                            selectedUser.value ||
-                            selectedUser.name ||
-                            selectedUser.key ||
-                            selectedUser.userId
+                          selectedUser.value ||
+                          selectedUser.name ||
+                          selectedUser.key ||
+                          selectedUser.userId
                           : 'Select Username'}
                       </span>
 
                       <i
-                        className={`demo-icon ${
-                          isOpen ? 'icon-angle-up' : 'icon-angle-down'
-                        }`}
+                        className={`demo-icon ${isOpen ? 'icon-angle-up' : 'icon-angle-down'
+                          }`}
                       ></i>
                     </div>
 
@@ -905,7 +913,7 @@ export default function VenueAdd({
                   <div className="d-flex gap-2">
                     <select
                       className={`form-select form-control-custom ${errors.selectedCountryId ? 'is-invalid' : ''}`}
-                      style={{ maxWidth: '140px' }}
+                      style={{ minWidth: '100px', width: '35%' }}
                       {...register('selectedCountryId')}
                       // onChange={(e) => {
                       //     const countryId = e.target.value;
@@ -1010,9 +1018,8 @@ export default function VenueAdd({
                       </span>
 
                       <i
-                        className={`demo-icon ${
-                          isVenuOpen ? 'icon-angle-up' : 'icon-angle-down'
-                        }`}
+                        className={`demo-icon ${isVenuOpen ? 'icon-angle-up' : 'icon-angle-down'
+                          }`}
                       ></i>
                     </div>
 
@@ -1028,9 +1035,9 @@ export default function VenueAdd({
                               setValue(
                                 'venueType',
                                 item.venueTypeId ||
-                                  item.id ||
-                                  item.venueType ||
-                                  '',
+                                item.id ||
+                                item.venueType ||
+                                '',
                                 { shouldValidate: true }
                               );
                               setisVenuOpen(false);
@@ -1246,4 +1253,6 @@ export default function VenueAdd({
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 }

@@ -12,6 +12,9 @@ import { Tooltip } from '@progress/kendo-react-tooltip';
 import { usePermission } from '../../hooks/UsePermission';
 import { MENU } from '../../data/Menu';
 import useUserPermission from '../../utils/UserPermission';
+import MediaViewer from '../../components/common/mediaPlayer/MediaPlayer';
+import MediaController from '../../components/common/mediaController/MediaController';
+import { useStatusChange } from '../../hooks/useStatusChange';
 const ActionCell = (props) => {
   return (
     <td {...props.tdProps}>
@@ -49,30 +52,33 @@ const TextCell = ({ tdProps, dataItem, field }) => {
     </td>
   );
 };
-const ImagesVdeo = ({ tdProps, dataItem }) => {
+const ImagesVdeo = ({ tdProps, dataItem, handleImageClick, setShowMediaModal }) => {
   const isVideo = (url) => {
     return /\.(mp4|webm|ogg|mov|avi|mkv)$/i.test(url);
   };
 
+  const attachments = dataItem.attachmentList || [];
+  const visibleAttachments = attachments.slice(0, 2);
+  const remainingCount = attachments.length - 2;
+
   return (
     <td {...tdProps}>
-      {dataItem.attachmentList?.length > 0 ? (
-        <div className="d-flex align-items-center gap-2 overflow-auto">
-          {dataItem.attachmentList.map((value, index) =>
+      {attachments.length > 0 ? (
+        <div className="d-flex align-items-center gap-2">
+          {visibleAttachments.map((value, index) =>
             isVideo(value) ? (
               <video
                 key={index}
                 width="50"
-                src={value}
                 height="50"
+                src={value}
                 className="rounded flex-shrink-0"
-
-                // autoPlay={true}
-              ></video>
+              />
             ) : (
               <img
                 key={index}
                 src={value}
+                onClick={() => handleImageClick(value, attachments)}
                 alt=""
                 width="50"
                 height="50"
@@ -80,6 +86,21 @@ const ImagesVdeo = ({ tdProps, dataItem }) => {
                 style={{ objectFit: 'cover' }}
               />
             )
+          )}
+
+          {remainingCount > 0 && (
+            <div
+              className="rounded d-flex align-items-center justify-content-center flex-shrink-0"
+              style={{
+                width: '50px',
+                height: '50px',
+                backgroundColor: '#f0f0f0',
+                fontWeight: '600',
+                fontSize: '14px',
+              }}
+            >
+              +{remainingCount}
+            </div>
           )}
         </div>
       ) : (
@@ -97,6 +118,15 @@ const StatusCell = (props) => {
           type="checkbox"
           checked={props.dataItem.isActive}
           disabled={!props.activityPersmission.canUpdate}
+          readOnly
+          onChange={(e) =>
+            props.handleStatusChange(
+              props.dataItem.postId,
+              e.target.checked,
+              'activities',
+              'activitiesPostStatus'
+            )
+          }
         />
         <label className="form-check-label"></label>
       </div>
@@ -104,15 +134,16 @@ const StatusCell = (props) => {
   );
 };
 export const DateCell = ({ tdProps, dataItem, field }) => {
-  // console.log(dataItem);
+ 
 
   return (
     <td {...tdProps}>
       {new Date(
+        dataItem?.updatedOn ||
         dataItem?.createdDate ||
-          dataItem?.createdOn ||
-          dataItem?.reportDate ||
-          dataItem?.createdAt
+        dataItem?.createdOn ||
+        dataItem?.reportDate ||
+        dataItem?.createdAt
       ).toLocaleDateString('en-US')}
     </td>
   );
@@ -181,16 +212,17 @@ export default function Activity() {
     setactivityData(res.data.data);
     settotalRecords(res.data.totalRecord);
   };
+  const { handleStatusChange, statusConfirmDialog } = useStatusChange(getActivities);
   const venueActivityTabColumn = [
     ...(activityPersmission?.canRead && venuePermission?.canRead
       ? [
-          {
-            field: 'action',
-            title: 'Action',
-            cell: ActionCell,
-            width: '80px',
-          },
-        ]
+        {
+          field: 'action',
+          title: 'Action',
+          cell: ActionCell,
+          width: '80px',
+        },
+      ]
       : []),
 
     {
@@ -290,7 +322,19 @@ export default function Activity() {
 
   const [searchText, setSearchText] = useState('');
   const [customSearch, setcustomSearch] = useState('');
+  const [showMediaModal, setShowMediaModal] = useState(false);
+  const [selectedImage, setSelectedImage] = useState("");
+  const [totalThumbnailImages, settotalThumbnailImages] = useState([])
+  const handleImageClick = (image, attachments) => {
+    setSelectedImage(image);
+    setShowMediaModal(true);
+    settotalThumbnailImages(attachments)
+  };
 
+  const handleCloseModal = () => {
+    setShowMediaModal(false);
+    setSelectedImage("");
+  };
   const handleGridDataStateChange = (event) => {
     onDataStateChange(event);
     setKendoSort(event.dataState?.sort || []);
@@ -365,7 +409,7 @@ export default function Activity() {
                     onDataStateChange={handleGridDataStateChange}
                   >
                     {venueActivityTabColumn?.map((col, ind) => {
-                      console.log(col.width);
+                      // console.log(col.width);
 
                       return (
                         <GridColumn
@@ -385,261 +429,43 @@ export default function Activity() {
                           cells={
                             col.cell
                               ? {
-                                  data: (props) => (
-                                    <col.cell
-                                      endUserPermission={endUserPermission}
-                                      activityPersmission={activityPersmission}
-                                      {...props}
-                                    />
-                                  ),
-                                }
+                                data: (props) => (
+                                  <col.cell
+                                    endUserPermission={endUserPermission}
+                                    activityPersmission={activityPersmission}
+                                    setShowMediaModal={setShowMediaModal}
+                                    handleImageClick={handleImageClick}
+                                    handleStatusChange={handleStatusChange}
+                                    {...props}
+                                  />
+                                ),
+                              }
                               : {
-                                  data: (props) => (
-                                    <TextCell {...props} field={col.field} />
-                                  ),
-                                }
+                                data: (props) => (
+                                  <TextCell {...props} field={col.field} />
+                                ),
+                              }
                           }
                         />
                       );
                     })}
                   </Grid>
-                  {/* 
-                                    <table className="table">
-                                        <thead className="table-dark">
-                                            <tr>
-                                                <th>Action</th>
-                                                <th>Host Name</th>
-                                                <th>Event Name</th>
-                                                <th>Date &amp; Time</th>
-                                                <th>Address</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>
-                                                    <span className="d-flex gap-2 align-items-center">
-                                                        <a
-                                                            className="small-square-btn edit-btn"
-                                                            href="javascript:void(0);"
-                                                        >
-                                                            <i className="demo-icon icon-eye-line" />
-                                                        </a>
-                                                        <a
-                                                            className="small-square-btn danger-btn"
-                                                            href="javascript:void(0);"
-                                                        >
-                                                            <i className="demo-icon icon-delete-1" />
-                                                        </a>
-                                                    </span>
-                                                </td>
-                                                <td>Andrew Abbott</td>
-                                                <td>Meet Ups</td>
-                                                <td>
-                                                    <p className="mb-0">
-                                                        Monday, 17 May 2024 3:30 am- 6:30 am
-                                                    </p>
-                                                </td>
-                                                <td>
-                                                    <p className="mb-0">
-                                                        Gun Club Association Member Meeting, Buriel
-                                                        club co. Ashville, NC
-                                                    </p>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <span className="d-flex gap-2 align-items-center">
-                                                        <a
-                                                            className="small-square-btn edit-btn"
-                                                            href="javascript:void(0);"
-                                                        >
-                                                            <i className="demo-icon icon-eye-line" />
-                                                        </a>
-                                                        <a
-                                                            className="small-square-btn danger-btn"
-                                                            href="javascript:void(0);"
-                                                        >
-                                                            <i className="demo-icon icon-delete-1" />
-                                                        </a>
-                                                    </span>
-                                                </td>
-                                                <td>Tom Curran</td>
-                                                <td>GO Up meeting</td>
-                                                <td>
-                                                    <p className="mb-0">
-                                                        Monday, 17 May 2024 3:30 am- 6:30 am
-                                                    </p>
-                                                </td>
-                                                <td>
-                                                    <p className="mb-0">
-                                                        Gun Club Association Member Meeting, Buriel
-                                                        club co. Ashville, NC
-                                                    </p>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <span className="d-flex gap-2 align-items-center">
-                                                        <a
-                                                            className="small-square-btn edit-btn"
-                                                            href="javascript:void(0);"
-                                                        >
-                                                            <i className="demo-icon icon-eye-line" />
-                                                        </a>
-                                                        <a
-                                                            className="small-square-btn danger-btn"
-                                                            href="javascript:void(0);"
-                                                        >
-                                                            <i className="demo-icon icon-delete-1" />
-                                                        </a>
-                                                    </span>
-                                                </td>
-                                                <td>Christopher Nolan</td>
-                                                <td>Gun Meet Ups</td>
-                                                <td>
-                                                    <p className="mb-0">
-                                                        Monday, 17 May 2024 3:30 am- 6:30 am
-                                                    </p>
-                                                </td>
-                                                <td>
-                                                    <p className="mb-0">
-                                                        Gun Club Association Member Meeting, Buriel
-                                                        club co. Ashville, NC
-                                                    </p>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <span className="d-flex gap-2 align-items-center">
-                                                        <a
-                                                            className="small-square-btn edit-btn"
-                                                            href="javascript:void(0);"
-                                                        >
-                                                            <i className="demo-icon icon-eye-line" />
-                                                        </a>
-                                                        <a
-                                                            className="small-square-btn danger-btn"
-                                                            href="javascript:void(0);"
-                                                        >
-                                                            <i className="demo-icon icon-delete-1" />
-                                                        </a>
-                                                    </span>
-                                                </td>
-                                                <td>Tom Curran</td>
-                                                <td>GO Up meeting</td>
-                                                <td>
-                                                    <p className="mb-0">
-                                                        Monday, 17 May 2024 3:30 am- 6:30 am
-                                                    </p>
-                                                </td>
-                                                <td>
-                                                    <p className="mb-0">
-                                                        Gun Club Association Member Meeting, Buriel
-                                                        club co. Ashville, NC
-                                                    </p>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <span className="d-flex gap-2 align-items-center">
-                                                        <a
-                                                            className="small-square-btn edit-btn"
-                                                            href="javascript:void(0);"
-                                                        >
-                                                            <i className="demo-icon icon-eye-line" />
-                                                        </a>
-                                                        <a
-                                                            className="small-square-btn danger-btn"
-                                                            href="javascript:void(0);"
-                                                        >
-                                                            <i className="demo-icon icon-delete-1" />
-                                                        </a>
-                                                    </span>
-                                                </td>
-                                                <td>Christopher Nolan</td>
-                                                <td>Gun Meet Ups</td>
-                                                <td>
-                                                    <p className="mb-0">
-                                                        Monday, 17 May 2024 3:30 am- 6:30 am
-                                                    </p>
-                                                </td>
-                                                <td>
-                                                    <p className="mb-0">
-                                                        Gun Club Association Member Meeting, Buriel
-                                                        club co. Ashville, NC
-                                                    </p>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <span className="d-flex gap-2 align-items-center">
-                                                        <a
-                                                            className="small-square-btn edit-btn"
-                                                            href="javascript:void(0);"
-                                                        >
-                                                            <i className="demo-icon icon-eye-line" />
-                                                        </a>
-                                                        <a
-                                                            className="small-square-btn danger-btn"
-                                                            href="javascript:void(0);"
-                                                        >
-                                                            <i className="demo-icon icon-delete-1" />
-                                                        </a>
-                                                    </span>
-                                                </td>
-                                                <td>Tom Curran</td>
-                                                <td>GO Up meeting</td>
-                                                <td>
-                                                    <p className="mb-0">
-                                                        Monday, 17 May 2024 3:30 am- 6:30 am
-                                                    </p>
-                                                </td>
-                                                <td>
-                                                    <p className="mb-0">
-                                                        Gun Club Association Member Meeting, Buriel
-                                                        club co. Ashville, NC
-                                                    </p>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <span className="d-flex gap-2 align-items-center">
-                                                        <a
-                                                            className="small-square-btn edit-btn"
-                                                            href="javascript:void(0);"
-                                                        >
-                                                            <i className="demo-icon icon-eye-line" />
-                                                        </a>
-                                                        <a
-                                                            className="small-square-btn danger-btn"
-                                                            href="javascript:void(0);"
-                                                        >
-                                                            <i className="demo-icon icon-delete-1" />
-                                                        </a>
-                                                    </span>
-                                                </td>
-                                                <td>Christopher Nolan</td>
-                                                <td>Gun Meet Ups</td>
-                                                <td>
-                                                    <p className="mb-0">
-                                                        Monday, 17 May 2024 3:30 am- 6:30 am
-                                                    </p>
-                                                </td>
-                                                <td>
-                                                    <p className="mb-0">
-                                                        Gun Club Association Member Meeting, Buriel
-                                                        club co. Ashville, NC
-                                                    </p>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table> */}
+
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      <MediaController
+        show={showMediaModal}
+        title='media'
+        onClose={handleCloseModal}
+        image={selectedImage}
+        totalThumbnailImages={totalThumbnailImages ?? []}
+      />
+      {statusConfirmDialog}
     </div>
   );
 }

@@ -1,8 +1,9 @@
 import { Grid, GridColumn } from '@progress/kendo-react-grid';
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useStatusChange } from '../../../hooks/useStatusChange';
 import { Tooltip } from '@progress/kendo-react-tooltip';
+import MediaController from '../../../components/common/mediaController/MediaController';
 const ActionCell = (props) => {
   return (
     <td {...props.tdProps}>
@@ -40,30 +41,33 @@ const TextCell = ({ tdProps, dataItem, field }) => {
     </td>
   );
 };
-const ImagesVdeo = ({ tdProps, dataItem }) => {
+const ImagesVdeo = ({ tdProps, dataItem, handleImageClick, setShowMediaModal }) => {
   const isVideo = (url) => {
     return /\.(mp4|webm|ogg|mov|avi|mkv)$/i.test(url);
   };
 
+  const attachments = dataItem.attachmentList || [];
+  const visibleAttachments = attachments.slice(0, 2);
+  const remainingCount = attachments.length - 2;
+
   return (
     <td {...tdProps}>
-      {dataItem.attachmentList?.length > 0 ? (
-        <div className="d-flex align-items-center gap-2 overflow-auto">
-          {dataItem.attachmentList.map((value, index) =>
+      {attachments.length > 0 ? (
+        <div style={{cursor:"pointer"}} className="d-flex align-items-center gap-2">
+          {visibleAttachments.map((value, index) =>
             isVideo(value) ? (
               <video
                 key={index}
                 width="50"
-                src={value}
                 height="50"
+                src={value}
                 className="rounded flex-shrink-0"
-
-                // autoPlay={true}
-              ></video>
+              />
             ) : (
               <img
                 key={index}
                 src={value}
+                onClick={() => handleImageClick(value, attachments)}
                 alt=""
                 width="50"
                 height="50"
@@ -71,6 +75,21 @@ const ImagesVdeo = ({ tdProps, dataItem }) => {
                 style={{ objectFit: 'cover' }}
               />
             )
+          )}
+
+          {remainingCount > 0 && (
+            <div
+              className="rounded d-flex align-items-center justify-content-center flex-shrink-0"
+              style={{
+                width: '50px',
+                height: '50px',
+                backgroundColor: '#f0f0f0',
+                fontWeight: '600',
+                fontSize: '14px',
+              }}
+            >
+              +{remainingCount}
+            </div>
           )}
         </div>
       ) : (
@@ -124,6 +143,21 @@ const DetailCell = ({ tdProps, dataItem, field }) => {
 
 export default function ActivitiesEndUser({ data }) {
   const { handleStatusChange, statusConfirmDialog } = useStatusChange();
+  const [showMediaModal, setShowMediaModal] = useState(false);
+  const [selectedImage, setSelectedImage] = useState('');
+  const [totalThumbnailImages, setTotalThumbnailImages] = useState([]);
+
+  const handleImageClick = (image, attachments = []) => {
+    setSelectedImage(image);
+    setShowMediaModal(true);
+    setTotalThumbnailImages(attachments);
+  };
+
+  const handleCloseModal = () => {
+    setShowMediaModal(false);
+    setSelectedImage('');
+  };
+
   const activityTabColumn = [
     { field: 'action', title: 'Action', cell: ActionCell, width: '80px' },
     { field: 'createdOn', title: 'Created On', cell: DateCell, width: '150px' },
@@ -188,7 +222,13 @@ export default function ActivitiesEndUser({ data }) {
                       cells={
                         col.cell
                           ? {
-                              data: (props) => <col.cell {...props} handleStatusChange={handleStatusChange} />,
+                              data: (props) => (
+                                <col.cell
+                                  {...props}
+                                  handleStatusChange={handleStatusChange}
+                                  handleImageClick={handleImageClick}
+                                />
+                              ),
                             }
                           : {
                               data: (props) => (
@@ -204,6 +244,13 @@ export default function ActivitiesEndUser({ data }) {
           </div>
         </div>
       </div>
+      <MediaController
+        show={showMediaModal}
+        title="media"
+        onClose={handleCloseModal}
+        image={selectedImage}
+        totalThumbnailImages={totalThumbnailImages ?? []}
+      />
       {statusConfirmDialog}
     </div>
   );

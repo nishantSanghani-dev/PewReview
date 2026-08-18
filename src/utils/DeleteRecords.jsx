@@ -2,6 +2,8 @@ import { API_ROUTES } from '../routes/api.routes';
 import { apiRequest } from '../services/Api';
 
 export const handleDelete = async (id, module, routes, refreshData) => {
+  console.log(id);
+  
   const res = await apiRequest(
     'DELETE',
     API_ROUTES[module][routes](id),

@@ -16,6 +16,7 @@ import { MENU } from '../../../data/Menu';
 import useUserPermission from '../../../utils/UserPermission';
 import { Tooltip } from '@progress/kendo-react-tooltip';
 import Gun from './Gun';
+import MediaController from '../../../components/common/mediaController/MediaController';
 const ActionCell = (props) => {
   const item = props.dataItem;
   return (
@@ -95,13 +96,17 @@ const TextCell = ({ tdProps, dataItem, field }) => {
   );
 };
 const ImageCell = (props) => {
+  const image = props.dataItem.attachmentFullPath;
+
   return (
     <td {...props.tdProps}>
-      {props.dataItem.attachmentFullPath ? (
+      {image ? (
         <img
-          src={props.dataItem.attachmentFullPath}
+          src={image}
           alt="Badge"
           className="gun-img"
+          onClick={() => props.handleImageClick(image, [image])}
+          style={{ cursor: 'pointer' }}
         />
       ) : null}
     </td>
@@ -154,6 +159,9 @@ export default function GunMaster() {
   const [id, setId] = useState(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [selectedGunId, setSelectedGunId] = useState(null);
+  const [showMediaModal, setShowMediaModal] = useState(false);
+  const [selectedImage, setSelectedImage] = useState('');
+  const [totalThumbnailImages, setTotalThumbnailImages] = useState([]);
   const {
     dataState,
     onDataStateChange,
@@ -180,6 +188,17 @@ export default function GunMaster() {
   };
 
   const { handleStatusChange, statusConfirmDialog } = useStatusChange(getGun);
+  const handleImageClick = (image, attachments = []) => {
+    setSelectedImage(image);
+    setShowMediaModal(true);
+    setTotalThumbnailImages(attachments);
+  };
+
+  const handleCloseModal = () => {
+    setShowMediaModal(false);
+    setSelectedImage('');
+  };
+
   const gunCoulmn = [
     ...(gunMasterPermission?.canUpdate || gunMasterPermission?.canDelete
       ? [
@@ -226,7 +245,7 @@ export default function GunMaster() {
       columnMenu: ColumnMenu,
     },
     {
-      field: 'Created On',
+      field: 'updatedOn',
       title: 'Updated On',
       cell: DateCell,
       filter: 'text',
@@ -391,6 +410,7 @@ export default function GunMaster() {
                                 setShowDeleteDialog={setShowDeleteDialog}
                                 setSelectedGunId={setSelectedGunId}
                                 handleStatusChange={handleStatusChange}
+                                handleImageClick={handleImageClick}
                               />
                             ),
                           }
@@ -431,6 +451,13 @@ export default function GunMaster() {
             }}
           />
         )}
+        <MediaController
+          show={showMediaModal}
+          title="media"
+          onClose={handleCloseModal}
+          image={selectedImage}
+          totalThumbnailImages={totalThumbnailImages ?? []}
+        />
         {statusConfirmDialog}
       </div>
     </div>

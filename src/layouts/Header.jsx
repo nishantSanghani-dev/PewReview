@@ -5,9 +5,11 @@ import { apiRequest } from '../services/Api';
 import { API_ROUTES } from '../routes/api.routes';
 import { useDispatch } from 'react-redux';
 import { logOut } from '../slice/user.slice';
+import AleartDialog from '../components/common/AleartDialog';
 
 export default function Header({ mobileSlideBar, setmobileSlideBar }) {
   const [userData, setuserData] = useState(null);
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const getUser = async () => {
@@ -124,18 +126,15 @@ export default function Header({ mobileSlideBar, setmobileSlideBar }) {
                       </Link>
                     </li>
                     <li>
-                      <Link
-                        onClick={() => {
-                          if (confirm('Want To LogOut ? ')) {
-                            dispatch(logOut());
-                            navigate('/');
-                          }
-                        }}
+                      <a
+                     
+                        onClick={() => setShowLogoutDialog(true)}
                         className="dropdown-item"
-                        href="#"
+                        style={{cursor:"pointer"}}
+                       
                       >
-                        logout
-                      </Link>
+                        Logout
+                      </a>
                     </li>
                   </ul>
                 </div>
@@ -144,6 +143,19 @@ export default function Header({ mobileSlideBar, setmobileSlideBar }) {
           </div>
         </div>
       </header>
+
+      {showLogoutDialog && (
+        <AleartDialog
+          title="Confirm Logout"
+          message="Are you sure you want to logout?"
+          onCancel={() => setShowLogoutDialog(false)}
+          onConfirm={() => {
+            dispatch(logOut());
+            navigate('/');
+            setShowLogoutDialog(false);
+          }}
+        />
+      )}
     </>
   );
 }
