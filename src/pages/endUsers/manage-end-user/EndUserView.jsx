@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import BreadCumb from '../../../components/common/breadCumb/BreadCumb';
 import { apiRequest } from '../../../services/Api';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { API_ROUTES } from '../../../routes/api.routes';
 import { Grid, GridColumn } from '@progress/kendo-react-grid';
 import UploadGun from './UploadGun';
@@ -244,10 +244,24 @@ export default function EndUserView() {
                   <div className="col-12">
                     <ul className="separater-list ps-0 d-flex flex-wrap mt-3">
                       <li>
-                        <p className="dark-color fw-semibold large mb-0">
-                          {manageUserSingleData?.postsCount}
-                        </p>
-                        <p className="mb-0">Post</p>
+                        {
+                          manageUserSingleData?.postsCount !== 0
+                            ?
+
+                            <Link to={'/admin/activity/view'}>
+                              <p className="dark-color fw-semibold large mb-0">
+                                {manageUserSingleData?.postsCount}
+                              </p>
+                              <p className="mb-0">Post</p>
+                            </Link>
+                            :
+                            <div>
+                              <p className="dark-color fw-semibold large mb-0">
+                                {manageUserSingleData?.postsCount}
+                              </p>
+                              <p className="mb-0">Post</p>
+                            </div>
+                        }
                       </li>
                       <li>
                         <p className="dark-color fw-semibold large mb-0">
@@ -288,86 +302,38 @@ export default function EndUserView() {
                           Badges Earned
                         </p>
                       </li>
-                      <li>
-                        <p>
-                          <a href="#" className="basic-links grey-links">
-                            View All
-                          </a>
-                        </p>
-                      </li>
+                      {
+                        manageUserSingleData?.badges?.length > 0
+                        &&
+                        <li>
+                          <p>
+                            <a href="#" className="basic-links grey-links">
+                              View All
+                            </a>
+                          </p>
+                        </li>
+                      }
                     </ul>
-                    <ul className="d-flex flex-wrap gap-2 badge-small justify-content-between align-items-center">
-                      <li>
-                        <img
-                          src="/assets/images/badge-1.svg"
-                          className="img-fluid"
-                          alt="badge-1"
-                        />
-                      </li>
-                      <li>
-                        <img
-                          src="/assets/images/badge-2.svg"
-                          className="img-fluid"
-                          alt="badge-2"
-                        />
-                      </li>
-                      <li>
-                        <img
-                          src="/assets/images/badge-1.svg"
-                          className="img-fluid"
-                          alt="badge-3"
-                        />
-                      </li>
-                      <li>
-                        <img
-                          src="/assets/images/badge-3.svg"
-                          className="img-fluid"
-                          alt="badge-4"
-                        />
-                      </li>
-                      <li>
-                        <img
-                          src="/assets/images/badge-1.svg"
-                          className="img-fluid"
-                          alt="badge-5"
-                        />
-                      </li>
-                      <li>
-                        <img
-                          src="/assets/images/badge-1.svg"
-                          className="img-fluid"
-                          alt="badge-6"
-                        />
-                      </li>
-                      <li>
-                        <img
-                          src="/assets/images/badge-4.svg"
-                          className="img-fluid"
-                          alt="badge-7"
-                        />
-                      </li>
-                      <li>
-                        <img
-                          src="/assets/images/badge-1.svg"
-                          className="img-fluid"
-                          alt="badge-8"
-                        />
-                      </li>
-                      <li>
-                        <img
-                          src="/assets/images/badge-2.svg"
-                          className="img-fluid"
-                          alt="badge-9"
-                        />
-                      </li>
-                      <li>
-                        <img
-                          src="/assets/images/badge-1.svg"
-                          className="img-fluid"
-                          alt="badge-10"
-                        />
-                      </li>
-                    </ul>
+                    {
+                      manageUserSingleData?.badges.length > 0
+                      &&
+                      <ul className="d-flex flex-wrap gap-2 badge-small justify-content-between align-items-center">
+                        {
+                          manageUserSingleData?.badges?.map((value, index) => {
+                            return (
+                              <li>
+                                <img
+                                  src={value}
+                                  className="img-fluid"
+                                  alt="badge-1"
+                                />
+                              </li>
+
+                            )
+                          })
+                        }
+                      </ul>
+                    }
                   </div>
                 </div>
               </div>
@@ -653,7 +619,7 @@ export default function EndUserView() {
             </div>
           </div>
         </div>
-      </div>
+      </div >
     </>
   );
 }

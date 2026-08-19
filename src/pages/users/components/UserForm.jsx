@@ -121,8 +121,8 @@ export default function UserForm({
           userId: id,
         },
         null,
-        {
-          showLoader: true,
+          {
+            showLoader: true,
           showToaster: true,
         }
       );
@@ -145,8 +145,8 @@ export default function UserForm({
       {
         Id: id,
       },
-      {
-        showLoader: true,
+        {
+          showLoader: false,
       }
     );
 

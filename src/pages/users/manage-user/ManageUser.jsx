@@ -25,7 +25,7 @@ const CheckboxCell = (props) => {
           type="checkbox"
           value={id}
           checked={props.ids.includes(id)}
-          onChange={props.handleChange}
+          onChange={(event) => props.handleChange(id, event.target.checked)}
         />
         <span className="checkmark"></span>
       </label>
@@ -96,11 +96,7 @@ const ActionCell = (props) => {
 
           <button
             type="button"
-            onClick={() => {
-              if (props.ids?.length > 0){
-                 props.handleDelete(props.dataItem.id)
-              }
-            }}
+            onClick={() => props.handleDelete(props.dataItem.id)}
             className="small-square-btn danger-btn"
           >
             <i className="demo-icon icon-delete-1" />
@@ -115,7 +111,6 @@ export default function ManageUser() {
   const [ids, setids] = useState([]);
   const [searchText, setSearchText] = useState('');
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [deleteTarget, setDeleteTarget] = useState(null);
 
   const [customSearch, setcustomSearch] = useState('');
   const [filters, setFilters] = useState([]);
@@ -171,12 +166,14 @@ export default function ManageUser() {
     setTotal(res.data.totalRecord);
   };
   const { handleStatusChange, statusConfirmDialog } = useStatusChange(getManageUser);
-  const handleChange = (event) => {
-    if (event.target.checked) {
-      setids([...ids, event.target.value]);
-    } else {
-      setids(ids.filter((value, index) => value != event.target.value));
-    }
+  const handleChange = (id, checked) => {
+    setids((currentIds) =>
+      checked
+        ? currentIds.includes(id)
+          ? currentIds
+          : [...currentIds, id]
+        : currentIds.filter((value) => value !== id)
+    );
   };
 
   // const handleStatusChange = async (id, checked) => {
@@ -202,14 +199,15 @@ export default function ManageUser() {
 
   const handleDelete = (id) => {
     if (id && (typeof id === 'string' || typeof id === 'number')) {
-      setDeleteTarget(id);
+      setids((currentIds) =>
+        currentIds.includes(id) ? currentIds : [...currentIds, id]
+      );
       setShowDeleteDialog(true);
     } else {
       if (ids.length === 0) {
         alert('Please Select Records');
         return;
       }
-      setDeleteTarget('bulk');
       setShowDeleteDialog(true);
     }
   };
@@ -386,14 +384,12 @@ export default function ManageUser() {
           message="Are you sure you want to delete this User? This action cannot be undone."
           onCancel={() => {
             setShowDeleteDialog(false);
-            setDeleteTarget(null);
           }}
           onConfirm={async () => {
-            const targets = deleteTarget === 'bulk' ? ids : [deleteTarget];
             const res = await apiRequest(
               'DELETE',
               API_ROUTES.user.userDelete,
-              { userIds: targets },
+              { userIds: ids },
               null,
               {
                 showLoader: true,
@@ -402,14 +398,9 @@ export default function ManageUser() {
             );
             if (res.status) {
               getManageUser();
-              if (deleteTarget === 'bulk') {
-                setids([]);
-              } else {
-                setids(ids.filter(val => val !== deleteTarget));
-              }
+              setids([]);
             }
             setShowDeleteDialog(false);
-            setDeleteTarget(null);
           }}
         />
       )}

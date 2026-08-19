@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom';
 import { DateCell } from '../activity/Activity';
 import { Grid, GridColumn } from '@progress/kendo-react-grid';
 import ReportedUser from './ReportedUser';
-import { handleStatusChange } from '../../utils/ChangeStatus';
 import { Tooltip } from '@progress/kendo-react-tooltip';
+import { useStatusChange } from '../../hooks/useStatusChange';
 const ActionCell = (props) => {
   // console.log(props.dataItem.venueId);
 
@@ -25,7 +25,7 @@ const ActionCell = (props) => {
             checked={props.dataItem.isActive}
             readOnly
             onChange={(e) =>
-              handleStatusChange(
+              props.handleStatusChange(
                 props.dataItem.postId,
                 e.target.checked,
                 'activities',
@@ -110,6 +110,7 @@ export default function TotalReportedPost({
 }) {
   // console.log(topReportedPosts);
   const [isOpenReportedPerson, setisOpenReportedPerson] = useState(false);
+  const { handleStatusChange, statusConfirmDialog } = useStatusChange();
   const reportedColumns = [
     { field: 'action', title: 'Action', cell: ActionCell, width: '60px' },
     { field: 'userName', title: 'Posted By', width: '100px' },
@@ -162,6 +163,7 @@ export default function TotalReportedPost({
                         isOpenReportedPerson={isOpenReportedPerson}
                         setisOpenReportedPerson={setisOpenReportedPerson}
                         filter={filter}
+                        handleStatusChange={handleStatusChange}
                       />
                     ),
                   }
@@ -172,6 +174,7 @@ export default function TotalReportedPost({
           />
         ))}
       </Grid>
+      {statusConfirmDialog}
     </>
   );
 }

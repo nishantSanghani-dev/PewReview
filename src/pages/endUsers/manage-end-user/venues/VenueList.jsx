@@ -237,7 +237,6 @@ export default function VenueList() {
       console.log(showGunDetails);
     }, [setShowGunDetails]);
     return (
-      <>
         <td {...tdProps}>
           <div>
             {dataItem.totalGun > 0 ? (
@@ -260,14 +259,6 @@ export default function VenueList() {
             )}
           </div>
         </td>
-
-        {showGunDetails && (
-          <GunDetails
-            gunDetailsData={gunDetailsData}
-            setShowGunDetails={setShowGunDetails}
-          />
-        )}
-      </>
     );
   };
   const ActionCell = (props) => {
@@ -320,8 +311,9 @@ export default function VenueList() {
       <td {...tdProps}>
         <div className="approval-status-wrapper">
           <select
-            disabled={!venuePermission?.canUpdate}
+            disabled={true}
             className="approval-status-select"
+            
           >
             <option value={dataItem.approvalStatusName}>Approved</option>
             <option value={dataItem.approvalStatusName}>Rejected</option>
@@ -480,23 +472,9 @@ export default function VenueList() {
         aria-labelledby="nav-four-tab"
         tabIndex={0}
       >
-        <h2 className="accordion-header d-lg-none" id="headingFour">
-          <button
-            className="accordion-button collapsed"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#collapseFour"
-            aria-expanded="false"
-            aria-controls="collapseThree"
-          >
-            Activities
-          </button>
-        </h2>
         <div
           id="collapseFour"
-          className="accordion-collapse collapse d-lg-block"
-          aria-labelledby="headingFour"
-          data-bs-parent="#myTabContent"
+          className="accordion-collapse d-block"
         >
           <div className="accordion-body mt-3 mt-xxl-4">
             <div className="row">
@@ -593,6 +571,12 @@ export default function VenueList() {
             setSelectedVenueId(null);
           }}
           onConfirm={deleteVenue}
+        />
+      )}
+      {showGunDetails && (
+        <GunDetails
+          gunDetailsData={gunDetailsData}
+          setShowGunDetails={setShowGunDetails}
         />
       )}
       {statusConfirmDialog}

@@ -6,7 +6,6 @@ import { filterIcon } from '@progress/kendo-svg-icons'
 import { ColumnMenu } from '../../../components/grid/ColumnMenu'
 import { getBackendFilters } from '../../../components/grid/GridFilter'
 import { DateCell } from '../../activity/Activity';
-import { handleStatusChange } from '../../../utils/ChangeStatus';
 import { handleDelete } from '../../../utils/DeleteRecords';
 import AccessoriesAdd from './AccessoriesAdd';
 import BreadCumb from '../../../components/common/breadCumb/BreadCumb';
@@ -15,7 +14,8 @@ import useGridPagination from '../../../hooks/useGridPagination'
 import { usePermission } from '../../../hooks/UsePermission'
 import { MENU } from '../../../data/Menu'
 import useUserPermission from '../../../utils/UserPermission'
-import { Tooltip } from '@progress/kendo-react-tooltip';
+import { useStatusChange } from '../../../hooks/useStatusChange';
+import AleartDialog from '../../../components/common/AleartDialog';
 const ActionCell = (props) => {
     const item = props.dataItem;
 
@@ -44,7 +44,7 @@ const ActionCell = (props) => {
                     &&
 
                     <button
-                        onClick={() => handleDelete(item.accessoryId, "accessories", "accessoroesDelete", props.getAccessories)}
+                        onClick={() => props.handleDelete(item.accessoryId)}
                         type="button"
                         className="small-square-btn danger-btn"
                     >
@@ -67,35 +67,19 @@ const StatusCell = (props) => {
                     disabled={![props.accessoriesPermission.canUpdate]}
                     checked={props.dataItem.isActive}
                     readOnly
-                    onChange={(e) => handleStatusChange(props.dataItem.accessoryId, e.target.checked, "accessories", "accessoriesStatusUpdate", props.getAccessories)}
+                    onChange={(e) => props.handleStatusChange(props.dataItem.accessoryId, e.target.checked, "accessories", "accessoriesStatusUpdate")}
                 />
                 <label className="form-check-label"></label>
             </div>
         </td>
     );
 };
-const TextCell = ({ tdProps, dataItem, field }) => {
-    const value = dataItem[field];
+const TextCell = ({ tdProps, dataItem, field }) => (
+    <td {...tdProps}>
 
-    return (
-        <td {...tdProps}>
-            <Tooltip anchorElement="target" position="top">
-                <span
-                    title={value}
-                    style={{
-                        display: "inline-block",
-                        width: "100%",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                    }}
-                >
-                    {value ?? '-'}
-                </span>
-            </Tooltip>
-        </td>
-    );
-};
+        {dataItem[field] ?? "-"}
+    </td>
+);
 export default function Accessories() {
     const [accessoriesData, setaccessoriesData] = useState([])
     const [isAccessoriesOpen, setisAccessoriesOpen] = useState(false)
@@ -103,6 +87,8 @@ export default function Accessories() {
     const [searchText, setSearchText] = useState("")
     const [customSearch, setcustomSearch] = useState("")
     const [filters, setFilters] = useState([])
+    const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+    const [selectedAccessoryId, setSelectedAccessoryId] = useState(null)
     const {
         dataState,
         onDataStateChange,
@@ -124,6 +110,11 @@ export default function Accessories() {
         })
         setaccessoriesData(res.data.data)
 
+    }
+    const { handleStatusChange, statusConfirmDialog } = useStatusChange(getAccessories)
+    const handleDeleteAccessory = (accessoryId) => {
+        setSelectedAccessoryId(accessoryId)
+        setShowDeleteDialog(true)
     }
 
     const accessoriesColumn = [
@@ -201,7 +192,7 @@ export default function Accessories() {
                     </div>
                     <div className="row">
                         <div className="col-12 mt-3 mt-xxl-4">
-                            <div className="table-responsive">
+                            <div className="">
                                 <Grid
                                     className="table-wrapper"
                                     data={accessoriesData}
@@ -218,7 +209,6 @@ export default function Accessories() {
                                     sortable={{ allowUnsort: true, mode: 'single' }}
                                     sort={kendoSort}
                                     pageable={{
-                                        responsive: false,
                                         buttonCount: 5,
                                         pageSizes: [10, 20, 50],
                                         previousNext: true,
@@ -237,7 +227,6 @@ export default function Accessories() {
                                                     width={col.width || "150px"}
                                                     sortable={col.field === 'action' ? false : true}
                                                     pageable={{
-                                                        responsive: false,
                                                         buttonCount: 4,
                                                         pageSizes: [20, 50, 200],
                                                         previousNext: true,
@@ -252,6 +241,8 @@ export default function Accessories() {
                                                                         {...props}
                                                                         accessoriesPermission={accessoriesPermission}
                                                                         getAccessories={getAccessories}
+                                                                        handleStatusChange={handleStatusChange}
+                                                                        handleDelete={handleDeleteAccessory}
                                                                         setisAccessoriesOpen={setisAccessoriesOpen}
                                                                         setid={setid}
                                                                     />
@@ -286,6 +277,27 @@ export default function Accessories() {
                     getAccessories={getAccessories}
                 />
             }
+            {statusConfirmDialog}
+            {showDeleteDialog && (
+                <AleartDialog
+                    title="Confirm Delete"
+                    message="Are you sure you want to delete this accessory? This action cannot be undone."
+                    onCancel={() => {
+                        setShowDeleteDialog(false)
+                        setSelectedAccessoryId(null)
+                    }}
+                    onConfirm={async () => {
+                        await handleDelete(
+                            selectedAccessoryId,
+                            'accessories',
+                            'accessoroesDelete',
+                            getAccessories
+                        )
+                        setShowDeleteDialog(false)
+                        setSelectedAccessoryId(null)
+                    }}
+                />
+            )}
         </>
     )
 }

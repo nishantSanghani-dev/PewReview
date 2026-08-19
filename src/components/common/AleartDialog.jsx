@@ -19,24 +19,23 @@ export default function AleartDialog({
 
   return (
     <div
-      className="modal fade show d-block"
+      className="modal fade show d-block alert-dialog-modal"
       tabIndex="-1"
       style={{
         backgroundColor: 'rgba(0,0,0,0.55)',
       }}
     >
-      <div className="modal-dialog modal-dialog-centered">
+      <div className="modal-dialog modal-dialog-centered alert-dialog-dialog">
         <div
-          className="modal-content border-0"
+          className="modal-content border-0 alert-dialog-content"
           style={{
             borderRadius: '14px',
             overflow: 'hidden',
-            maxWidth: '500px',
             margin: 'auto',
           }}
         >
           {/* Header */}
-          <div className="modal-header border-bottom px-4 py-3">
+          <div className="modal-header border-bottom px-4 py-3 alert-dialog-header">
             <h3
               className="modal-title fw-bold mb-0"
               style={{ fontSize: '20px' }}
@@ -52,7 +51,7 @@ export default function AleartDialog({
           </div>
 
           {/* Body */}
-          <div className="modal-body px-4 py-3">
+          <div className="modal-body px-4 py-3 alert-dialog-body">
             <p
               className="mb-0 fw-semibold"
               style={{
@@ -65,7 +64,7 @@ export default function AleartDialog({
           </div>
 
           {/* Footer */}
-          <div className="modal-footer px-4 py-3">
+          <div className="modal-footer px-4 py-3 alert-dialog-footer">
             <button
               type="button"
               className="btn btn-outline-secondary"

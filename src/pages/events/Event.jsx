@@ -98,7 +98,7 @@ export default function Event() {
                 <div className="row">
                     <div className="col-12">
                         {/* Tab Nav (desktop only) */}
-                        <ul className="nav nav-tabs" id="myTab" role="tablist">
+                        <ul className="nav nav-tabs event-tabs" id="myTab" role="tablist">
                             <li className="nav-item" role="presentation">
                                 <button
                                     onClick={() => setSearchParams({ tab: 'upcomingEvents' })}

@@ -2,8 +2,8 @@ import { Grid, GridColumn } from '@progress/kendo-react-grid';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { DateCell } from '../activity/Activity';
-import { handleStatusChange } from '../../utils/ChangeStatus';
 import { Tooltip } from '@progress/kendo-react-tooltip';
+import { useStatusChange } from '../../hooks/useStatusChange';
 
 const ActionCell = (props) => {
   // console.log(props.dataItem.venueId);
@@ -28,7 +28,7 @@ const ActionCell = (props) => {
             checked={props.dataItem.isActive}
             readOnly
             onChange={(e) =>
-              handleStatusChange(
+              props.handleStatusChange(
                 props.dataItem.postId,
                 e.target.checked,
                 'activities',
@@ -64,6 +64,7 @@ const TextCell = ({ tdProps, dataItem, field }) => {
   );
 };
 export default function TopLikedPost({ topLikedPost, dashboardPermission }) {
+  const { handleStatusChange, statusConfirmDialog } = useStatusChange();
   const venueColumns = [
     { field: 'action', title: 'Action', cell: ActionCell, width: '80px' },
     { field: 'userName', title: 'Username' },
@@ -78,41 +79,45 @@ export default function TopLikedPost({ topLikedPost, dashboardPermission }) {
   ];
 
   return (
-    <Grid
-      className="table-wrapper  text-center"
-      data={topLikedPost}
+    <>
+      <Grid
+        className="table-wrapper  text-center"
+        data={topLikedPost}
 
-      pageable={{
-        responsive: false,
-        buttonCount: 5,
-        pageSizes: [10, 20, 50],
-        info: true,
-        previousNext: true,
-        type: 'numeric',
-      }}
-    >
-      {venueColumns.map((col) => (
-        <GridColumn
-          key={col.field}
-          field={col.field}
-          title={col.title}
-          width={col.width || '150px'}
-          cells={
-            col.cell
-              ? {
-                  data: (props) => (
-                    <col.cell
-                      {...props}
-                      dashboardPermission={dashboardPermission}
-                    />
-                  ),
-                }
-              : {
-                  data: (props) => <TextCell {...props} field={col.field} />,
-                }
-          }
-        />
-      ))}
-    </Grid>
+        pageable={{
+          responsive: false,
+          buttonCount: 5,
+          pageSizes: [10, 20, 50],
+          info: true,
+          previousNext: true,
+          type: 'numeric',
+        }}
+      >
+        {venueColumns.map((col) => (
+          <GridColumn
+            key={col.field}
+            field={col.field}
+            title={col.title}
+            width={col.width || '150px'}
+            cells={
+              col.cell
+                ? {
+                    data: (props) => (
+                      <col.cell
+                        {...props}
+                        dashboardPermission={dashboardPermission}
+                        handleStatusChange={handleStatusChange}
+                      />
+                    ),
+                  }
+                : {
+                    data: (props) => <TextCell {...props} field={col.field} />,
+                  }
+            }
+          />
+        ))}
+      </Grid>
+      {statusConfirmDialog}
+    </>
   );
 }

@@ -30,6 +30,7 @@ export const useStatusChange = (refreshData) => {
     );
     if (res.status && refreshData) {
       refreshData();
+      
     }
     setShowStatusDialog(false);
     setStatusData(null);

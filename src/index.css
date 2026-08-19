@@ -93,3 +93,173 @@
     display: block;
   }
 }
+
+.event-tabs.nav.nav-tabs {
+  display: inline-flex !important;
+  width: fit-content !important;
+  max-width: 100%;
+  flex-wrap: nowrap !important;
+  overflow-x: auto !important;
+  overflow-y: hidden;
+  vertical-align: top;
+}
+
+.event-tabs .nav-item {
+  flex: 0 0 auto;
+}
+
+.event-tabs .nav-link {
+  white-space: nowrap;
+}
+
+.gun-modal-overlay {
+  overflow-y: hidden;
+}
+
+@media (max-width: 991.98px) {
+  .gun-modal-overlay {
+    overflow-y: auto;
+  }
+}
+
+.venue-modal {
+  overflow-y: auto;
+  padding: 0.5rem 0;
+}
+
+.venue-modal .venue-modal-content {
+  border-radius: 14px !important;
+}
+
+.venue-modal .modal-dialog {
+  width: min(100% - 2rem, 1140px);
+  max-width: 1140px;
+  margin: 1rem auto;
+}
+
+.venue-modal .modal-body {
+  max-height: calc(100vh - 180px);
+  overflow-y: auto;
+  padding: 0.75rem 1.25rem !important;
+}
+
+.venue-modal .modal-header,
+.venue-modal .modal-footer {
+  padding: 0.75rem 1.25rem !important;
+}
+
+.venue-modal .form-control-custom,
+.venue-modal .custom-dropdown-toggle {
+  min-height: 46px;
+}
+
+.venue-modal .venue-map-box {
+  width: 100%;
+}
+
+.venue-modal .venue-phone-fields {
+  align-items: flex-start;
+}
+
+.venue-modal .venue-country-select {
+  flex: 0 0 35%;
+  width: 35% !important;
+  min-width: 100px;
+}
+
+.venue-modal .venue-phone-input {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.venue-modal .venue-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.venue-modal .venue-cancel-button,
+.venue-modal .venue-save-button {
+  min-width: 105px;
+  min-height: 40px;
+  border-radius: 10px;
+}
+
+.venue-modal .venue-save-button {
+  border: 0;
+  background: linear-gradient(90deg, #c1272d 0%, #771818 100%);
+}
+
+@media (max-width: 991.98px) {
+  .venue-modal {
+    padding: 0;
+  }
+
+  .venue-modal .modal-dialog {
+    width: 100%;
+    margin: 0;
+  }
+
+  .venue-modal .venue-modal-content {
+    min-height: 100vh;
+    border-radius: 0 !important;
+  }
+
+  .venue-modal .modal-body {
+    max-height: none;
+    overflow-y: visible;
+    padding: 0.75rem 1rem !important;
+  }
+
+  .venue-modal .modal-header,
+  .venue-modal .modal-footer {
+    padding: 0.75rem 1rem !important;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .venue-modal .modal-header,
+  .venue-modal .modal-body {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+
+  .venue-modal .modal-footer {
+    padding: 0.75rem !important;
+  }
+
+  .venue-modal .venue-form-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .venue-modal .venue-cancel-button,
+  .venue-modal .venue-save-button {
+    width: 100%;
+    margin: 0 !important;
+  }
+
+  .venue-modal .venue-phone-fields {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 0.5rem !important;
+  }
+
+  .venue-modal .venue-country-select {
+    flex: 0 0 35%;
+    width: 35% !important;
+    min-width: 0;
+  }
+
+  .venue-modal .venue-phone-input {
+    flex: 1 1 auto;
+    width: auto !important;
+    min-width: 0;
+  }
+
+  .venue-modal #map-container {
+    height: 260px !important;
+  }
+}

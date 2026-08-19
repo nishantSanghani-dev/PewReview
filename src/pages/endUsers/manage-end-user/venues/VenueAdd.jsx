@@ -651,7 +651,7 @@ export default function VenueAdd({
       <div
         className="modal-dialog modal-xl modal-dialog-centered"
       >
-        <div className="modal-content border-0 rounded-4 shadow">
+        <div className="modal-content border-0 rounded-4 shadow venue-modal-content">
           <form onSubmit={handleSubmit(handleSave)}>
             <div className="modal-header border-bottom px-4 py-3">
               <h4 className="modal-title fw-bold mb-0" style={{ fontSize: '20px' }}>
@@ -910,9 +910,9 @@ export default function VenueAdd({
                     Phone <span className="text-danger">*</span>
                   </label>
 
-                  <div className="d-flex gap-2">
+                  <div className="d-flex gap-2 venue-phone-fields">
                     <select
-                      className={`form-select form-control-custom ${errors.selectedCountryId ? 'is-invalid' : ''}`}
+                      className={`form-select form-control-custom venue-country-select ${errors.selectedCountryId ? 'is-invalid' : ''}`}
                       style={{ minWidth: '100px', width: '35%' }}
                       {...register('selectedCountryId')}
                       // onChange={(e) => {
@@ -940,7 +940,7 @@ export default function VenueAdd({
 
                     <input
                       type="text"
-                      className={`form-control form-control-custom ${errors.phone ? 'is-invalid' : ''}`}
+                      className={`form-control form-control-custom venue-phone-input ${errors.phone ? 'is-invalid' : ''}`}
                       {...register('phone')}
                     />
                     <input type="hidden" {...register('countryCode')} />
@@ -985,7 +985,7 @@ export default function VenueAdd({
                 </label>
 
                 <div
-                  className="map-box"
+                  className="map-box venue-map-box"
                   style={{
                     overflow: 'hidden',
                     borderRadius: '8px',
@@ -1231,20 +1231,20 @@ export default function VenueAdd({
               </div>
 
               {/* Buttons */}
-              <div className="text-end mt-4">
+              <div className="text-end mt-4 venue-form-actions">
                 <button
                   type="button"
                   onClick={() => {
                     setvenueAddBtn(false);
                     if (setEditVenueId) setEditVenueId(null);
                   }}
-                  className="btn btn-light px-4 me-2"
+                  className="btn btn-light px-4 me-2 venue-cancel-button"
                 >
                   Cancel
                 </button>
 
-                <button type="submit" className="btn btn-primary px-4">
-                  Save Venue
+                <button type="submit" className="btn text-white px-4 venue-save-button">
+                  Save
                 </button>
               </div>
             </div>

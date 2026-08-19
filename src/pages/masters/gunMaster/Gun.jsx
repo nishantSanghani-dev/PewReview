@@ -356,12 +356,11 @@ export default function Gun({
 
     const modalContent = (
         <div
-            className="modal fade show d-block"
+            className="modal fade show d-block gun-modal-overlay"
             tabIndex="-1"
             style={{
                 backgroundColor: 'rgba(0,0,0,0.55)',
                 zIndex: 9999,
-                overflowY: 'auto'
             }}
         >
             <div className="modal-dialog modal-dialog-centered modal-xl">

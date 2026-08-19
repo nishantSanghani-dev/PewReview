@@ -1,215 +1,169 @@
-import { TextFilterCell } from '@progress/kendo-react-data-tools';
 import { Grid, GridColumn } from '@progress/kendo-react-grid';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { DateCell } from '../UploadGun';
 import { Link } from 'react-router-dom';
 import GunDetails from '../../../../components/common/gunDetails/GunDetails';
 import { apiRequest } from '../../../../services/Api';
 import { API_ROUTES } from '../../../../routes/api.routes';
-import { useSelector } from 'react-redux';
 import useUserPermission from '../../../../utils/UserPermission';
-import { Tooltip } from '@progress/kendo-react-tooltip';
+import VenueAdd from './VenueAdd';
+import AleartDialog from '../../../../components/common/AleartDialog';
 
-const ActionCell = (props) => {
-  console.log(props.dataItem.venueId);
-
-  return (
+const ActionCell = (props) => (
     <td {...props.tdProps}>
-      <div className="d-flex gap-2 align-items-center">
-        {props.venuePermission?.canRead && (
-          <Link
-            to={`/admin/venues/view/${props.dataItem.venueId}`}
-
-            className="small-square-btn edit-btn"
-          >
-            <i className="demo-icon icon-eye-line"></i>
-          </Link>
-        )}
-
-        <a href="javascript:void(0)" className="small-square-btn edit-btn">
-          <i className="demo-icon icon-edit-1" />
-        </a>
-        <a href="javascript:void(0)" className="small-square-btn danger-btn">
-          <i className="demo-icon icon-delete-1"></i>
-        </a>
-      </div>
+        <div className="d-flex gap-2 align-items-center">
+            {props.venuePermission?.canRead && (
+                <Link to={`/admin/venues/view/${props.dataItem.venueId}`} className="small-square-btn edit-btn">
+                    <i className="demo-icon icon-eye-line" />
+                </Link>
+            )}
+            {props.venuePermission?.canUpdate && (
+                <button type="button" className="small-square-btn edit-btn" onClick={() => props.handleEdit(props.dataItem.venueId)}>
+                    <i className="demo-icon icon-edit-1" />
+                </button>
+            )}
+            {props.venuePermission?.canDelete && (
+                <button type="button" className="small-square-btn danger-btn" onClick={() => props.handleDelete(props.dataItem.venueId)}>
+                    <i className="demo-icon icon-delete-1" />
+                </button>
+            )}
+        </div>
     </td>
-  );
-};
-const AddressCell = (props) => {
-  const item = props.dataItem;
-  return (
-    <td {...props.tdProps}>
-      <div className="text-ellipsis">
-        <p className="mb-0">
-          {item.address || item.location || item.fullAddress || '-'}
-        </p>
-      </div>
-    </td>
-  );
-};
-const TextCell = ({ tdProps, dataItem, field }) => {
-  const value = dataItem[field];
+);
 
-  return (
+const AddressCell = ({ tdProps, dataItem }) => (
     <td {...tdProps}>
-      <Tooltip anchorElement="target" position="top">
-        <span
-          title={value}
-          style={{
-            display: 'inline-block',
-            width: '100%',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {value ?? '-'}
-        </span>
-      </Tooltip>
+        <div className="text-ellipsis">
+            <p className="mb-0">{dataItem.address || dataItem.location || dataItem.fullAddress || '-'}</p>
+        </div>
     </td>
-  );
-};
-const DetailCell = ({ tdProps, dataItem, field }) => {
-  return (
+);
+
+const TextCell = ({ tdProps, dataItem, field }) => <td {...tdProps}>{dataItem[field] ?? '-'}</td>;
+
+const DetailCell = ({ tdProps, dataItem }) => (
+    <td {...tdProps}><div className="text-ellipsis">{dataItem.description || '-'}</div></td>
+);
+
+const WebsiteCell = ({ tdProps, dataItem }) => (
     <td {...tdProps}>
-      <div className="text-ellipsis">{dataItem.description || '-'}</div>
+        <a target="_blank" rel="noreferrer" href={dataItem.website} className="text-primary">
+            {dataItem.website || '-'}
+        </a>
     </td>
-  );
-};
-const WebsiteCell = ({ tdProps, dataItem, field }) => (
-  <td {...tdProps}>
-    <a target="_blank" href={dataItem.website} className="text-primary">
-      {dataItem.website}
-    </a>
-  </td>
 );
 
 export default function Venues({ data }) {
-  const [showGunDetails, setShowGunDetails] = useState(false);
-  const [gunDetailsData, setgunDetailsData] = useState([]);
+    const [showGunDetails, setShowGunDetails] = useState(false);
+    const [gunDetailsData, setgunDetailsData] = useState([]);
+    const [venueAddBtn, setvenueAddBtn] = useState(false);
+    const [editVenueId, setEditVenueId] = useState(null);
+    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+    const [selectedVenueId, setSelectedVenueId] = useState(null);
+    const { venuePermission, gunMasterPermission } = useUserPermission();
 
-  const { venuePermission } = useUserPermission();
-  const getVenueGunDetails = async (venueId) => {
-    const res = await apiRequest(
-      'GET',
-      API_ROUTES.venue.getVenueGunDetails,
-      null,
-      {
-        venueId,
-      },
-      {
-        showLoader: true,
-      }
-    );
-    setgunDetailsData(res.data);
-  };
-  const GunCell = ({ tdProps, dataItem, setShowGunDetails }) => {
-    console.log(dataItem.venueId);
-    const { gunMasterPermission } = useUserPermission();
-    useEffect(() => {
-      console.log(showGunDetails);
-    }, [setShowGunDetails]);
-    return (
-      <>
+    const getVenueGunDetails = async (venueId) => {
+        const res = await apiRequest('GET', API_ROUTES.venue.getVenueGunDetails, null, { venueId }, { showLoader: true });
+        setgunDetailsData(res.data);
+    };
+
+    const handleEdit = (venueId) => {
+        setEditVenueId(venueId);
+        setvenueAddBtn(true);
+    };
+
+    const handleDelete = (venueId) => {
+        setSelectedVenueId(venueId);
+        setShowDeleteDialog(true);
+    };
+
+    const deleteVenue = async () => {
+        if (!selectedVenueId) return;
+        const res = await apiRequest('DELETE', API_ROUTES.venue.venueDelete(selectedVenueId), null, null, {
+            showLoader: true,
+            showToaster: true,
+        });
+        if (res.status) {
+            setShowDeleteDialog(false);
+            setSelectedVenueId(null);
+        }
+    };
+
+    const GunCell = ({ tdProps, dataItem }) => (
         <td {...tdProps}>
-          <div>
-            {gunMasterPermission?.canRead ? (
-              <Link
-                onClick={() => {
-                  setShowGunDetails(true);
-                  getVenueGunDetails(dataItem.venueId);
-                }}
-                className="text-primary"
-                style={{ cursor: 'pointer' }}
-              >
-                {dataItem.totalGun || '-'}
-              </Link>
+            {dataItem.totalGun > 0 && gunMasterPermission?.canRead ? (
+                <Link
+                    onClick={() => {
+                        setShowGunDetails(true);
+                        getVenueGunDetails(dataItem.venueId);
+                    }}
+                    className="text-primary"
+                    style={{ cursor: 'pointer' }}
+                >
+                    {dataItem.totalGun}
+                </Link>
             ) : (
-              <span> {dataItem.totalGun || '-'}</span>
+                dataItem.totalGun || 0
             )}
-          </div>
         </td>
-
-        {showGunDetails && (
-          <GunDetails
-            gunDetailsData={gunDetailsData}
-            setShowGunDetails={setShowGunDetails}
-          />
-        )}
-      </>
     );
-  };
-  const venueColumns = [
-    { field: 'action', title: 'Action', cell: ActionCell, width: '130px' },
-    { field: 'venueName', title: 'Venue Name' },
-    { field: 'description', title: 'Description', cell: DetailCell },
-    { field: 'website', title: 'Website', cell: WebsiteCell },
-    { field: 'phone', title: 'Phone' },
-    { field: 'address', title: 'Address', cell: AddressCell },
-    { field: 'totalGun', title: 'No. of Gun', cell: GunCell },
-    { field: 'venueTypeName', title: 'Type' },
-    { field: 'approvalStatusName', title: 'Approval Status' },
-    { field: 'avgRate', title: 'Avg Venue Ratings' },
-    { field: 'noOfChackin', title: 'No. of Check-Ins' },
-    { field: 'noOfEvent', title: 'No. of Event Created' },
-    { field: 'createdOn', title: 'Created On', cell: DateCell },
-    { field: 'approvalStatusName', title: 'Approval Status' },
-  ];
-  return (
-    <div
-      id="collapseTwo"
-      className="accordion-collapse collapse show d-lg-block"
-      aria-labelledby="headingTwo"
-      data-bs-parent="#myTabContent"
-    >
-      <div className="accordion-body mt-3 mt-xxl-4">
-        <div className="row">
-          <div className="col-12">
-            <div className="table-responsive">
-              <Grid
-                className="table-wrapper  text-center"
-                data={data}
-                sortable
-                pageable={{
-                  responsive: false,
-                  buttonCount: 5,
-                  pageSizes: [10, 20, 50],
-                  info: true,
-                  previousNext: true,
-                  type: 'numeric',
-                }}
-              >
-                {venueColumns.map((col) => (
-                  <GridColumn
-                    key={col.field}
-                    field={col.field}
-                    title={col.title}
-                    width={col.width || '150px'}
-                    cells={
-                      col.cell
-                        ? {
-                            data: (props) => (
-                              <col.cell
-                                {...props}
-                                venuePermission={venuePermission}
-                                setShowGunDetails={setShowGunDetails}
-                              />
-                            ),
-                          }
-                        : {
-                            data: (props) => (
-                              <TextCell {...props} field={col.field} />
-                            ),
-                          }
-                    }
-                  />
-                ))}
-              </Grid>
+
+    const venueColumns = [
+        { field: 'action', title: 'Action', cell: ActionCell, width: '130px' },
+        { field: 'venueName', title: 'Venue Name' },
+        { field: 'description', title: 'Description', cell: DetailCell },
+        { field: 'website', title: 'Website', cell: WebsiteCell },
+        { field: 'phone', title: 'Phone' },
+        { field: 'address', title: 'Address', cell: AddressCell },
+        { field: 'totalGun', title: 'No. of Gun', cell: GunCell },
+        { field: 'venueTypeName', title: 'Type' },
+        { field: 'approvalStatusName', title: 'Approval Status' },
+        { field: 'avgRate', title: 'Avg Venue Ratings' },
+        { field: 'noOfChackin', title: 'No. of Check-Ins' },
+        { field: 'noOfEvent', title: 'No. of Event Created' },
+        { field: 'createdOn', title: 'Created On', cell: DateCell },
+    ];
+
+    return (
+        <>
+            <div id="collapseTwo" className="accordion-collapse collapse show d-lg-block" aria-labelledby="headingTwo" data-bs-parent="#myTabContent">
+                <div className="accordion-body mt-3 mt-xxl-4">
+                    <div className="row">
+                        <div className="col-12">
+                            <div className="table-responsive">
+                                <Grid className="table-wrapper text-center" data={data} sortable pageable={{ buttonCount: 5, pageSizes: [10, 20, 50], info: true, previousNext: true, type: 'numeric' }}>
+                                    {venueColumns.map((col) => (
+                                        <GridColumn
+                                            key={col.field}
+                                            field={col.field}
+                                            title={col.title}
+                                            width={col.width || '150px'}
+                                            cells={col.cell ? {
+                                                data: (props) => <col.cell {...props} venuePermission={venuePermission} handleEdit={handleEdit} handleDelete={handleDelete} />,
+                                            } : {
+                                                data: (props) => <TextCell {...props} field={col.field} />,
+                                            }}
+                                        />
+                                    ))}
+                                </Grid>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+            {venueAddBtn && <VenueAdd setvenueAddBtn={setvenueAddBtn} editVenueId={editVenueId} setEditVenueId={setEditVenueId} />}
+            {showDeleteDialog && (
+                <AleartDialog
+                    title="Confirm Delete"
+                    message="Are you sure you want to delete this venue? This action cannot be undone."
+                    onCancel={() => {
+                        setShowDeleteDialog(false);
+                        setSelectedVenueId(null);
+                    }}
+                    onConfirm={deleteVenue}
+                />
+            )}
+            {showGunDetails && <GunDetails gunDetailsData={gunDetailsData} setShowGunDetails={setShowGunDetails} />}
+        </>
+    );
 }
