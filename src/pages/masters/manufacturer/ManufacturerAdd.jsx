@@ -4,6 +4,7 @@ import { API_ROUTES } from '../../../routes/api.routes';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { manufecturerSchema } from '../../../validation/zod.validation';
+import { onInvalidSubmit } from '../../../utils/InvalidSubmit';
 
 export default function ManufacturerAdd({
   id,
@@ -14,6 +15,8 @@ export default function ManufacturerAdd({
   const {
     register,
     handleSubmit,
+    getValues,
+    setValue,
     formState: { errors },
     reset,
   } = useForm({
@@ -41,7 +44,11 @@ export default function ManufacturerAdd({
       });
     }
   };
+  const fieldsToTrim = [
+    'name'
+  ]
   const onSubmit = async (data) => {
+
     let res;
     if (id) {
       data.id = id;
@@ -113,7 +120,7 @@ export default function ManufacturerAdd({
           </div>
 
           {/* Body */}
-          <form onSubmit={handleSubmit(onSubmit)}>
+          <form onSubmit={handleSubmit(onSubmit, () => { onInvalidSubmit(fieldsToTrim, getValues, setValue) })}>
             <div className="modal-body px-4 py-3">
               {/* Prohibited Word */}
               <div className="form-group mb-3">
