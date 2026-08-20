@@ -91,14 +91,13 @@ export default function Header({ mobileSlideBar, setmobileSlideBar }) {
                                         </ul> */}
                   </li>
                   <li className="dropdown no-arrow notification">
-                    <a
-                      href="javascript:void(0);"
+                    <Link
+                      to="/admin/notification"
                       className="dropdown-toggle"
-                      data-bs-toggle="dropdown"
                     >
                       <i className="demo-icon icon-bell" />
                       <span />
-                    </a>
+                    </Link>
                   </li>
                 </ul>
               </div>
@@ -127,11 +126,11 @@ export default function Header({ mobileSlideBar, setmobileSlideBar }) {
                     </li>
                     <li>
                       <a
-                     
+
                         onClick={() => setShowLogoutDialog(true)}
                         className="dropdown-item"
-                        style={{cursor:"pointer"}}
-                       
+                        style={{ cursor: "pointer" }}
+
                       >
                         Logout
                       </a>

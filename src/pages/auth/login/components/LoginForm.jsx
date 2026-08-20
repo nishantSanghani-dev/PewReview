@@ -19,6 +19,7 @@ export default function LoginForm() {
   // console.log(token);
   const permission = usePermission();
   const [shouldRedirect, setShouldRedirect] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   // console.log(permission);
   const rememberedEmail = Cookies.get('rememberedEmail');
   const rememberedPassword = Cookies.get('rememberedPassword')
@@ -125,13 +126,25 @@ export default function LoginForm() {
           <label htmlFor="password" className="fw-semibold">
             Password
           </label>
-          <input
-            type="password"
-            name="password"
-            {...register('password')}
-            className={`form-control ${touchedFields.password && errors.password && 'border-danger'}`}
-            placeholder="Enter Your Password"
-          />
+          <div className="password-input-group">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              name="password"
+              {...register('password')}
+              className={`form-control ${touchedFields.password && errors.password && 'border-danger'}`}
+              placeholder="Enter Your Password"
+            />
+            <button
+              type="button"
+              className="password-eye-btn"
+              onClick={() => setShowPassword((prev) => !prev)}
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+            >
+              <i
+                className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}
+              ></i>
+            </button>
+          </div>
           <p className="text-danger">
             {touchedFields.password && errors.password?.message}
           </p>

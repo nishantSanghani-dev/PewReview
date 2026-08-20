@@ -20,9 +20,6 @@ export default function MediaController({
         if (!show) {
             return;
         }
-
-    
-
         return () => {
        
             document.body.classList.remove("media-modal-open");

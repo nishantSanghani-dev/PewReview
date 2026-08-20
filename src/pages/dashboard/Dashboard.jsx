@@ -82,7 +82,7 @@ export default function Dashboard() {
             <div className="col-12 col-md">
               <h2 className="page-title">Welcome to Dashboard, John!</h2>
             </div>
-            {/* <div className="col-12 col-sm-6 col-md-5 col-lg-3">
+            <div className="col-12 col-sm-6 col-md-5 col-lg-3">
               <select
                 onChange={(e) => {
                   setfilter(e.target.value);
@@ -97,7 +97,7 @@ export default function Dashboard() {
                   </option>
                 ))}
               </select>
-            </div> */}
+            </div>
           </div>
         </div>
 

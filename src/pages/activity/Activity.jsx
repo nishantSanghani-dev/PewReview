@@ -71,6 +71,7 @@ const ImagesVdeo = ({ tdProps, dataItem, handleImageClick, setShowMediaModal }) 
                 key={index}
                 width="50"
                 height="50"
+                onClick={() => handleImageClick(value, attachments)}
                 src={value}
                 className="rounded flex-shrink-0"
               />
@@ -134,7 +135,7 @@ const StatusCell = (props) => {
   );
 };
 export const DateCell = ({ tdProps, dataItem, field }) => {
- 
+
 
   return (
     <td {...tdProps}>

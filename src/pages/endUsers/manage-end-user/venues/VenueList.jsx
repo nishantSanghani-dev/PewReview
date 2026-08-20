@@ -372,8 +372,7 @@ export default function VenueList() {
       field: 'totalGun',
       title: 'No. of Guns',
       cell: GunCell,
-      filter: 'numeric',
-      columnMenu: ColumnMenu,
+
     },
     {
       field: 'avgRate',
@@ -410,8 +409,7 @@ export default function VenueList() {
       field: 'approvalStatusName',
       title: 'Approval Status',
       cell: ApprovalStatusCell,
-      filter: 'text',
-      columnMenu: ColumnMenu,
+      filter: 'text'
     },
     { field: 'isActive', title: 'Status', cell: StatusCell, filter: 'boolean' },
   ];
@@ -521,7 +519,7 @@ export default function VenueList() {
                         key={col.field}
                         field={col.field}
                         title={col.title}
-                        sortable={col.field === 'action' ? false : true}
+                        sortable={col.field === 'action' || col.field==='approvalStatusName'? false : true}
                         width={col.width || '150px'}
                         filterable={col.filter !== false}
                         filter={col.filter}

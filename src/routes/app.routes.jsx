@@ -37,6 +37,7 @@ import Profile from '../pages/profile/Profile';
 import ForgotPassword from '../pages/auth/forgot-password/ForgotPassword';
 import PermissionRoute from './PermissionRoute';
 import { MENU } from '../data/Menu';
+import Notification from '../pages/notification/Notification';
 
 export const routes = createBrowserRouter([
   {
@@ -336,6 +337,10 @@ export const routes = createBrowserRouter([
             <LeaderBoard />
           </PermissionRoute>
         ),
+      },
+      {
+        path: "notification",
+        element: <Notification />
       },
       {
         path: 'profile',

@@ -2,6 +2,8 @@
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { setGlobalLoader } from '../context/LoaderProvider';
+import { logOut } from '../slice/user.slice';
+import { store } from '../store/store';
 
 const apiOp = {
   showToaster: false,
@@ -91,13 +93,12 @@ export const apiRequest = async (
     }
     return responseMessage;
   } catch (error) {
-    console.log(error.response.status === 401);
-    if (error.response.status === 401) {
+    if (error.response?.status === 401) {
       mergedApiOption.showToaster = false;
-      localStorage.removeItem('TOKEN');
+      store.dispatch(logOut());
+      window.location.replace('/');
     }
-    console.log(error.response.data.strError);
-    if (error.response.data.strError) {
+    if (error.response?.data?.strError) {
       toast.error(error.response.data.strError);
       return;
     }

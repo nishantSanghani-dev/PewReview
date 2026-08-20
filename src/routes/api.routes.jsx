@@ -19,7 +19,7 @@ export const API_ROUTES = {
     endUserView: 'EndUser/GetUsers',
     endUserSingleView: (id) => `EndUser/${id}`,
     endUserDropDown: 'EndUser/GetEndUserDropdown',
-    endUserDelete:  `EndUser`,
+    endUserDelete: `EndUser`,
     endUserStatusUpdate: (id) => `EndUser/UpdateStatus/${id}`,
     endUserVerifyUpdate: (id) => `EndUser/EndUserVerify/${id}`
   },
@@ -143,4 +143,7 @@ export const API_ROUTES = {
   report: {
     getReport: 'Report/GetUserReportList',
   },
+  notification: {
+    getNotification: "Notifications/GetNotifications"
+  }
 };
