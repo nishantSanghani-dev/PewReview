@@ -74,6 +74,7 @@ const ImagesVdeo = ({ tdProps, dataItem, handleImageClick, setShowMediaModal }) 
                 onClick={() => handleImageClick(value, attachments)}
                 src={value}
                 className="rounded flex-shrink-0"
+                style={{ cursor: 'pointer',}}
               />
             ) : (
               <img
@@ -84,7 +85,7 @@ const ImagesVdeo = ({ tdProps, dataItem, handleImageClick, setShowMediaModal }) 
                 width="50"
                 height="50"
                 className="rounded flex-shrink-0"
-                style={{ objectFit: 'cover' }}
+                style={{ objectFit: 'cover', cursor: 'pointer', }}
               />
             )
           )}
@@ -92,12 +93,14 @@ const ImagesVdeo = ({ tdProps, dataItem, handleImageClick, setShowMediaModal }) 
           {remainingCount > 0 && (
             <div
               className="rounded d-flex align-items-center justify-content-center flex-shrink-0"
+              onClick={() => handleImageClick(attachments[2], attachments)}
               style={{
                 width: '50px',
                 height: '50px',
                 backgroundColor: '#f0f0f0',
                 fontWeight: '600',
                 fontSize: '14px',
+                cursor: 'pointer',
               }}
             >
               +{remainingCount}

@@ -5,6 +5,7 @@ import { API_ROUTES } from '../../../routes/api.routes';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { categorySchema } from '../../../validation/zod.validation';
 import { useForm } from 'react-hook-form';
+import { onInvalidSubmit } from '../../../utils/InvalidSubmit';
 export default function CategoryModel({ isCategoryOpen, setisCategoryOpen }) {
   const [categoryData, setcategoryData] = useState([]);
   const [applicationForData, setapplicationForData] = useState([]);
@@ -33,10 +34,15 @@ export default function CategoryModel({ isCategoryOpen, setisCategoryOpen }) {
     );
     setapplicationForData(res.data);
   };
-
+  const fieldToTrim = [
+    'categoryName',
+    'description'
+  ]
   const {
     register,
     handleSubmit,
+    getValues,
+    setValue,
     formState: { errors, touchedFields },
     reset,
   } = useForm({
@@ -49,9 +55,24 @@ export default function CategoryModel({ isCategoryOpen, setisCategoryOpen }) {
     },
   });
 
+
+
+
+  // const onInvalidSubmit = () => {
+  //   const categoryName = getValues('categoryName');
+  //   if (typeof categoryName === 'string') {
+  //     setValue('categoryName', categoryName.trim(), {
+  //       shouldValidate: true,
+  //     });
+  //   }
+  // };
+
+
   const onSubmit = async (data) => {
     const payload = {
       ...data,
+      categoryName: data.categoryName.trim(),
+      description: data.description.trim(),
       applicationFor: Number(data.applicationFor),
     };
 
@@ -114,7 +135,9 @@ export default function CategoryModel({ isCategoryOpen, setisCategoryOpen }) {
           </div>
 
           {/* Body */}
-          <form onSubmit={handleSubmit(onSubmit)}>
+          <form
+            onSubmit={handleSubmit(onSubmit, () => { onInvalidSubmit(fieldToTrim, getValues, setValue) })}
+          >
             <div className="modal-body px-4 py-3">
               {/* Applicable For */}
               <div className="mb-4">

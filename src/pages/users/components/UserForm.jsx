@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { Calendar } from '@progress/kendo-react-dateinputs';
 import { Switch } from '@progress/kendo-react-inputs';
 import { Label } from '@progress/kendo-react-labels';
+import { onInvalidSubmit } from '../../../utils/InvalidSubmit';
 
 export default function UserForm({
   userRoleData,
@@ -30,12 +31,23 @@ export default function UserForm({
     register,
     control,
     handleSubmit,
+    getValues,
+    setValue,
     reset,
     formState: { errors, touchedFields },
   } = useForm({
     resolver: zodResolver(userSchema),
     mode: 'onBlur',
   });
+
+  const fieldsToTrim = [
+    'firstName',
+    'lastName',
+    'userName',
+    'address',
+    'contactNumber',
+    'email',
+  ];
 
   const formatDate = (value) => {
     if (!value) return '';
@@ -99,9 +111,9 @@ export default function UserForm({
     );
     const selectedCountryDetails = selectedCountry
       ? {
-          countryCode: selectedCountry.phoneInternationalCode,
-          countryCodeName: selectedCountry.countryCode,
-        }
+        countryCode: selectedCountry.phoneInternationalCode,
+        countryCodeName: selectedCountry.countryCode,
+      }
       : countryDetails;
 
     data.countryCode =
@@ -121,8 +133,8 @@ export default function UserForm({
           userId: id,
         },
         null,
-          {
-            showLoader: true,
+        {
+          showLoader: true,
           showToaster: true,
         }
       );
@@ -145,8 +157,8 @@ export default function UserForm({
       {
         Id: id,
       },
-        {
-          showLoader: false,
+      {
+        showLoader: false,
       }
     );
 
@@ -163,9 +175,9 @@ export default function UserForm({
       const countryIdForSelect = matchedCountry ? matchedCountry.countryId : '';
       const countryDetailsFromMatch = matchedCountry
         ? {
-            countryCode: matchedCountry.phoneInternationalCode,
-            countryCodeName: matchedCountry.countryCode,
-          }
+          countryCode: matchedCountry.phoneInternationalCode,
+          countryCodeName: matchedCountry.countryCode,
+        }
         : {};
 
       setcountryDetails(countryDetailsFromMatch);
@@ -192,7 +204,12 @@ export default function UserForm({
   }, [userSingleData, countryData]);
 
   return (
-    <form onSubmit={handleSubmit(userAddForm)} className="mt-3 mt-xxl-4">
+    <form
+      onSubmit={handleSubmit(userAddForm, () =>
+        onInvalidSubmit(fieldsToTrim, getValues, setValue)
+      )}
+      className="mt-3 mt-xxl-4"
+    >
       <fieldset className="row">
         <div className="col-12">
           <div className="field d-flex align-items-center gap-3">
